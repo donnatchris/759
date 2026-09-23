@@ -18,7 +18,7 @@ export function Category({ dishCategory, imagePriority = false }: Props) {
   return (
     <div>
       <div
-        className="grid scroll-mt-24 overflow-hidden rounded-2xl border-2 border-primary bg-card shadow-[5px_5px_0_var(--primary)] lg:grid-cols-[.65fr_1.35fr]"
+        className="grid scroll-mt-24 overflow-hidden rounded-sm border border-border bg-card lg:grid-cols-[.65fr_1.35fr]"
         id={id}
       >
         <div className="group relative flex min-h-72 flex-col justify-end gap-2 overflow-hidden bg-primary p-8 text-primary-foreground">
@@ -40,7 +40,7 @@ export function Category({ dishCategory, imagePriority = false }: Props) {
           <p className="relative z-10 mb-2 text-xs font-bold uppercase tracking-widest">
             À la table
           </p>
-          <h3 className="relative z-10 mb-4 font-heading text-5xl font-normal uppercase tracking-tight">
+          <h3 className="relative z-10 mb-4 font-heading text-4xl font-semibold tracking-tight">
             {dishCategory.label}
           </h3>
           <p className="relative z-10 whitespace-pre-line text-sm leading-6 text-primary-foreground/75">

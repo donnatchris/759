@@ -26,8 +26,8 @@ export function CurrentEventCard({ currentEvent }: Props) {
   );
 
   return (
-    <article className="relative grid overflow-hidden rounded-[1.5rem] border-2 border-primary bg-card shadow-[6px_6px_0_var(--primary)] md:grid-cols-[18rem_1fr]">
-      <aside className="relative flex flex-col bg-heritage-ink p-6 text-heritage-paper md:border-r-2 md:border-heritage-ink">
+    <article className="relative grid overflow-hidden rounded-sm border border-border bg-card md:grid-cols-[18rem_1fr]">
+      <aside className="relative flex flex-col bg-heritage-ink p-6 text-heritage-paper md:border-r md:border-heritage-ink">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <span className="text-xs font-semibold uppercase tracking-widest">
             À l’affiche
@@ -35,14 +35,14 @@ export function CurrentEventCard({ currentEvent }: Props) {
           {currentEvent.tag && (
             <Badge
               variant="outline"
-              className="rounded-full border-heritage-gold px-3 py-3 text-heritage-gold"
+              className="rounded-sm border-heritage-gold px-3 py-3 text-heritage-gold"
             >
               {currentEvent.tag}
             </Badge>
           )}
         </div>
         {currentEvent.imageUrl && (
-          <div className="relative aspect-square overflow-hidden rounded-full border-2 border-heritage-paper">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-heritage-paper/25">
             <Image
               src={currentEvent.imageUrl}
               alt={currentEvent.title}
@@ -63,7 +63,7 @@ export function CurrentEventCard({ currentEvent }: Props) {
           <EditCurrentEventAdminButton currentEvent={currentEvent} />
           <DeleteCurrentEvent id={currentEvent.id} />
         </div>
-        <h2 className="mt-3 font-heading text-4xl font-normal uppercase leading-tight tracking-tight sm:text-4xl">
+        <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
           {currentEvent.title}
         </h2>
         {currentEvent.subTitle && (

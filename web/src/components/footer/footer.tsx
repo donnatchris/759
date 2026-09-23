@@ -53,9 +53,9 @@ export function Footer({ siteSettings }: Props) {
     <footer className="overflow-hidden border-t border-heritage-gold/30 bg-heritage-ink text-heritage-paper">
       <div
         aria-hidden="true"
-        className="mx-auto max-w-7xl border-b border-heritage-gold/20 px-8 py-12 font-heading text-6xl uppercase leading-none text-heritage-gold sm:text-8xl"
+        className="mx-auto max-w-7xl border-b border-heritage-gold/20 px-8 py-12 font-heading text-4xl leading-tight text-heritage-paper sm:text-6xl"
       >
-        À la prochaine tablée.
+        Le goût d’être ensemble.
       </div>
       <div className="container mx-auto flex flex-col gap-12 px-6 py-16 text-sm sm:grid sm:grid-cols-[1.35fr_1fr_1fr] sm:px-8 lg:py-20">
         <div>

@@ -35,7 +35,7 @@ export function OpeningSlots({
   return (
     <section className="relative overflow-hidden border-y-2 border-heritage-ink bg-heritage-ink px-6 py-16 text-heritage-paper sm:px-10 sm:py-24">
       <div
-        className="absolute inset-0 opacity-[0.06] [background-image:radial-gradient(circle_at_center,#fff_1px,transparent_1px)] [background-size:18px_18px]"
+        className="absolute inset-y-0 right-0 w-2 bg-[repeating-linear-gradient(0deg,var(--heritage-gold)_0_20px,var(--heritage-red)_20px_36px)]"
         aria-hidden="true"
       />
       <div className="absolute right-4 top-4 z-20 flex items-center gap-1">
@@ -54,7 +54,7 @@ export function OpeningSlots({
             )}
 
             {title && (
-              <h2 className="font-heading text-6xl font-normal uppercase leading-[.95] tracking-tight text-heritage-paper sm:text-6xl">
+              <h2 className="font-heading text-5xl font-semibold leading-[.95] tracking-tight text-heritage-paper sm:text-6xl">
                 {title}
               </h2>
             )}
@@ -93,7 +93,7 @@ export function OpeningSlots({
           </div>
 
           <div className="relative">
-            <div className="divide-y-2 divide-heritage-ink rounded-2xl border-2 border-heritage-ink bg-heritage-paper px-5 shadow-[8px_8px_0_var(--heritage-gold)] sm:px-8">
+            <div className="divide-y divide-heritage-ink/15 border-t-4 border-heritage-gold bg-heritage-paper px-5 sm:px-8">
               {OPENING_SLOT_DAY_LABELS.map((label, dayOfWeek) => {
                 const daySlots = (slotsByDay.get(dayOfWeek) ?? []).sort(
                   (a, b) => a.slotIndex - b.slotIndex,

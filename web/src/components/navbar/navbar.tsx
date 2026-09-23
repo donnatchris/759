@@ -51,7 +51,7 @@ export function Navbar({
   }
 
   return (
-    <nav className="sticky top-0 z-50 flex h-20 w-full items-center border-b-2 border-border bg-card px-4 sm:px-8">
+    <nav className="sticky top-0 z-50 flex h-20 w-full items-center border-b border-border bg-card px-4 before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-[linear-gradient(90deg,var(--heritage-ink)_0_33.33%,var(--heritage-paper)_33.33%_66.66%,var(--heritage-red)_66.66%)] sm:px-8">
       <div className="mr-auto">
         <LogoLink size={170} name={siteName} />
       </div>
@@ -59,13 +59,13 @@ export function Navbar({
       <div className="mr-5 hidden items-center gap-5 lg:flex">
         <Link
           href="/#horaires"
-          className="rounded-full border-2 border-transparent px-3 py-2.5 text-xs font-bold text-foreground transition hover:border-primary hover:bg-secondary"
+          className="border-b-2 border-transparent px-2 py-2.5 text-xs font-semibold text-foreground transition hover:border-accent hover:text-accent"
         >
           Nous retrouver
         </Link>
         <Link
           href="/menu"
-          className="rounded-full border-2 border-transparent px-3 py-2.5 text-xs font-bold text-foreground transition hover:border-primary hover:bg-secondary"
+          className="border-b-2 border-transparent px-2 py-2.5 text-xs font-semibold text-foreground transition hover:border-accent hover:text-accent"
         >
           À la table
         </Link>
@@ -77,13 +77,13 @@ export function Navbar({
 				</Link> */}
         <Link
           href="/actualites"
-          className="rounded-full border-2 border-transparent px-3 py-2.5 text-xs font-bold text-foreground transition hover:border-primary hover:bg-secondary"
+          className="border-b-2 border-transparent px-2 py-2.5 text-xs font-semibold text-foreground transition hover:border-accent hover:text-accent"
         >
           Rendez-vous
         </Link>
         <Link
           href="/"
-          className="rounded-full border-2 border-transparent px-3 py-2.5 text-xs font-bold text-foreground transition hover:border-primary hover:bg-secondary"
+          className="border-b-2 border-transparent px-2 py-2.5 text-xs font-semibold text-foreground transition hover:border-accent hover:text-accent"
         >
           L’association
         </Link>
