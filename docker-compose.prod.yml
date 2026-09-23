@@ -1,0 +1,37 @@
+###################################################################################################
+# Production deployment for Dokploy's Docker Compose mode.
+# Runtime environment variables are managed in Dokploy and written to .env.
+###################################################################################################
+
+services:
+  # migrate:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: migrator
+  #   env_file:
+  #     - .env
+  #   restart: "no"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL must be set}
+        SITE_FULL_NAME: ${SITE_FULL_NAME:?SITE_FULL_NAME must be set}
+        SITE_SHORT_NAME: ${SITE_SHORT_NAME:?SITE_SHORT_NAME must be set}
+    env_file:
+      - .env
+      # depends_on:
+      # migrate:
+      #   condition: service_completed_successfully
+    expose:
+      - "3000"
+    volumes:
+      - uploaded_images:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  uploaded_images:
+    name: ${SITE_NAME:?SITE_NAME must be set}-uploads

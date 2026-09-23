@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Image à personnaliser</title>
+  <desc id="description">Emplacement réservé pour l'identité visuelle du site.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff7ed"/>
+      <stop offset="1" stop-color="#fed7aa"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#background)"/>
+  <circle cx="600" cy="250" r="82" fill="#ea580c" opacity=".9"/>
+  <path d="M565 250h70M600 215v70" stroke="#fff" stroke-width="18" stroke-linecap="round"/>
+  <text x="600" y="390" text-anchor="middle" fill="#7c2d12" font-family="Arial, sans-serif" font-size="42" font-weight="700">Votre image ici</text>
+  <text x="600" y="445" text-anchor="middle" fill="#9a3412" font-family="Arial, sans-serif" font-size="24">Remplacez les médias avant la mise en production</text>
+</svg>

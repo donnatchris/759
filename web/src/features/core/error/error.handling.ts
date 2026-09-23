@@ -1,0 +1,49 @@
+import { AppError } from './error.AppError';
+
+export const ERROR_CODES = {
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  NOT_FOUND: 'NOT_FOUND',
+  INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+  BAD_REQUEST: 'BAD_REQUEST',
+  DATABASE_ERROR: 'DATABASE_ERROR',
+  SERVICE_ERROR: 'SERVICE_ERROR',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+  FILE_SYSTEM_ERROR: 'FILE_SYSTEM_ERROR',
+  MAX_FILES_ERROR: 'MAX_FILES_ERROR',
+  MAX_FILE_SIZE_ERROR: 'MAX_FILE_SIZE_ERROR',
+  INVALID_FILE_TYPE: 'INVALID_FILE_TYPE',
+  USER_ALREADY_EXISTS: 'USER_ALREADY_EXISTS',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  RESSOURCE_IN_USE: 'RESSOURCE_IN_USE',
+  SERVICE_NOT_BOOKABLE: 'SERVICE_NOT_BOOKABLE',
+  USER_PHONE_REQUIRED: 'USER_PHONE_REQUIRED',
+  USER_CANNOT_BOOK: 'USER_CANNOT_BOOK',
+  LEGAL_TERMS_ACCEPTANCE_REQUIRED: 'LEGAL_TERMS_ACCEPTANCE_REQUIRED',
+  ADMIN_ACCOUNT_PROTECTED: 'ADMIN_ACCOUNT_PROTECTED',
+  ADMIN_ROLE_PROTECTED: 'ADMIN_ROLE_PROTECTED',
+  STAFF_ACCOUNT_ADMIN_ONLY: 'STAFF_ACCOUNT_ADMIN_ONLY',
+  STAFF_PERMISSIONS_ONLY: 'STAFF_PERMISSIONS_ONLY',
+  USER_HAS_UPCOMING_RESERVATIONS: 'USER_HAS_UPCOMING_RESERVATIONS',
+  RESERVATION_CANNOT_BE_CANCELLED: 'RESERVATION_CANNOT_BE_CANCELLED',
+} as const;
+
+export type TErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
+
+export function isClassAppError(error: unknown): error is AppError {
+  return error instanceof AppError;
+}
+
+export function isAppError(error: unknown): error is { code: TErrorCode } {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof error.code === 'string' &&
+    Object.values(ERROR_CODES).includes(error.code as TErrorCode)
+  );
+}
+
+export function getErrorCodeFromError(error: unknown): TErrorCode {
+  return isAppError(error) ? error.code : ERROR_CODES.UNKNOWN_ERROR;
+}

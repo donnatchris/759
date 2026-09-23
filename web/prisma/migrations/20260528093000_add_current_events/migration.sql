@@ -1,0 +1,1 @@
+-- No-op: table current_event is created in 20260528073501_add_model_current_event.

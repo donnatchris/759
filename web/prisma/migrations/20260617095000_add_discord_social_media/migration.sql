@@ -1,0 +1,1 @@
+ALTER TYPE "SocialMediaType" ADD VALUE 'DISCORD';

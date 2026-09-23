@@ -1,0 +1,25 @@
+# Docker Compose configuration for development (Nextjs is running in development mode, not in container)
+
+services:
+  db:
+    image: postgres:17
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+volumes:
+  db_data:
+    name: ${SITE_NAME}-postgres-data

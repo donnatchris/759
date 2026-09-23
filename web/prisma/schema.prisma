@@ -1,0 +1,558 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+/**
+ * ***********************************************************************************************
+ * BetterAuth models enhanced with custom fields for the application
+ * ***********************************************************************************************
+ */
+
+enum UserRole {
+    USER
+    STAFF
+    ADMIN
+}
+
+enum ReservationStatus {
+    PENDING
+    CONFIRMED
+    CANCELLED
+    COMPLETED
+    NO_SHOW
+}
+
+enum ReservationCancelledBy {
+    USER
+    STAFF
+}
+
+model User {
+    id            String         @id @default(uuid())
+    name          String
+    email         String
+    emailVerified Boolean        @default(false)
+    image         String?
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    sessions      Session[]
+    accounts      Account[]
+    reservations  Reservation[]
+    notifications Notification[]
+    staffPermission StaffPermission?
+
+    role                        UserRole @default(USER)
+    phone                       String?
+    canBook                     Boolean  @default(true)
+    canReceiveMarketingEmails   Boolean  @default(false)
+    legalTermsAccepted          Boolean?
+    legalTermsAcceptedAt        DateTime?
+    acceptedLegalTermsId        String?
+    acceptedLegalTerms          LegalTerms? @relation(fields: [acceptedLegalTermsId], references: [id], onDelete: SetNull)
+
+    @@unique([email])
+    @@index([acceptedLegalTermsId])
+    @@map("user")
+}
+
+model StaffPermission {
+    userId                   String  @id
+    canManageAppointments    Boolean @default(false)
+    canManageUsers           Boolean @default(false)
+    canManageMarketingEmails Boolean @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("staff_permission")
+}
+
+model BannedEmail {
+    id        String   @id @default(uuid())
+    email     String   @unique
+    createdAt DateTime @default(now())
+
+    @@map("banned_email")
+}
+
+model Session {
+    id        String   @id
+    expiresAt DateTime
+    token     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    ipAddress String?
+    userAgent String?
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([token])
+    @@index([userId])
+    @@map("session")
+}
+
+model Account {
+    id                    String    @id
+    accountId             String
+    providerId            String
+    userId                String
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String?
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
+
+    @@index([userId])
+    @@map("account")
+}
+
+model Verification {
+    id         String   @id
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@index([identifier])
+    @@map("verification")
+}
+
+/**
+ * ***********************************************************************************************
+ * Site models
+ * ***********************************************************************************************
+ */
+
+model SiteSettings {
+    id           Int      @id @default(1)
+    fullName     String
+    shortName    String
+    sloganHead   String?
+    sloganAccent String?
+    sloganTail   String?
+    address      String?
+    tel          String?
+    mail         String?
+    activities   String[]
+
+    seoTitle       String?
+    seoDescription String?
+    ogImageUrl     String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("site_settings")
+}
+
+model SitePage {
+    slug      String   @id @unique
+    title     String
+    subTitle  String?
+    content   String?  @db.Text
+    image     String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("site_pages")
+}
+
+model SiteSection {
+    id       String  @id
+    title    String?
+    subTitle String?
+    content  String?
+    footer   String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("site_section")
+}
+
+model LegalTerms {
+    id      String @id @unique @default(uuid())
+    content String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    acceptedByUsers User[]
+
+    @@map("legal_terms")
+}
+
+model ServicesCategory {
+    id               String   @id @unique @default(uuid())
+    label            String   @unique
+    shortDescription String
+    longDescription  String?
+    imageUrl         String
+    infos            String?
+    orderIndex       Int?
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+
+    services Service[]
+
+    @@map("services_category")
+}
+
+model DishCategory {
+    id               String   @id @default(uuid())
+    label            String   @unique
+    shortDescription String
+    longDescription  String?
+    imageUrl         String
+    infos            String?
+    orderIndex       Int?
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+
+    dishes Dish[]
+
+    @@map("dish_category")
+}
+
+model Ressource {
+    id       String @id @unique @default(uuid())
+    label    String
+    quantity Int
+    color    String @default("#d97706")
+
+    createdAt          DateTime                    @default(now())
+    updatedAt          DateTime                    @updatedAt
+    serviceRessources  ServiceRessource[]
+    reservationUsages  ReservationResourceUsage[]
+    unavailablePeriods ResourceUnavailablePeriod[]
+
+    @@map("ressource")
+}
+
+model Service {
+    id         String  @id @unique @default(uuid())
+    label      String
+    price      String?
+    details    String?
+    orderIndex Int?
+    bookable   Boolean @default(true)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    categoryId        String
+    category          ServicesCategory   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    serviceRessources ServiceRessource[]
+    reservations      Reservation[]
+
+    @@unique([label, categoryId])
+    @@map("service")
+}
+
+model Dish {
+    id         String  @id @default(uuid())
+    label      String
+    price      String?
+    details    String?
+    imageUrl   String
+    orderIndex Int?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    categoryId String
+    category   DishCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+    @@unique([label, categoryId])
+    @@map("dish")
+}
+
+model ServiceRessource {
+    serviceId         String
+    ressourceId       String
+    quantity          Int
+    durationInMinutes Int?
+    offsetInMinutes   Int?
+
+    service   Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+    ressource Ressource @relation(fields: [ressourceId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@id([serviceId, ressourceId])
+    @@map("service_ressource")
+}
+
+model Reservation {
+    id String @id @default(uuid())
+
+    serviceId String
+    service   Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+    userId String?
+    user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    customerName  String?
+    customerEmail String?
+    customerPhone String
+
+    bookedBy     String?
+    bookedByName String?
+    bookedByRole UserRole?
+
+    startsAt DateTime
+
+    status ReservationStatus @default(CONFIRMED)
+    notes  String?
+
+    cancelledAt DateTime?
+    cancelledBy ReservationCancelledBy?
+    createdAt   DateTime                @default(now())
+    updatedAt   DateTime                @updatedAt
+
+    resourceUsages ReservationResourceUsage[]
+
+    @@index([serviceId])
+    @@index([userId])
+    @@index([startsAt])
+    @@index([status])
+    @@map("reservation")
+}
+
+model ReservationResourceUsage {
+    id String @id @default(uuid())
+
+    reservationId String
+    reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+    ressourceId String
+    ressource   Ressource @relation(fields: [ressourceId], references: [id], onDelete: Restrict)
+
+    quantity Int
+    startAt  DateTime
+    endAt    DateTime
+
+    status ReservationStatus @default(CONFIRMED)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([ressourceId, startAt, endAt])
+    @@index([reservationId])
+    @@index([status])
+    @@map("reservation_resource_usage")
+}
+
+model OpeningSlot {
+    id Int @id @default(autoincrement())
+
+    dayOfWeek      Int
+    slotIndex      Int @default(1)
+    opensAtMinute  Int
+    closesAtMinute Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([dayOfWeek, slotIndex])
+    @@index([dayOfWeek])
+    @@map("opening_slot")
+}
+
+model OpeningException {
+    id Int @id @default(autoincrement())
+
+    date     DateTime @db.Date
+    label    String?
+    isClosed Boolean  @default(true)
+
+    slots OpeningExceptionSlot[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([date])
+    @@map("opening_exception")
+}
+
+model OpeningExceptionSlot {
+    id Int @id @default(autoincrement())
+
+    exceptionId Int
+    exception   OpeningException @relation(fields: [exceptionId], references: [id], onDelete: Cascade)
+
+    opensAtMinute  Int
+    closesAtMinute Int
+
+    @@map("opening_exception_slot")
+}
+
+model ResourceUnavailablePeriod {
+    id String @id @default(uuid())
+
+    ressourceId String
+    ressource   Ressource @relation(fields: [ressourceId], references: [id], onDelete: Cascade)
+
+    startAt  DateTime
+    endAt    DateTime
+    quantity Int?
+    reason   String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([ressourceId, startAt, endAt])
+    @@map("resource_unavailable_period")
+}
+
+model BookingSettings {
+    id Int @id @default(1)
+
+    enabled              Boolean @default(true)
+    onlineBookingEnabled Boolean @default(true)
+    slotStepMinutes      Int     @default(15)
+    minNoticeHours       Int     @default(2)
+    maxAdvanceDays       Int     @default(60)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("booking_settings")
+}
+
+enum SocialMediaType {
+    INSTAGRAM
+    FACEBOOK
+    TIKTOK
+    SNAPCHAT
+    WHATSAPP
+    TWITTER
+    DISCORD
+}
+
+model SocialMedia {
+    id        SocialMediaType @id @unique
+    name      String?
+    url       String?
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @updatedAt
+
+    @@map("social_media")
+}
+
+model CarouselImage {
+    id        String   @id @unique @default(uuid())
+    url       String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("carousel_image")
+}
+
+model CurrentEvent {
+    id               String    @id @unique @default(uuid())
+    title            String
+    subTitle         String?
+    tag              String?
+    content          String
+    author           String?
+    eventStartDate   DateTime?
+    eventEndDate     DateTime?
+    displayStartDate DateTime?
+    displayEndDate   DateTime?
+    imageUrl         String?
+    links            String[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("current_event")
+}
+
+enum NotificationType {
+    NEW_RESERVATION
+    RESERVATION_REMINDER
+    RESERVATION_CANCELLATION
+    CURRENT_EVENT_ANNOUNCEMENT
+    NEW_USER_ADMIN_NOTIFICATION
+    NEW_USER_WELCOME
+    USER_ACCOUNT_DELETED_ADMIN_NOTIFICATION
+}
+
+enum MarketingEmailStatus {
+    PENDING
+    SENDING
+    SENT
+    FAILED
+    CANCELLED
+}
+
+model Notification {
+    id                 String           @id @default(uuid())
+    type               NotificationType
+    title              String
+    content            String
+    isRead             Boolean          @default(false)
+    readAt             DateTime?
+    notifyByEmail      Boolean          @default(true)
+    emailAttempts      Int              @default(0)
+    emailLastAttemptAt DateTime?
+    emailLastError     String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([userId, isRead, createdAt])
+    @@map("notification")
+}
+
+model MarketingEmail {
+    id String @id @default(uuid())
+
+    subject String
+    eyebrow String?
+    title   String
+    intro   String? @db.Text
+    content String @db.Text
+
+    note String? @db.Text
+
+    status       MarketingEmailStatus @default(PENDING)
+    scheduledFor DateTime
+    sentAt       DateTime?
+
+    eligibleRecipientCount Int @default(0)
+    sentRecipientCount     Int @default(0)
+
+    emailAttempts      Int       @default(0)
+    emailLastAttemptAt DateTime?
+    emailLastError     String?
+
+    createdByUserId String?
+    createdByEmail  String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([status, scheduledFor])
+    @@index([createdAt])
+    @@map("marketing_email")
+}

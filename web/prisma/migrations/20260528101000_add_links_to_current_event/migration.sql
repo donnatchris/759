@@ -1,0 +1,2 @@
+ALTER TABLE "current_event"
+ADD COLUMN "links" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];

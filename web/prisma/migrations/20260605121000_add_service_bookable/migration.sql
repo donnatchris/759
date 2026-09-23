@@ -1,0 +1,1 @@
+ALTER TABLE "service" ADD COLUMN "bookable" BOOLEAN NOT NULL DEFAULT true;
