@@ -4,7 +4,7 @@ YELLOW=\033[33m
 BLUE=\033[34m
 RESET=\033[0m
 
-.PHONY: format lint typecheck check push dev-init dev-run dev-stop db-studio db-local-migrate db-prod-migrate db-seed-data db-seed-user generate-favicons convert-images clean dev-run-local
+.PHONY: format lint typecheck check push dev-init dev-run dev-stop db-studio db-local-migrate db-prod-migrate db-seed-data db-seed-data-local db-seed-user db-local-seed-user generate-favicons convert-images clean dev-run-local
 
 # Initialisation de l'environnement de développement
 
@@ -48,15 +48,25 @@ db-prod-migrate:
 	@printf "\n$(YELLOW)Migration de la base de données en production...$(RESET)\n"
 	@cd web && npx prisma migrate deploy
 
-db-seed-data:
+db-prod-seed-data:
 	@printf "\n$(YELLOW)Exécution du seed Prisma...$(RESET)\n"
 	@cd web && npm run prisma:seed
 	@printf "\n$(GREEN)Seeds exécutés avec succès !$(RESET)\n"
+
+db-local-seed-data:
+	@printf "\n$(YELLOW)Exécution du seed Prisma sur la base locale...$(RESET)\n"
+	@cd web && npx dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npm run prisma:seed'
+	@printf "\n$(GREEN)Seeds locaux exécutés avec succès !$(RESET)\n"
 
 db-seed-user:
 	@printf "\n$(YELLOW)Exécution du seed Prisma pour les utilisateurs...$(RESET)\n"
 	@cd web && SEEDING_ADMIN=true npm run prisma:seed-user
 	@printf "\n$(GREEN)Administrateur créé ou mis à jour avec succès !$(RESET)\n"
+
+db-local-seed-user:
+	@printf "\n$(YELLOW)Exécution du seed administrateur sur la base locale...$(RESET)\n"
+	@cd web && npx dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" SEEDING_ADMIN=true npm run prisma:seed-user'
+	@printf "\n$(GREEN)Administrateur local créé ou mis à jour avec succès !$(RESET)\n"
 
 generate-favicons:
 	@printf "\n$(YELLOW)Génération des favicons...$(RESET)\n"
