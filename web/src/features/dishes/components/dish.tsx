@@ -9,7 +9,7 @@ type Props = {
 
 export function Dish({ dish }: Props) {
   return (
-    <div className="group relative rounded-md bg-background/60 p-4 transition-colors hover:bg-muted/60">
+    <div className="group relative rounded-xl border-2 border-primary/25 bg-background/60 p-4 transition-colors hover:bg-muted/60">
       <div className="absolute -top-2 right-2 z-20 flex gap-2">
         <EditDishAdminButton dish={dish} />
         <DeleteDish id={dish.id} />

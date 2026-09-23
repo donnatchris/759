@@ -51,7 +51,7 @@ export function Navbar({
   }
 
   return (
-    <nav className="sticky top-0 z-50 flex h-20 w-full items-center border-b border-border/70 bg-card/95 px-4  backdrop-blur-xl sm:px-8">
+    <nav className="sticky top-0 z-50 flex h-20 w-full items-center border-b-2 border-border bg-card px-4 sm:px-8">
       <div className="mr-auto">
         <LogoLink size={170} name={siteName} />
       </div>
@@ -59,13 +59,13 @@ export function Navbar({
       <div className="mr-5 hidden items-center gap-5 lg:flex">
         <Link
           href="/#horaires"
-          className="border-b border-transparent px-1 py-2.5 text-[.65rem] font-semibold uppercase tracking-[.16em] text-foreground/70 transition hover:border-heritage-gold hover:text-accent"
+          className="rounded-full border-2 border-transparent px-3 py-2.5 text-xs font-bold text-foreground transition hover:border-primary hover:bg-secondary"
         >
           Nous retrouver
         </Link>
         <Link
           href="/menu"
-          className="border-b border-transparent px-1 py-2.5 text-[.65rem] font-semibold uppercase tracking-[.16em] text-foreground/70 transition hover:border-heritage-gold hover:text-accent"
+          className="rounded-full border-2 border-transparent px-3 py-2.5 text-xs font-bold text-foreground transition hover:border-primary hover:bg-secondary"
         >
           À la table
         </Link>
@@ -77,13 +77,13 @@ export function Navbar({
 				</Link> */}
         <Link
           href="/actualites"
-          className="border-b border-transparent px-1 py-2.5 text-[.65rem] font-semibold uppercase tracking-[.16em] text-foreground/70 transition hover:border-heritage-gold hover:text-accent"
+          className="rounded-full border-2 border-transparent px-3 py-2.5 text-xs font-bold text-foreground transition hover:border-primary hover:bg-secondary"
         >
           Rendez-vous
         </Link>
         <Link
           href="/"
-          className="border-b border-transparent px-1 py-2.5 text-[.65rem] font-semibold uppercase tracking-[.16em] text-foreground/70 transition hover:border-heritage-gold hover:text-accent"
+          className="rounded-full border-2 border-transparent px-3 py-2.5 text-xs font-bold text-foreground transition hover:border-primary hover:bg-secondary"
         >
           L’association
         </Link>
@@ -95,7 +95,7 @@ export function Navbar({
             type="button"
             variant="ghost"
             size="icon"
-            className="border border-primary/20 bg-background transition-colors hover:border-accent hover:bg-accent hover:text-accent-foreground lg:hidden"
+            className="border-2 border-primary bg-background transition-colors hover:border-accent hover:bg-accent hover:text-accent-foreground lg:hidden"
             aria-label="Ouvrir le menu de navigation"
           >
             <Menu className="size-5" />

@@ -44,27 +44,27 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
   return (
     <section
       id="hero"
-      className="relative overflow-hidden bg-heritage-ink text-heritage-paper"
+      className="relative overflow-hidden bg-heritage-gold text-heritage-ink"
     >
       <div className="absolute right-4 top-4 z-20">
         <EditSiteSettingsAdminButton siteSettings={siteSettings} />
       </div>
-      <div className="mx-auto grid max-w-[1600px] items-center lg:min-h-[620px] lg:grid-cols-[.85fr_1.15fr]">
-        <div className="order-2 px-6 pb-12 pt-6 sm:px-12 lg:order-1 lg:py-20 lg:pl-16 xl:pl-24">
-          <p className="mb-6 flex items-center gap-3 text-[.65rem] font-semibold uppercase tracking-[.24em] text-heritage-gold">
+      <div className="mx-auto grid max-w-[1440px] items-center gap-2 px-6 py-10 sm:px-10 lg:min-h-[680px] lg:grid-cols-[1fr_1fr] lg:py-14">
+        <div className="relative z-10 pt-4 lg:pl-8">
+          <p className="mb-7 flex w-fit items-center gap-3 rounded-full border-2 border-current px-4 py-2 text-[.65rem] font-bold uppercase tracking-[.14em]">
             <span className="h-px w-8 bg-current" />
             Le 7.59 · Pays catalan
           </p>
-          <h1 className="max-w-xl font-heading text-[clamp(2.6rem,4.7vw,5rem)] leading-[1.02] tracking-[-.035em]">
+          <h1 className="max-w-2xl font-heading text-[clamp(3.5rem,6.7vw,6.8rem)] uppercase leading-[.94] tracking-[-.025em]">
             {sloganHead}
             {sloganAccent && (
-              <span className="mt-2 block italic text-heritage-gold">
+              <span className="mt-1 block text-heritage-red">
                 {sloganAccent}
               </span>
             )}
             {sloganTail && <span className="mt-2 block">{sloganTail}</span>}
           </h1>
-          <div className="mt-7 space-y-2 text-sm leading-6 text-heritage-paper/70">
+          <div className="mt-7 max-w-md space-y-2 text-sm font-medium leading-6">
             {activities.map((activity, index) => (
               <p key={index}>{activity}</p>
             ))}
@@ -72,48 +72,44 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
           <div className="mt-9 flex flex-wrap gap-x-6 gap-y-4">
             <Link
               href="/actualites"
-              className="inline-flex min-h-12 items-center gap-3 rounded-sm border border-heritage-gold bg-heritage-gold px-5 py-3 text-xs font-semibold uppercase tracking-wider text-heritage-ink transition hover:bg-heritage-paper focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-heritage-gold"
+              className="inline-flex min-h-12 items-center gap-3 rounded-full border-2 border-heritage-ink bg-heritage-ink px-6 py-3 text-sm font-bold text-heritage-paper shadow-[4px_4px_0_var(--heritage-red)] transition hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               <CalendarDays className="size-4" />
               Nos rendez-vous
             </Link>
             <a
               href="#horaires"
-              className="inline-flex min-h-12 items-center gap-3 border-b border-heritage-gold/40 py-3 text-sm text-heritage-paper transition hover:border-heritage-gold hover:text-heritage-gold focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="inline-flex min-h-12 items-center gap-3 border-b-2 border-heritage-ink py-3 text-sm font-bold transition hover:text-heritage-red focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               Nous retrouver
               <ArrowDownRight className="size-4" />
             </a>
           </div>
         </div>
-        <figure className="relative order-1 m-0 lg:order-2">
+        <figure className="relative m-0 mx-auto w-full max-w-[640px]">
           <Image
-            src="/hero.png"
-            alt="Emblème doré réunissant fleur de lys et croix occitane, entre les couleurs françaises et catalanes"
-            width={1672}
-            height={941}
+            src="/banquet-pop.svg"
+            alt="Une tablée illustrée : nappe à carreaux, pain, fromage et vin à partager"
+            width={720}
+            height={720}
             priority
-            sizes="(min-width: 1024px) 60vw, 100vw"
+            sizes="(min-width: 1024px) 50vw, 100vw"
             className="block h-auto w-full"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-heritage-ink via-transparent to-transparent lg:bg-gradient-to-r"
           />
         </figure>
       </div>
-      <div className="border-y border-heritage-gold/25">
+      <div className="border-y-2 border-heritage-ink bg-heritage-ink text-heritage-paper">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-8 gap-y-4 px-6 py-5 sm:px-8">
-          <p className="font-heading text-lg italic text-heritage-gold">
-            Le goût du partage. La force des racines.
+          <p className="font-brand text-xl text-heritage-gold sm:text-2xl">
+            Du pays. Du pain. Des copains.
           </p>
-          <p className="text-[.6rem] uppercase tracking-[.22em] text-heritage-paper/60">
-            Terroir · Amitié · Transmission
+          <p className="text-[.65rem] font-bold uppercase tracking-[.18em] text-heritage-paper">
+            Racines françaises · Cœur catalan
           </p>
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-6 sm:px-8">
-        <div className="flex flex-wrap gap-x-6 gap-y-3 text-xs [&_a]:text-heritage-paper/70 [&_a]:no-underline [&_a:hover]:text-heritage-gold">
+        <div className="flex flex-wrap gap-x-6 gap-y-3 text-xs [&_a]:text-heritage-ink [&_a]:no-underline [&_a:hover]:text-heritage-red">
           {addressLink && (
             <LinkWithIcon href={addressLink} Icon={MapPin} text={address} />
           )}
@@ -127,7 +123,7 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
           {googleRatings && (
             <GoogleRatingsCard
               ratings={googleRatings}
-              className="rounded-sm border border-heritage-gold/20 bg-transparent text-heritage-paper shadow-none [&_*]:text-heritage-paper/80"
+              className="rounded-full border-2 border-heritage-ink bg-heritage-paper text-heritage-ink shadow-none [&_*]:text-heritage-ink"
             />
           )}
         </div>

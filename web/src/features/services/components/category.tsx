@@ -30,7 +30,7 @@ export function Category({
   return (
     <div>
       <div
-        className="grid scroll-mt-24 overflow-hidden rounded-md bg-card lg:grid-cols-[.75fr_1.25fr]"
+        className="grid scroll-mt-24 overflow-hidden rounded-2xl border-2 border-primary bg-card shadow-[5px_5px_0_var(--primary)] lg:grid-cols-[.75fr_1.25fr]"
         id={id}
       >
         <div className="relative flex min-h-72 flex-col justify-end gap-3 overflow-hidden bg-primary p-8 text-primary-foreground">
@@ -48,7 +48,7 @@ export function Category({
             loading={imagePriority ? 'eager' : 'lazy'}
             className="absolute inset-0 h-full w-full object-cover opacity-15"
           />
-          <h3 className="relative font-heading text-4xl font-medium leading-none">
+          <h3 className="relative font-heading text-5xl font-normal uppercase leading-none">
             {servicesCategory.label}
           </h3>
           <p className="relative whitespace-pre-line text-sm leading-6 text-primary-foreground/75">

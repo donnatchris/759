@@ -30,12 +30,12 @@ export async function DishesSummary({ dishCategories }: Props) {
           {dishCategories.map((category) => {
             const id = String(category.id);
             return (
-              <div key={id} className="relative animate-fade-in-on-scroll">
+              <div key={id} className="relative animate-fade-in-on-scroll even:[&>a]:bg-secondary">
                 <Link
                   href={`/menu/#${category.id}`}
-                  className="group flex h-full flex-col overflow-hidden rounded-md border border-border/70 bg-card p-3 transition-transform duration-300 motion-safe:hover:-translate-y-1"
+                  className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border-2 border-primary bg-card p-4 shadow-[5px_5px_0_var(--primary)] transition-transform duration-300 motion-safe:hover:-translate-y-1"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-[5rem_5rem_.75rem_.75rem] border-2 border-primary">
                     <Image
                       src={category.imageUrl}
                       alt={category.label}
@@ -45,13 +45,13 @@ export async function DishesSummary({ dishCategories }: Props) {
                     />
                   </div>
 
-                  <h3 className="px-4 pt-6 font-heading text-3xl font-medium text-foreground">
+                  <h3 className="px-4 pt-6 font-heading text-4xl font-normal uppercase text-foreground">
                     {category.label}
                   </h3>
                   <p className="mt-3 flex-1 whitespace-pre-line px-4 text-sm leading-6 text-muted-foreground">
                     {category.shortDescription}
                   </p>
-                  <p className="m-4 mt-6 flex w-fit border-b border-heritage-gold px-0 py-2 text-xs font-bold text-primary transition-colors group-hover:text-accent">
+                  <p className="m-4 mt-6 flex w-fit rounded-full border-2 border-primary px-4 py-2 text-xs font-bold text-primary transition-colors group-hover:text-accent">
                     {hoverText} →
                   </p>
                 </Link>

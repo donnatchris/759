@@ -33,7 +33,7 @@ export function OpeningSlots({
   }
 
   return (
-    <section className="relative overflow-hidden border-y border-heritage-gold/25 bg-heritage-ink px-6 py-16 text-heritage-paper sm:px-10 sm:py-24">
+    <section className="relative overflow-hidden border-y-2 border-heritage-ink bg-heritage-ink px-6 py-16 text-heritage-paper sm:px-10 sm:py-24">
       <div
         className="absolute inset-0 opacity-[0.06] [background-image:radial-gradient(circle_at_center,#fff_1px,transparent_1px)] [background-size:18px_18px]"
         aria-hidden="true"
@@ -54,7 +54,7 @@ export function OpeningSlots({
             )}
 
             {title && (
-              <h2 className="font-heading text-5xl font-medium leading-[.95] tracking-tight text-heritage-paper sm:text-6xl">
+              <h2 className="font-heading text-6xl font-normal uppercase leading-[.95] tracking-tight text-heritage-paper sm:text-6xl">
                 {title}
               </h2>
             )}
@@ -75,7 +75,7 @@ export function OpeningSlots({
                   {openingClosures.map((closure) => (
                     <div
                       key={closure.id}
-                      className="border-l-2 border-[#e0b553] bg-white/5 px-4 py-3 text-sm text-heritage-paper/75"
+                      className="border-l-2 border-heritage-gold bg-white/5 px-4 py-3 text-sm text-heritage-paper/75"
                     >
                       <p className="font-medium text-white">{closure.label}</p>
                       <p>{formatOpeningClosurePeriod(closure)}</p>
@@ -93,7 +93,7 @@ export function OpeningSlots({
           </div>
 
           <div className="relative">
-            <div className="divide-y divide-heritage-gold/20 border-y border-heritage-gold/30">
+            <div className="divide-y-2 divide-heritage-ink rounded-2xl border-2 border-heritage-ink bg-heritage-paper px-5 shadow-[8px_8px_0_var(--heritage-gold)] sm:px-8">
               {OPENING_SLOT_DAY_LABELS.map((label, dayOfWeek) => {
                 const daySlots = (slotsByDay.get(dayOfWeek) ?? []).sort(
                   (a, b) => a.slotIndex - b.slotIndex,
@@ -104,17 +104,17 @@ export function OpeningSlots({
                     key={label}
                     className="grid min-h-16 grid-cols-[6rem_1fr] items-center gap-4 py-5 sm:grid-cols-[9rem_1fr]"
                   >
-                    <span className="font-heading text-xl font-medium text-heritage-paper">
+                    <span className="text-sm font-extrabold uppercase text-heritage-ink">
                       {label}
                     </span>
-                    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-sm text-heritage-paper/70">
+                    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-sm font-medium text-heritage-ink">
                       {daySlots.length === 0 ? (
                         <span>Fermé</span>
                       ) : (
                         daySlots.map((slot) => (
                           <span key={slot.id} className="whitespace-nowrap">
                             {formatOpeningSlotTime(slot.opensAtMinute)}
-                            <span className="mx-2 text-heritage-gold">-</span>
+                            <span className="mx-2 text-heritage-red">-</span>
                             {formatOpeningSlotTime(slot.closesAtMinute)}
                           </span>
                         ))
