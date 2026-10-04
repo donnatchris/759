@@ -4,7 +4,7 @@ import Link from 'next/link';
 import type { Event } from '../lib/events.types';
 import { EditEventAdminButton } from './edit-event-admin-button';
 import { DeleteEvent } from './delete-event';
-import { formatEventDateRange, formatEventDate } from '../lib/events.ui';
+import { formatEventDate } from '../lib/events.ui';
 import { Badge } from '@/components/ui/badge';
 
 type Props = {
@@ -20,54 +20,81 @@ export function EventCard({ event }: Props) {
   const displayCreatedOrEditedDate = isEdited
     ? `Événement mis à jour le ${editedAt}`
     : `Événement publié le ${publishedAt}`;
-  const displayEventDateRange = formatEventDateRange(
-    event.eventStartDate,
-    event.eventEndDate,
-  );
+  const dates = [
+    { label: 'Début', value: event.eventStartDate },
+    { label: 'Fin', value: event.eventEndDate },
+  ].filter((date) => date.value);
+  const hasVisual = Boolean(event.imageUrl || dates.length);
 
   return (
-    <article className="relative grid overflow-hidden rounded-sm border border-border bg-card md:grid-cols-[18rem_1fr]">
-      <aside className="relative flex flex-col bg-heritage-ink p-6 text-heritage-paper md:border-r md:border-heritage-ink">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <span className="text-xs font-semibold uppercase tracking-widest">
-            À l’affiche
-          </span>
+    <article
+      className={`relative overflow-hidden rounded-sm border border-border bg-card ${hasVisual ? 'grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]' : ''}`}
+    >
+      {hasVisual && (
+        <div className="min-w-0 bg-heritage-ink text-heritage-paper">
+          {event.imageUrl && (
+            <div className="relative aspect-[4/3] overflow-hidden">
+              <Image
+                src={event.imageUrl}
+                alt={event.title}
+                fill
+                sizes="(max-width: 1023px) 100vw, 42vw"
+                className="object-cover"
+              />
+            </div>
+          )}
+          {dates.length > 0 && (
+            <dl className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-x-6 gap-y-5 border-t-4 border-heritage-gold px-6 py-6 sm:px-8">
+              {dates.map(({ label, value }) => {
+                const date = new Date(value!);
+                return (
+                  <div key={label}>
+                    <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-heritage-paper/80">
+                      {label}
+                    </dt>
+                    <dd className="mt-2">
+                      <time dateTime={date.toISOString()}>
+                        <span className="block font-heading text-5xl leading-none text-heritage-gold tabular-nums">
+                          {date.toLocaleDateString('fr-FR', { day: '2-digit' })}
+                        </span>
+                        <span className="mt-2 block text-base font-semibold">
+                          {date.toLocaleDateString('fr-FR', {
+                            month: 'long',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </time>
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          )}
+        </div>
+      )}
+      <div className="relative min-w-0 p-6 pt-12 sm:p-10 sm:pt-12">
+        <div className="absolute right-4 top-2 z-10 flex gap-1">
+          <EditEventAdminButton event={event} />
+          <DeleteEvent id={event.id} />
+        </div>
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <span className="section-kicker">À l’affiche</span>
           {event.tag && (
             <Badge
               variant="outline"
-              className="rounded-sm border-heritage-gold px-3 py-3 text-heritage-gold"
+              className="max-w-full whitespace-normal rounded-sm border-border px-3 py-1 text-foreground"
             >
               {event.tag}
             </Badge>
           )}
         </div>
-        {event.imageUrl && (
-          <div className="relative aspect-[4/3] overflow-hidden rounded-sm border border-heritage-paper/25">
-            <Image
-              src={event.imageUrl}
-              alt={event.title}
-              fill
-              sizes="(max-width: 767px) 100vw, 288px"
-              className="object-cover"
-            />
-          </div>
-        )}
-        {displayEventDateRange && (
-          <p className="mt-6 font-heading text-xl font-medium text-heritage-gold">
-            {displayEventDateRange}
-          </p>
-        )}
-      </aside>
-      <div className="relative p-7 sm:p-10">
-        <div className="absolute right-4 top-2 z-10 flex gap-1">
-          <EditEventAdminButton event={event} />
-          <DeleteEvent id={event.id} />
-        </div>
-        <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+        <h2 className="font-heading text-3xl font-semibold leading-tight tracking-tight [overflow-wrap:anywhere] sm:text-4xl">
           {event.title}
         </h2>
         {event.subTitle && (
-          <p className="mt-4 text-lg text-muted-foreground">{event.subTitle}</p>
+          <p className="mt-5 border-l-4 border-heritage-gold pl-4 text-xl font-semibold leading-snug text-foreground [overflow-wrap:anywhere] sm:text-2xl">
+            {event.subTitle}
+          </p>
         )}
         <p className="mt-7 whitespace-pre-line leading-7 text-foreground/80">
           {event.content}
@@ -80,7 +107,7 @@ export function EventCard({ event }: Props) {
                 href={link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="break-all text-sm font-semibold text-accent underline underline-offset-4"
+                className="break-all rounded-sm text-sm font-semibold text-accent underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               >
                 {link}
               </Link>
