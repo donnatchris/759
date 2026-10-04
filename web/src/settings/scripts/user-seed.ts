@@ -13,10 +13,22 @@ const usersToSeed = [
     role: 'ADMIN' as const,
   },
   {
-    name: 'Christophe Donnat',
-    email: 'donnatchris@live.fr',
-    password: 'Test123!flex',
-    role: 'STAFF' as const,
+    name: 'Oliver Brosed',
+    email: 'oliver.brosed@orange.fr',
+    password: 'Oliver759!',
+    role: 'ADMIN' as const,
+  },
+  {
+    name: 'Santer Stéphanie',
+    email: 'stephsanter@yahoo.fr',
+    password: 'Steph759!',
+    role: 'ADMIN' as const,
+  },
+  {
+    name: 'Romain Faucher',
+    email: 'rom1faucher@yahoo.fr',
+    password: 'Romain759!',
+    role: 'ADMIN' as const,
   },
 ];
 
