@@ -4,6 +4,7 @@ import { getEventMarketingEmailData } from './events.email';
 import { requireEventsEnabled } from '@/settings/settings.guards';
 import { executeServiceOrThrow } from '@/features/core';
 import {
+  getCalendarEventsFromPrismaRepository,
   createEventInPrismaRepository,
   deleteEventFromPrismaRepository,
   editEventFromPrismaRepository,
@@ -12,6 +13,7 @@ import {
   getMaxFiveEventsToDisplayFromPrismaRepository,
 } from './events.repository';
 import {
+  getCalendarEventsSchema,
   createEventSchema,
   deleteEventSchema,
   getEventsSchema,
@@ -89,5 +91,15 @@ export async function deleteEventService(data: unknown): Promise<void> {
     repositoryMethod: deleteEventFromPrismaRepository,
     data,
     zodSchema: deleteEventSchema,
+  });
+}
+
+export async function getCalendarEventsService(data: unknown) {
+  requireEventsEnabled();
+  return await executeServiceOrThrow({
+    serviceName: 'getCalendarEventsService',
+    repositoryMethod: getCalendarEventsFromPrismaRepository,
+    data,
+    zodSchema: getCalendarEventsSchema,
   });
 }

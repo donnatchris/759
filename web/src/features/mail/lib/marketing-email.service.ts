@@ -4,14 +4,10 @@ import { requireStaffPermissionOrThrow } from '@/features/permission/lib/permiss
 import { requireStaffOrThrow } from '@/features/auth/server/require-staff';
 import { resend } from '@/lib/resend/resend';
 import {
-  claimMarketingEmailSendAttemptInPrismaRepository,
   createMarketingEmailInPrismaRepository,
   deleteMarketingEmailFromPrismaRepository,
   getMarketingEmailRecipientsFromPrismaRepository,
   getMarketingEmailsFromPrismaRepository,
-  getMarketingEmailsToSendFromPrismaRepository,
-  markMarketingEmailAsFailedInPrismaRepository,
-  markMarketingEmailAsSentInPrismaRepository,
 } from './marketing-email.repository';
 import {
   createMarketingEmailSchema,
@@ -20,7 +16,6 @@ import {
 } from './marketing-email.schema';
 import { getMarketingEmailHtml } from './marketing-email.templates';
 import type {
-  TMarketingEmailRecipient,
   TMarketingEmailListItem,
   TMarketingEmailsPagination,
   TSendMarketingEmailsDetail,
@@ -28,9 +23,20 @@ import type {
   TSendMarketingEmailsResult,
 } from './marketing-email.types';
 
-const MAX_MARKETING_EMAIL_ATTEMPTS = 3;
+import {
+  checkpointMarketingEmail,
+  claimMarketingEmailSendAttemptInPrismaRepository,
+  getMarketingEmailsToSendFromPrismaRepository,
+  MarketingEmailLeaseLostError,
+  reserveMarketingEmailSlot,
+} from './marketing-email.delivery-repository';
+import {
+  deliverMarketingEmail,
+  type MarketingSnapshot,
+} from './marketing-email.delivery';
+
 const MARKETING_EMAIL_SEND_LIMIT = 20;
-const RESEND_BATCH_SIZE = 100;
+const RUN_BUDGET_MS = 40_000;
 
 export async function getMarketingEmailsService(
   data: unknown,
@@ -85,168 +91,109 @@ export async function deleteMarketingEmailService(
 export async function sendMarketingEmails(
   options: TSendMarketingEmailsOptions = {},
 ): Promise<TSendMarketingEmailsResult> {
+  const deadline = Date.now() + RUN_BUDGET_MS;
   const marketingEmails = await getMarketingEmailsToSendFromPrismaRepository({
     limit: options.limit ?? MARKETING_EMAIL_SEND_LIMIT,
-    maxAttempts: MAX_MARKETING_EMAIL_ATTEMPTS,
     scheduledForLte: options.ignoreSchedule
       ? undefined
       : (options.now ?? new Date()),
   });
-
-  if (marketingEmails.length === 0) {
-    return emptySendMarketingEmailsResult();
-  }
-
-  const recipients = await getMarketingEmailRecipientsFromPrismaRepository();
   const details: TSendMarketingEmailsDetail[] = [];
 
   for (const marketingEmail of marketingEmails) {
-    const claimedMarketingEmail =
-      await claimMarketingEmailSendAttemptInPrismaRepository({
-        id: marketingEmail.id,
-        maxAttempts: MAX_MARKETING_EMAIL_ATTEMPTS,
-      });
-
-    if (!claimedMarketingEmail) {
-      details.push({
-        id: marketingEmail.id,
-        subject: marketingEmail.subject,
-        status: 'SKIPPED',
-        attempts: marketingEmail.emailAttempts,
-        eligibleRecipientCount: marketingEmail.eligibleRecipientCount,
-        sentRecipientCount: marketingEmail.sentRecipientCount,
-        error: 'La campagne a déjà été traitée par un autre processus.',
-      });
-      continue;
-    }
-
-    let sentRecipientCount = 0;
-
+    if (Date.now() + 17_000 >= deadline) break;
+    const claimed = await claimMarketingEmailSendAttemptInPrismaRepository(
+      marketingEmail.id,
+    );
+    if (!claimed?.sendLeaseToken) continue;
+    const checkpoint = (data: Prisma.MarketingEmailUpdateManyMutationInput) =>
+      checkpointMarketingEmail(claimed.id, claimed.sendLeaseToken!, data);
+    let sentRecipientCount = claimed.sentRecipientCount;
+    let eligibleRecipientCount = claimed.eligibleRecipientCount;
     try {
-      if (recipients.length === 0) {
-        await markMarketingEmailAsSentInPrismaRepository({
-          id: claimedMarketingEmail.id,
-          eligibleRecipientCount: 0,
-          sentRecipientCount: 0,
+      // Freeze recipients, sender and rendered content once. Retries must have
+      // exactly the same payload, even if users or templates change meanwhile.
+      let snapshot = claimed.deliverySnapshot as MarketingSnapshot | null;
+      if (!snapshot) {
+        const recipients =
+          await getMarketingEmailRecipientsFromPrismaRepository();
+        snapshot = {
+          from: getMarketingEmailFromAddress(),
+          subject: claimed.subject,
+          html: getMarketingEmailHtml(claimed),
+          recipients: recipients.map((recipient) => recipient.email),
+        };
+        eligibleRecipientCount = snapshot.recipients.length;
+        await checkpoint({
+          deliverySnapshot: snapshot,
+          eligibleRecipientCount,
         });
-
-        details.push({
-          id: claimedMarketingEmail.id,
-          subject: claimedMarketingEmail.subject,
-          status: 'SENT',
-          attempts: claimedMarketingEmail.emailAttempts,
-          eligibleRecipientCount: 0,
-          sentRecipientCount: 0,
-          error: null,
-        });
-        continue;
       }
-
-      sentRecipientCount = await sendMarketingEmailToRecipients({
-        marketingEmail: claimedMarketingEmail,
-        recipients,
+      const outcome = await deliverMarketingEmail(
+        {
+          id: claimed.id,
+          snapshot,
+          nextBatchIndex: claimed.nextBatchIndex,
+          batchAttemptedAt: claimed.batchAttemptedAt,
+          sentRecipientCount,
+        },
+        deadline,
+        {
+          now: Date.now,
+          sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+          reserveSlot: reserveMarketingEmailSlot,
+          checkpoint: async (data) => {
+            await checkpoint(data);
+            // Update local count only after the durable checkpoint succeeds.
+            if (data.sentRecipientCount !== undefined)
+              sentRecipientCount = data.sentRecipientCount;
+          },
+          send: (messages, idempotencyKey, timeoutMs) =>
+            resend.batch.send(messages, {
+              batchValidation: 'strict',
+              idempotencyKey,
+              signal: AbortSignal.timeout(timeoutMs),
+            }),
+        },
+      );
+      await checkpoint({
+        status: outcome.status,
+        sentRecipientCount: outcome.sentRecipientCount,
+        sentAt: outcome.status === 'SENT' ? new Date() : null,
+        emailLastError: outcome.error?.slice(0, 1000) ?? null,
+        nextAttemptAt: outcome.nextAttemptAt ?? null,
+        requiresReview: outcome.requiresReview ?? false,
+        ...(outcome.status === 'FAILED'
+          ? { consecutiveFailures: { increment: 1 } }
+          : {}),
+        sendLeaseToken: null,
+        sendLeaseExpiresAt: null,
       });
-
-      await markMarketingEmailAsSentInPrismaRepository({
-        id: claimedMarketingEmail.id,
-        eligibleRecipientCount: recipients.length,
-        sentRecipientCount,
-      });
-
       details.push({
-        id: claimedMarketingEmail.id,
-        subject: claimedMarketingEmail.subject,
-        status: 'SENT',
-        attempts: claimedMarketingEmail.emailAttempts,
-        eligibleRecipientCount: recipients.length,
-        sentRecipientCount,
-        error: null,
+        id: claimed.id,
+        subject: claimed.subject,
+        status: outcome.status === 'PENDING' ? 'DEFERRED' : outcome.status,
+        attempts: claimed.emailAttempts,
+        eligibleRecipientCount,
+        sentRecipientCount: outcome.sentRecipientCount,
+        error: outcome.error,
       });
     } catch (error) {
-      const errorMessage = getSendMarketingEmailErrorMessage(error);
-
-      await markMarketingEmailAsFailedInPrismaRepository({
-        id: claimedMarketingEmail.id,
-        errorMessage,
-        eligibleRecipientCount: recipients.length,
-        sentRecipientCount,
-      });
-
+      // Leave the durable checkpoint untouched on database errors. The expired
+      // lease lets a later cron recover, including an unacknowledged batch.
+      if (!(error instanceof MarketingEmailLeaseLostError)) throw error;
       details.push({
-        id: claimedMarketingEmail.id,
-        subject: claimedMarketingEmail.subject,
-        status: 'FAILED',
-        attempts: claimedMarketingEmail.emailAttempts,
-        eligibleRecipientCount: recipients.length,
+        id: claimed.id,
+        subject: claimed.subject,
+        status: 'SKIPPED',
+        attempts: claimed.emailAttempts,
+        eligibleRecipientCount,
         sentRecipientCount,
-        error: errorMessage,
+        error: error.message,
       });
     }
   }
-
   return toSendMarketingEmailsResult(details);
-}
-
-async function sendMarketingEmailToRecipients({
-  marketingEmail,
-  recipients,
-}: {
-  marketingEmail: {
-    id: string;
-    subject: string;
-    eyebrow: string | null;
-    title: string;
-    intro: string | null;
-    content: string;
-    note: string | null;
-    imageUrl?: string | null;
-    links?: string[];
-  };
-  recipients: TMarketingEmailRecipient[];
-}): Promise<number> {
-  const html = getMarketingEmailHtml({
-    eyebrow: marketingEmail.eyebrow,
-    title: marketingEmail.title,
-    intro: marketingEmail.intro,
-    content: marketingEmail.content,
-    note: marketingEmail.note,
-    imageUrl: marketingEmail.imageUrl,
-    links: marketingEmail.links,
-  });
-  const from = getMarketingEmailFromAddress();
-  let sentRecipientCount = 0;
-
-  for (const [batchIndex, batchRecipients] of chunkArray(
-    recipients,
-    RESEND_BATCH_SIZE,
-  ).entries()) {
-    const result = await resend.batch.send(
-      batchRecipients.map((recipient) => ({
-        from,
-        to: recipient.email,
-        subject: marketingEmail.subject,
-        html,
-        tags: [
-          {
-            name: 'marketing_email_id',
-            value: marketingEmail.id,
-          },
-        ],
-      })),
-      {
-        batchValidation: 'strict',
-        idempotencyKey: `marketing-email-${marketingEmail.id}-batch-${batchIndex}`,
-      },
-    );
-
-    if (result.error || !result.data) {
-      throw new Error(formatResendError(result.error));
-    }
-
-    sentRecipientCount += result.data.data.length;
-  }
-
-  return sentRecipientCount;
 }
 
 function getMarketingEmailFromAddress() {
@@ -270,6 +217,9 @@ function toSendMarketingEmailsResult(
     failedMarketingEmailCount: details.filter(
       (detail) => detail.status === 'FAILED',
     ).length,
+    deferredMarketingEmailCount: details.filter(
+      (detail) => detail.status === 'DEFERRED',
+    ).length,
     skippedMarketingEmailCount: details.filter(
       (detail) => detail.status === 'SKIPPED',
     ).length,
@@ -279,33 +229,4 @@ function toSendMarketingEmailsResult(
     ),
     details,
   };
-}
-
-function emptySendMarketingEmailsResult(): TSendMarketingEmailsResult {
-  return toSendMarketingEmailsResult([]);
-}
-
-function getSendMarketingEmailErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === 'string') return error;
-  return "L'envoi de l'email marketing a échoué.";
-}
-
-function formatResendError(
-  error: { message: string; name: string; statusCode: number | null } | null,
-): string {
-  if (!error) return "L'envoi Resend a échoué.";
-
-  const status = error.statusCode ? ` (${error.statusCode})` : '';
-  return `${error.name}${status}: ${error.message}`;
-}
-
-function chunkArray<T>(items: T[], size: number): T[][] {
-  const chunks: T[][] = [];
-
-  for (let index = 0; index < items.length; index += size) {
-    chunks.push(items.slice(index, index + size));
-  }
-
-  return chunks;
 }

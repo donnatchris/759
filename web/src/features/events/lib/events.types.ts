@@ -8,3 +8,11 @@ export type TEventsPagination = {
   nextPage: number | null;
   version: string;
 };
+
+export type TPublicCalendarEvent = {
+  id: string;
+  title: string;
+  content: string;
+  start: string;
+  end: string | null;
+};

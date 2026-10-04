@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { MapPin, Mail, Phone } from 'lucide-react';
 import { LinkWithIcon } from '@/components/custom-ui/link-with-icon';
 
@@ -53,30 +52,19 @@ export function Footer({ siteSettings }: Props) {
 		<footer className="overflow-hidden border-t border-heritage-gold/30 bg-heritage-ink text-heritage-paper">
 			<div className="container mx-auto flex flex-col gap-12 px-6 py-16 text-sm sm:grid sm:grid-cols-[1.35fr_1fr_1fr] sm:px-8 lg:py-20">
 				<div>
-					<div className="flex items-center gap-4">
-						<span className="relative size-16 shrink-0 overflow-hidden rounded-full border-2 border-secondary bg-black">
-							<Image
-								src="/uploads/logo-noir.jpg"
-								alt="Logo du 7.59"
-								fill
-								sizes="64px"
-								className="object-cover"
-							/>
-						</span>
-						<div>
-							<p className="font-heading text-3xl font-semibold tracking-[-0.04em] text-heritage-paper">
+					<div>
+						<p className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-heritage-gold">
+							Association Délices et Traditions du Roussillon
+						</p>
+						<div className="mt-5 flex flex-col gap-3 [&_a]:text-heritage-paper/65 [&_a:hover]:text-heritage-paper">
+							<p className="text-heritage-paper/60">
 								{fullName}
 							</p>
-							<p className="mt-1.5 text-[0.62rem] font-bold uppercase tracking-[0.2em] text-heritage-gold">
-								Association · Pyrénées-Orientales
+							<p className="text-heritage-paper/60">
+								{slogan}
 							</p>
 						</div>
 					</div>
-					{description && (
-						<p className="mt-6 max-w-md text-sm leading-7 text-heritage-paper/60">
-							{description}
-						</p>
-					)}
 					<Link
 						href="/cgu"
 						className="mt-5 inline-block text-xs font-semibold uppercase tracking-[0.1em] text-heritage-paper/75 underline underline-offset-4 transition-colors hover:text-heritage-paper"

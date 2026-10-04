@@ -48,7 +48,7 @@ export const NOTIFICATION_TYPE_ACTIONS: Record<
     href: '/staff/utilisateurs',
   }),
   NEW_USER_WELCOME: () => ({
-    label: 'Voir mon tableau de bord',
+    label: 'Voir mon compte',
     href: '/dashboard',
   }),
   USER_ACCOUNT_DELETED_ADMIN_NOTIFICATION: () => ({

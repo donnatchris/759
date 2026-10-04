@@ -15,6 +15,7 @@ import {
   createOpeningClosureSchema,
   deleteOpeningClosureSchema,
   getOpeningClosuresCalendarSchema,
+  getPublicOpeningClosuresCalendarSchema,
   updateOpeningClosureSchema,
   updateOpeningSlotsSchema,
 } from './opening-slots.schema';
@@ -153,4 +154,16 @@ export async function getCachedNextOpeningClosurePeriodsService(): Promise<
 > {
   requireHorairesEnabled();
   return readCachedOpeningClosures();
+}
+
+export async function getPublicOpeningClosureCalendarEventsService(
+  data: unknown,
+): Promise<TOpeningClosureCalendarEvent[]> {
+  requireHorairesEnabled();
+  return await executeServiceOrThrow({
+    serviceName: 'getPublicOpeningClosureCalendarEventsService',
+    repositoryMethod: getOpeningClosureCalendarEventsFromPrismaRepository,
+    data,
+    zodSchema: getPublicOpeningClosuresCalendarSchema,
+  });
 }

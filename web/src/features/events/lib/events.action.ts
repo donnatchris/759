@@ -3,6 +3,7 @@
 import { executeAction, type TServerResponse } from '@/features/core';
 import { revalidatePath } from 'next/cache';
 import {
+  getCalendarEventsService,
   createEventService,
   deleteEventService,
   editEventService,
@@ -89,4 +90,12 @@ export async function deleteEventAction(
   }
 
   return response;
+}
+
+export async function getCalendarEventsAction(data: unknown) {
+  return await executeAction({
+    actionName: 'getCalendarEventsAction',
+    service: getCalendarEventsService,
+    input: data,
+  });
 }

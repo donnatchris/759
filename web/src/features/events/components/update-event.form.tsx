@@ -1,5 +1,6 @@
 'use client';
 
+import { notifyCalendarEventsChanged } from '../lib/events-calendar-refresh';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -92,6 +93,7 @@ export function UpdateEventForm({ values, onSuccess, onClose }: Props) {
       }
 
       resetAll();
+      notifyCalendarEventsChanged();
       onSuccess?.();
       onClose?.();
     } catch {
@@ -152,14 +154,15 @@ export function UpdateEventForm({ values, onSuccess, onClose }: Props) {
         </h3>
         <p className="text-xs text-muted-foreground">
           {
-            "Si votre événement est temporaire, vous pouvez définir les dates de début et de fin de l'événement pour informer les utilisateurs de la période de validité de l'événement."
+            'La date de début place l’événement dans le calendrier public. La date de fin est facultative : sans elle, l’événement apparaît sur une seule journée.'
           }
         </p>
         <RHFInput
           name="eventStartDate"
           label="Date de début de l'événement"
           type="date"
-          popoverContent="Date et heure de début de l'événement (optionnel)."
+          required
+          popoverContent="Date de début obligatoire. L’événement sera visible dans les calendriers et sur la page d’accueil."
         />
         <RHFInput
           name="eventEndDate"

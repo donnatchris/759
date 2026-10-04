@@ -7,6 +7,7 @@ import {
   getAllOpeningSlotsService,
   getNextOpeningClosurePeriodsService,
   getOpeningClosureCalendarEventsService,
+  getPublicOpeningClosureCalendarEventsService,
   updateOpeningClosureService,
   updateAllOpeningSlotsService,
 } from './opening-slots.service';
@@ -92,4 +93,14 @@ export async function deleteOpeningClosureAction(
   });
   if (res.success) safeUpdateTag(OPENING_SLOT_CACHE_TAG);
   return res;
+}
+
+export async function getPublicOpeningClosureCalendarEventsAction(
+  data: unknown,
+): Promise<TServerResponse<TOpeningClosureCalendarEvent[]>> {
+  return await executeAction({
+    actionName: 'getPublicOpeningClosureCalendarEventsAction',
+    service: getPublicOpeningClosureCalendarEventsService,
+    input: data,
+  });
 }

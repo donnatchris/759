@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 
 import { sendMarketingEmails } from '@/features/mail/lib/marketing-email.service';
 
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   const siteName = process.env.SITE_NAME || 'unknown-site';
   const logPrefix = `[cron-marketing-emails-${siteName}]`;
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
     console.dir(result, { depth: null });
 
     return NextResponse.json({
-      success: true,
+      success: result.failedMarketingEmailCount === 0,
       siteName,
       result,
     });

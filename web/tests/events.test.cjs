@@ -182,3 +182,122 @@ test('optional media preserves old emails and escapes unsafe URLs', () => {
   });
   assert.ok(!unsafe.includes('javascript:'));
 });
+
+test('calendar events require a start date and accept a single-day event', () => {
+  for (const start of [undefined, null, '']) {
+    assert.equal(
+      createEventSchema.safeParse({ ...input, eventStartDate: start }).success,
+      false,
+    );
+    assert.equal(
+      updateEventSchema.safeParse({
+        ...input,
+        id: 'event',
+        eventStartDate: start,
+      }).success,
+      false,
+    );
+  }
+  assert.equal(
+    createEventSchema.safeParse({ ...input, eventEndDate: null }).success,
+    true,
+  );
+});
+
+test('calendar includes the last day and isolates event identifiers from reservations', () => {
+  const {
+    toPublicCalendarEvent,
+  } = require('../src/features/events/lib/events.calendar.ts');
+  const event = {
+    id: 'same-id',
+    title: 'Public',
+    content: 'Details',
+    start: '2028-02-28',
+    end: '2028-02-29',
+  };
+  const mapped = toPublicCalendarEvent(event);
+  assert.equal(mapped.end, '2028-03-01');
+  assert.equal(mapped.start, '2028-02-28');
+  assert.equal(mapped.allDay, true);
+  assert.equal(mapped.id, 'public-event-same-id');
+  assert.equal(mapped.extendedProps.eventKind, 'publicEvent');
+  assert.equal(
+    toPublicCalendarEvent({ ...event, start: '2026-12-31', end: null }).end,
+    '2027-01-01',
+  );
+});
+
+test('public calendar reads only event fields without staff access and validates its range', async (t) => {
+  t.mock.method(console, 'error', () => {});
+  const {
+    getCalendarEventsService,
+  } = require('../src/features/events/lib/events.service.ts');
+  let query;
+  prisma.event = {
+    findMany: async (args) => {
+      query = args;
+      return [
+        {
+          id: 'public',
+          title: 'Public',
+          content: 'Details',
+          eventStartDate: new Date('2099-09-29'),
+          eventEndDate: new Date('2099-10-03'),
+        },
+      ];
+    },
+  };
+  admin = false;
+  SETTINGS.features.events = true;
+  const result = await getCalendarEventsService({
+    start: '2099-10-01',
+    end: '2099-11-01',
+  });
+  assert.deepEqual(result, [
+    {
+      id: 'public',
+      title: 'Public',
+      content: 'Details',
+      start: '2099-09-29',
+      end: '2099-10-03',
+    },
+  ]);
+  assert.deepEqual(query.select, {
+    id: true,
+    title: true,
+    content: true,
+    eventStartDate: true,
+    eventEndDate: true,
+  });
+  assert.deepEqual(query.where, {
+    eventStartDate: { not: null, lt: new Date('2099-11-01') },
+    OR: [
+      { eventEndDate: { gte: new Date('2099-10-01') } },
+      { eventEndDate: null, eventStartDate: { gte: new Date('2099-10-01') } },
+    ],
+  });
+  for (const range of [
+    { start: 'invalid', end: '2099-11-01' },
+    { start: '2099-11-01', end: '2099-10-01' },
+    { start: '2099-10-01', end: '2101-10-01' },
+  ])
+    await assert.rejects(() => getCalendarEventsService(range));
+  SETTINGS.features.events = false;
+  await assert.rejects(() =>
+    getCalendarEventsService({ start: '2099-10-01', end: '2099-11-01' }),
+  );
+  SETTINGS.features.events = true;
+  admin = true;
+});
+
+test('public closures preserve exclusive calendar end and inclusive detail dates', () => {
+  const { toPublicClosureCalendarEvent } = require('../src/features/events/lib/events.calendar.ts');
+  const closure = { id: 'opening-closure-7', title: 'Fermeture', label: 'Congés', startDate: '2026-12-28', endDate: '2027-01-03', start: '2026-12-28', end: '2027-01-04', allDay: true };
+  const event = toPublicClosureCalendarEvent(closure);
+  assert.equal(event.start, '2026-12-28');
+  assert.equal(event.end, '2027-01-04');
+  assert.equal(event.extendedProps.publicEvent.end, '2027-01-03');
+  assert.equal(event.extendedProps.publicEvent.content, 'Congés');
+  assert.equal(event.extendedProps.eventKind, 'publicClosure');
+  assert.equal(event.title, 'Fermeture : Congés');
+});

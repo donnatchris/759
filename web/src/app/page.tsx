@@ -5,6 +5,7 @@ import {
 	isMenuEnabled,
 	isPrestationsEnabled,
 } from '@/settings/settings.helpers';
+import { HomeEventsCalendar } from '@/features/events/components/home-events-calendar';
 import { Hero } from '@/components/landing-page/hero';
 import { OfferingsSummary } from '@/features/services/components/offerings-summary';
 import { getCachedAllServicesCategoriesService } from '@/features/services/lib/services.service';
@@ -98,6 +99,7 @@ export default async function HomePage() {
 					openingClosures={openingClosures}
 					presentation={openingSlotsPresentation}
 				/>}
+			<HomeEventsCalendar />
 			<ScrollReveal />
 		</section>
 	);

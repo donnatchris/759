@@ -55,7 +55,7 @@ export function getReservationReminderEmailHtml({
   return getGenericEmailHtml({
     title: 'Rappel de votre rendez-vous',
     intro: getGreeting(customerName),
-    content: `Nous vous rappelons votre rendez-vous pour ${serviceLabel}, prévu le ${formatReservationDateTime(startsAt)}. Vous pouvez consulter ou annuler votre réservation depuis votre tableau de bord.`,
+    content: `Nous vous rappelons votre rendez-vous pour ${serviceLabel}, prévu le ${formatReservationDateTime(startsAt)}. Vous pouvez consulter ou annuler votre réservation depuis votre compte.`,
     actionUrl: dashboardUrl,
     actionLabel: 'Consulter ma réservation',
   });

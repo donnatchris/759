@@ -51,7 +51,7 @@ export type TSendMarketingEmailsOptions = {
 export type TSendMarketingEmailsDetail = {
   id: string;
   subject: string;
-  status: 'SENT' | 'FAILED' | 'SKIPPED';
+  status: 'SENT' | 'FAILED' | 'SKIPPED' | 'DEFERRED';
   attempts: number;
   eligibleRecipientCount: number;
   sentRecipientCount: number;
@@ -62,6 +62,7 @@ export type TSendMarketingEmailsResult = {
   processedMarketingEmailCount: number;
   sentMarketingEmailCount: number;
   failedMarketingEmailCount: number;
+  deferredMarketingEmailCount: number;
   skippedMarketingEmailCount: number;
   sentRecipientCount: number;
   details: TSendMarketingEmailsDetail[];

@@ -1,5 +1,7 @@
 'use client';
 
+import { notifyCalendarEventsChanged } from '@/features/events/lib/events-calendar-refresh';
+
 import { useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -69,6 +71,7 @@ export function CreateOpeningClosureForm({ onSuccess, onClose }: Props) {
 
       reset(defaultValues);
       setSuccessMessage('La période de fermeture a bien été enregistrée.');
+      notifyCalendarEventsChanged();
       onSuccess?.();
       onClose?.();
     } catch {

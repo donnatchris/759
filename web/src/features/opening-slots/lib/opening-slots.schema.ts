@@ -197,3 +197,9 @@ export type TGetOpeningClosuresCalendarInput = z.input<
 export type TGetOpeningClosuresCalendarOutput = z.output<
   typeof getOpeningClosuresCalendarSchema
 >;
+
+export const getPublicOpeningClosuresCalendarSchema =
+  getOpeningClosuresCalendarSchema.refine(
+    ({ start, end }) => end.getTime() - start.getTime() <= 370 * 86400000,
+    { message: 'La période demandée ne doit pas dépasser un an.' },
+  );

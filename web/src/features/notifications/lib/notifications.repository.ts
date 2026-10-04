@@ -208,7 +208,7 @@ export async function createNewUserWelcomeNotificationInPrismaRepository(
         type: 'NEW_USER_WELCOME',
         title: 'Bienvenue',
         content:
-          'Votre compte a bien été créé. Vous pouvez désormais gérer vos informations et vos réservations depuis votre tableau de bord.',
+          'Votre compte a bien été créé. Vous pouvez désormais gérer vos informations et vos réservations depuis votre compte.',
       },
     });
   } catch (error) {

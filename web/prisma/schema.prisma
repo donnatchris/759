@@ -566,6 +566,16 @@ model MarketingEmail {
     emailLastAttemptAt DateTime?
     emailLastError     String?
 
+    // Immutable send payload and durable checkpoint, independent of Resend's 24h cache.
+    deliverySnapshot Json?
+    nextBatchIndex Int @default(0)
+    batchAttemptedAt DateTime?
+    sendLeaseToken String?
+    sendLeaseExpiresAt DateTime?
+    nextAttemptAt DateTime?
+    consecutiveFailures Int @default(0)
+    requiresReview Boolean @default(false)
+
     createdByUserId String?
     createdByEmail  String?
 
@@ -575,4 +585,11 @@ model MarketingEmail {
     @@index([status, scheduledFor])
     @@index([createdAt])
     @@map("marketing_email")
+}
+
+// Shared pacing across cron processes using this database.
+model MarketingEmailDispatchClock {
+    id String @id
+    nextSlotAt DateTime
+    @@map("marketing_email_dispatch_clock")
 }

@@ -11,7 +11,7 @@ export const siteSectionSeeds: TSiteSectionSeed[] = [
     subTitle:
       'Ici, les traditions ne prennent pas la poussière : elles passent de main en main.',
     content: `${fullName} réunit celles et ceux qui aiment le pays catalan, la France, les grandes tablées et les conversations qui durent. Nous organisons des rencontres conviviales, des repas, des conférences et des soirées pour faire vivre un héritage commun sans jamais le figer.`,
-    footer: 'Bonne bouffe · Copains · Traditions',
+    footer: 'Patriotisme · Copains · Traditions',
   },
   {
     id: 'opening-slots',

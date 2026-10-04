@@ -257,3 +257,54 @@
     --swiper-pagination-color: #fffdf7;
   }
 }
+
+#horaires:has(+ #agenda) {
+  padding-bottom: 2rem;
+  border-bottom: 0;
+}
+
+#horaires + #agenda {
+  padding-top: 0;
+}
+
+.public-events-calendar {
+  --fc-border-color: color-mix(in srgb, var(--heritage-paper) 25%, transparent);
+  --fc-page-bg-color: var(--heritage-ink);
+  --fc-neutral-bg-color: #ffffff0a;
+  --fc-neutral-text-color: var(--heritage-paper);
+  --fc-today-bg-color: #ffffff0d;
+  --fc-button-bg-color: var(--heritage-ink);
+  --fc-button-border-color: var(--heritage-gold);
+  --fc-button-text-color: var(--heritage-paper);
+  --fc-button-hover-bg-color: var(--heritage-red);
+  --fc-button-hover-border-color: var(--heritage-gold);
+  --fc-button-active-bg-color: var(--heritage-red);
+  --fc-button-active-border-color: var(--heritage-gold);
+}
+.public-events-calendar .fc-event {
+  cursor: pointer;
+}
+.public-events-calendar .fc-event-title {
+  white-space: normal;
+}
+.public-events-calendar .fc-toolbar-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+}
+@media (max-width: 639px) {
+  .public-events-calendar .fc-header-toolbar {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .public-events-calendar .fc-toolbar-chunk:nth-child(2) {
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+  .public-events-calendar .fc-daygrid-day-number {
+    padding: 4px;
+  }
+  .public-events-calendar .fc-event {
+    font-size: 0.7rem;
+  }
+}

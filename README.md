@@ -155,6 +155,43 @@ POST /api/cron/reservation-reminders
 POST /api/cron/marketing-emails
 ```
 
+### Reprise des campagnes marketing
+
+Appeler `/api/cron/marketing-emails` **toutes les minutes**. La date `scheduledFor`
+empêche les départs anticipés ; les appels suivants reprennent les campagnes
+incomplètes. Chaque exécution dispose d'un budget de 40 secondes (route configurée
+à 60 secondes). Vérifier que l'hébergement et le client cron autorisent cette durée.
+
+Les envois sont découpés en lots de 100, avec un créneau par seconde partagé entre
+les processus utilisant la même base. Les autres applications utilisant le même
+compte Resend partagent toujours sa limite globale. Les réponses `429` sont
+retentées en respectant `Retry-After` ; une attente trop longue reporte la reprise
+au prochain appel éligible. Les quotas journaliers attendent le prochain jour UTC.
+
+Avant de déployer ce code, appliquer les migrations avec le processus habituel
+(`prisma migrate deploy`) et régénérer le client Prisma. La migration
+`20261004140000_marketing_email_delivery_checkpoints` ajoute les données de reprise.
+Elle bloque les anciennes campagnes déjà tentées mais non terminées : leur
+historique ne permet pas de savoir quels lots ont été acceptés. Vérifier ces
+campagnes dans Resend avant d'envisager un nouvel envoi.
+
+Les destinataires, l'expéditeur et le contenu sont figés au début du traitement.
+Après chaque lot accepté, le compteur et le prochain lot sont sauvegardés.
+`SENT` indique l'acceptation par Resend, pas une livraison garantie en boîte de
+réception. Une exécution interrompue devient récupérable après expiration de son
+verrou de deux minutes. Une interruption entre l'appel Resend et sa sauvegarde
+réutilise la même clé d'idempotence et le même contenu.
+
+Un lot dont la réception reste incertaine depuis 23 heures est bloqué
+(`requiresReview`) pour éviter un doublon après expiration de la protection de
+24 heures de Resend. Consulter `emailLastError` dans le détail de la campagne et
+rapprocher les logs Resend avec son tag `marketing_email_id` et sa clé
+`marketing-email-<id>-batch-<index>` (index à partir de zéro). Ne pas effacer le
+point de reprise ni recréer la campagne sans vérifier les envois déjà acceptés.
+Trois échecs consécutifs de campagne suspendent également la reprise automatique ;
+une pause liée au budget de temps ou au débit ne consomme pas ces trois essais.
+Le résultat du cron distingue les campagnes `DEFERRED`, `FAILED` et `SENT`.
+
 ## Remarque sur le seed
 
 `make dev-init` recrée une base vide. `make db-seed-data` peut aussi supprimer et

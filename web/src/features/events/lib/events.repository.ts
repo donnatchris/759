@@ -5,12 +5,17 @@ import { ERROR_CODES } from '@/features/core/error/error.handling';
 import { isNotFoundError } from '@/lib/prisma/prisma.helpers';
 import { prisma } from '@/lib/prisma/prisma';
 import type {
+  TGetCalendarEventsOutput,
   TCreateEventOutput,
   TDeleteEventOutput,
   TGetEventsOutput,
   TUpdateEventOutput,
 } from './events.schema';
-import type { Event, TEventsPagination } from './events.types';
+import type {
+  Event,
+  TEventsPagination,
+  TPublicCalendarEvent,
+} from './events.types';
 
 export async function getMaxFiveEventsToDisplayFromPrismaRepository(): Promise<
   Event[]
@@ -165,4 +170,37 @@ export async function deleteEventFromPrismaRepository(
     if (error instanceof AppError) throw error;
     throw new AppError(ERROR_CODES.DATABASE_ERROR);
   }
+}
+
+// This public query reads only events; reservation data never enters this feed.
+export async function getCalendarEventsFromPrismaRepository(
+  data: TGetCalendarEventsOutput,
+): Promise<TPublicCalendarEvent[]> {
+  requireEventsEnabled();
+  const start = new Date(data.start);
+  const end = new Date(data.end);
+  const events = await prisma.event.findMany({
+    where: {
+      eventStartDate: { not: null, lt: end },
+      OR: [
+        { eventEndDate: { gte: start } },
+        { eventEndDate: null, eventStartDate: { gte: start } },
+      ],
+    },
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      eventStartDate: true,
+      eventEndDate: true,
+    },
+    orderBy: { eventStartDate: 'asc' },
+  });
+  return events.map((event) => ({
+    id: event.id,
+    title: event.title,
+    content: event.content,
+    start: event.eventStartDate!.toISOString().slice(0, 10),
+    end: event.eventEndDate?.toISOString().slice(0, 10) ?? null,
+  }));
 }

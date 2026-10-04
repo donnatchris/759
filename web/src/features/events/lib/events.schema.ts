@@ -69,6 +69,14 @@ export const eventSchema = z
     ),
   })
   .superRefine((data, ctx) => {
+    if (!data.eventStartDate) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'La date de début est obligatoire pour afficher l’événement dans le calendrier.',
+        path: ['eventStartDate'],
+      });
+    }
     const now = new Date();
     if (data.eventEndDate && data.eventEndDate < now) {
       ctx.addIssue({
@@ -164,3 +172,20 @@ export const getEventsSchema = z.object({
 
 export type TGetEventsInput = z.input<typeof getEventsSchema>;
 export type TGetEventsOutput = z.output<typeof getEventsSchema>;
+
+export const getCalendarEventsSchema = z
+  .object({
+    start: z.iso.date(),
+    end: z.iso.date(),
+  })
+  .refine(
+    ({ start, end }) =>
+      start < end &&
+      new Date(end).getTime() - new Date(start).getTime() <= 370 * 86400000,
+    {
+      message:
+        'La période du calendrier doit être valide et ne pas dépasser un an.',
+    },
+  );
+
+export type TGetCalendarEventsOutput = z.output<typeof getCalendarEventsSchema>;

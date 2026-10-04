@@ -35,7 +35,7 @@ export function OpeningSlots({
 	}
 
 	return (
-		<section id="horaires" className="scroll-mt-20 relative overflow-hidden border-y-2 border-heritage-ink bg-heritage-ink px-6 py-16 text-heritage-paper sm:px-10 sm:py-24">
+		<section id="horaires" className="relative overflow-hidden border-y-2 border-heritage-ink bg-heritage-ink px-6 py-16 text-heritage-paper sm:px-10 sm:py-24">
 			<div
 				className="absolute inset-y-0 right-0 w-2 bg-[repeating-linear-gradient(0deg,var(--heritage-gold)_0_20px,var(--heritage-red)_20px_36px)]"
 				aria-hidden="true"

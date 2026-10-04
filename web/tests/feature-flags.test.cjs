@@ -415,3 +415,31 @@ test('opening-hours section disappears when disabled and renders again when enab
     Object.assign(SETTINGS.features, originalFlags);
   }
 });
+
+test('public closure calendar requires no authentication, validates ranges and respects horaires', async (t) => {
+  t.mock.method(console, 'error', () => {});
+  const service = require('../src/features/opening-slots/lib/opening-slots.service.ts');
+  const previous = SETTINGS.features.horaires;
+  const beforeAuth = authCalls;
+  try {
+    SETTINGS.features.horaires = true;
+    assert.deepEqual(await service.getPublicOpeningClosureCalendarEventsService({
+      start: '2026-10-01T00:00:00.000Z', end: '2026-11-01T00:00:00.000Z',
+    }), []);
+    assert.equal(authCalls, beforeAuth);
+    const beforeDb = databaseCalls;
+    for (const range of [
+      { start: 'invalid', end: '2026-11-01T00:00:00.000Z' },
+      { start: '2026-11-01T00:00:00.000Z', end: '2026-10-01T00:00:00.000Z' },
+      { start: '2026-10-01T00:00:00.000Z', end: '2028-10-01T00:00:00.000Z' },
+    ]) await assert.rejects(() => service.getPublicOpeningClosureCalendarEventsService(range));
+    SETTINGS.features.horaires = false;
+    await assert.rejects(() => service.getPublicOpeningClosureCalendarEventsService({
+      start: '2026-10-01T00:00:00.000Z', end: '2026-11-01T00:00:00.000Z',
+    }));
+    assert.equal(databaseCalls, beforeDb);
+    assert.equal(authCalls, beforeAuth);
+  } finally {
+    SETTINGS.features.horaires = previous;
+  }
+});

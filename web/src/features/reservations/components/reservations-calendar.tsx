@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  isEventsEnabled,
   isPrestationsEnabled,
   isHorairesEnabled,
 } from '@/settings/settings.helpers';
@@ -19,6 +20,11 @@ import type {
   EventSourceFuncArg,
   FormatterInput,
 } from '@fullcalendar/core';
+import { getCalendarEventsAction } from '@/features/events/lib/events.action';
+import { useCalendarEventsRefresh } from '@/features/events/lib/events-calendar-refresh';
+import { toPublicCalendarEvent } from '@/features/events/lib/events.calendar';
+import { CalendarEventDialog } from '@/features/events/components/calendar-event-dialog';
+import type { TPublicCalendarEvent } from '@/features/events/lib/events.types';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Ban, CalendarPlus, CalendarX } from 'lucide-react';
@@ -82,7 +88,11 @@ export function ReservationsCalendar({
   showCreateReservationAction,
   reservationUser,
 }: TReservationsCalendarProps) {
+  const [publicEvent, setPublicEvent] = useState<TPublicCalendarEvent | null>(
+    null,
+  );
   const calendarRef = useRef<FullCalendar | null>(null);
+  useCalendarEventsRefresh(calendarRef);
   const router = useRouter();
   const isMobile = useIsMobile();
   const { isAdmin, user } = useUser();
@@ -237,8 +247,21 @@ export function ReservationsCalendar({
         return [];
       }
 
-      setCalendarError(null);
+      const publicResponse = isEventsEnabled()
+        ? await getCalendarEventsAction({
+            start: fetchInfo.startStr.slice(0, 10),
+            end: fetchInfo.endStr.slice(0, 10),
+          }).catch(() => ({ success: false as const }))
+        : null;
+      setCalendarError(
+        publicResponse && !publicResponse.success
+          ? 'Les événements publics n’ont pas pu être chargés.'
+          : null,
+      );
       return [
+        ...(publicResponse?.success
+          ? publicResponse.data.map(toPublicCalendarEvent)
+          : []),
         ...reservationResponse.data.map((reservation) =>
           toCalendarEvent(reservation, mode),
         ),
@@ -252,6 +275,11 @@ export function ReservationsCalendar({
 
   const onEventClick = async (info: EventClickArg) => {
     info.jsEvent.preventDefault();
+
+    if (info.event.extendedProps.eventKind === 'publicEvent') {
+      setPublicEvent(info.event.extendedProps.publicEvent);
+      return;
+    }
 
     if (info.event.extendedProps.eventKind === 'openingClosure') {
       if (!isAdmin) return;
@@ -339,14 +367,16 @@ export function ReservationsCalendar({
                   Déclarer une fermeture
                 </Button>
               )}
-              <Button
-                type="button"
-                variant="default"
-                onClick={openCreateResourceUnavailableDialog}
-              >
-                <Ban className="h-4 w-4" aria-hidden="true" />
-                Immobiliser une ressource
-              </Button>
+              {isPrestationsEnabled() && (
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={openCreateResourceUnavailableDialog}
+                >
+                  <Ban className="h-4 w-4" aria-hidden="true" />
+                  Immobiliser une ressource
+                </Button>
+              )}
             </>
           )}
           {canShowCreateReservationAction && (
@@ -381,6 +411,10 @@ export function ReservationsCalendar({
         }}
       />
 
+      <CalendarEventDialog
+        event={publicEvent}
+        onClose={() => setPublicEvent(null)}
+      />
       <ReservationDetailsDialog
         open={detailsOpen}
         onOpenChange={setDetailsOpen}

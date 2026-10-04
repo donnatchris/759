@@ -16,7 +16,7 @@ const usersToSeed = [
     name: 'Christophe Donnat',
     email: 'donnatchris@live.fr',
     password: 'Test123!flex',
-    role: 'ADMIN' as const,
+    role: 'STAFF' as const,
   },
 ];
 
