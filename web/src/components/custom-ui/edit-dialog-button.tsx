@@ -6,12 +6,7 @@ type Props = {
   subTitle: string;
   label?: string;
   buttonVariant?:
-    | 'default'
-    | 'outline'
-    | 'ghost'
-    | 'link'
-    | 'secondary'
-    | 'destructive';
+    'default' | 'outline' | 'ghost' | 'link' | 'secondary' | 'destructive';
   children: React.ReactNode;
 };
 

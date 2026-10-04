@@ -147,7 +147,7 @@ export default async function RootLayout({ children }: Props) {
 							<EditModeProvider>
 								<Navbar
 									initialUnreadNotificationsCount={unreadNotificationsCount}
-									siteName={siteSettings.fullName}
+									siteName={siteSettings.shortName}
 								/>
 								{children}
 								<Footer siteSettings={siteSettings} />

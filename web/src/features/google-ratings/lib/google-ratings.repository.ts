@@ -10,12 +10,12 @@ export async function getGoogleRatingsFromFetchGoogle(): Promise<TGoogleRatings>
     const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
     if (!googlePlaceId || !googleMapsApiKey) {
-    //   throw new AppError(ERROR_CODES.INTERNAL_SERVER_ERROR);
-		return {
-			rating: 0,
-			userRatingCount: 0,
-			googleMapsUri: '',
-		};
+      //   throw new AppError(ERROR_CODES.INTERNAL_SERVER_ERROR);
+      return {
+        rating: 0,
+        userRatingCount: 0,
+        googleMapsUri: '',
+      };
     }
 
     const res = await fetch(

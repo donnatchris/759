@@ -1,5 +1,5 @@
 import { isHorairesEnabled } from '@/settings/settings.helpers';
-import { isActualitesEnabled } from '@/settings/settings.helpers';
+import { isBlogEnabled } from '@/settings/settings.helpers';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -54,7 +54,7 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
 			</div>
 			<div className="relative min-h-full">
 				<Image
-					src="/tchin.png"
+					src="/uploads/tchin.png"
 					alt="Un moment de convivialité autour d’une table au 7.59"
 					fill
 					priority
@@ -93,13 +93,13 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
 							))}
 						</div>
 						<div className="mt-9 flex flex-wrap gap-x-6 gap-y-4">
-							{isActualitesEnabled() && (
+							{isBlogEnabled() && (
 								<Link
-									href="/actualites"
+									href="/blog"
 									className="inline-flex min-h-12 items-center gap-3 rounded-sm border border-heritage-red bg-heritage-red px-6 py-3 text-sm font-semibold text-heritage-paper transition hover:bg-heritage-paper hover:text-heritage-ink focus-visible:outline-2 focus-visible:outline-offset-4"
 								>
 									<CalendarDays className="size-4" />
-									Nos rendez-vous
+									Notre Blog
 								</Link>
 							)}
 							{isHorairesEnabled() && (

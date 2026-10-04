@@ -12,10 +12,7 @@ import {
   deletePublicImageService,
 } from './image.service';
 import type { TPublicImage } from './image.service';
-import {
-  MAX_IMAGE_FILE_SIZE_BYTES,
-  MAX_IMAGES_COUNT,
-} from './image.const';
+import { MAX_IMAGE_FILE_SIZE_BYTES, MAX_IMAGES_COUNT } from './image.const';
 
 export async function getPublicImages(): Promise<
   TServerResponse<TPublicImage[]>

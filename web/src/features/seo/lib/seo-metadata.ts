@@ -6,7 +6,7 @@ import {
   getSiteFullName,
 } from '@/settings/settings.helpers';
 
-const BUSINESS_TOPICS = ['Services', 'Réservation en ligne', 'Actualités'];
+const BUSINESS_TOPICS = ['Services', 'Réservation en ligne', 'Blog'];
 
 const SAME_AS_URLS: string[] = [];
 
@@ -14,7 +14,7 @@ const DEFAULT_SITE_NAME = process.env.SITE_FULL_NAME || 'Mon site';
 
 export const DEFAULT_SEO_TITLE = `${DEFAULT_SITE_NAME} - Site officiel`;
 
-export const DEFAULT_SEO_DESCRIPTION = `Découvrez ${DEFAULT_SITE_NAME}, ses services, ses actualités et ses informations pratiques.`;
+export const DEFAULT_SEO_DESCRIPTION = `Découvrez ${DEFAULT_SITE_NAME}, ses services, son Blog et ses informations pratiques.`;
 
 type PublicPageMetadataOptions = {
   title: string;

@@ -17,22 +17,10 @@ type Props = {
   buttonLabel: React.ReactNode;
   buttonAriaLabel?: string;
   buttonSize?:
-    | 'sm'
-    | 'default'
-    | 'xs'
-    | 'lg'
-    | 'icon'
-    | 'icon-xs'
-    | 'icon-sm'
-    | 'icon-lg';
+    'sm' | 'default' | 'xs' | 'lg' | 'icon' | 'icon-xs' | 'icon-sm' | 'icon-lg';
   buttonClassName?: string;
   buttonVariant?:
-    | 'default'
-    | 'outline'
-    | 'ghost'
-    | 'link'
-    | 'secondary'
-    | 'destructive';
+    'default' | 'outline' | 'ghost' | 'link' | 'secondary' | 'destructive';
   children: React.ReactNode;
 };
 

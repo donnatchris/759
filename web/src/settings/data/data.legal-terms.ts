@@ -34,7 +34,7 @@ Les coordonnées complètes de l'hébergeur doivent être renseignées par l'éd
 
 ## 3. Objet du site
 
-Le site de ${siteName} est un site vitrine à vocation informative. Il permet notamment de présenter l'établissement, sa carte, ses horaires, ses coordonnées et ses actualités.
+Le site de ${siteName} est un site vitrine à vocation informative. Il permet notamment de présenter l'établissement, sa carte, ses horaires, ses coordonnées et son Blog.
 
 Le site public ne propose ni création de compte client, ni commande, ni paiement, ni réservation en ligne. Toute prise de contact s'effectue directement au moyen des coordonnées affichées sur le site.
 

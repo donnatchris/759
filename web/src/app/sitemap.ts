@@ -1,15 +1,17 @@
 import {
-  isActualitesEnabled,
+  isBlogEnabled,
+  isEventsEnabled,
   isMenuEnabled,
   isPrestationsEnabled,
 } from '@/settings/settings.helpers';
 import type { MetadataRoute } from 'next';
 
 const PUBLIC_ROUTES = [
+  { path: '/evenements', priority: 0.8, enabled: isEventsEnabled },
   { path: '/', priority: 1, enabled: () => true },
   { path: '/menu', priority: 0.9, enabled: isMenuEnabled },
   { path: '/prestations', priority: 0.9, enabled: isPrestationsEnabled },
-  { path: '/actualites', priority: 0.8, enabled: isActualitesEnabled },
+  { path: '/blog', priority: 0.8, enabled: isBlogEnabled },
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {

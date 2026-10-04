@@ -11,6 +11,8 @@ type GenericEmailTemplateParams = {
   content?: string;
   eyebrow?: string | null;
   note?: string | null;
+  imageUrl?: string | null;
+  links?: string[];
   showAction?: boolean;
   footerText?: string;
   footerUrl?: string;
@@ -26,6 +28,8 @@ export function getGenericEmailHtml({
   actionLabel,
   eyebrow = "Message de l'association",
   note,
+  imageUrl,
+  links,
   showAction = true,
   footerText = 'Message automatique — merci de ne pas répondre à cet email.',
   footerUrl,
@@ -99,6 +103,7 @@ export function getGenericEmailHtml({
                           : ''
                       }
 
+                      ${imageUrl && /^https?:\/\//i.test(imageUrl) ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}" width="516" style="display:block;width:100%;height:auto;margin:0 0 24px;" />` : ''}
                       <h1 class="generic-email-title"
                         style="
                           margin: 0 0 20px 0;
@@ -188,6 +193,13 @@ export function getGenericEmailHtml({
                           : ''
                       }
 
+                      ${(links ?? [])
+                        .filter((url) => /^https?:\/\//i.test(url))
+                        .map(
+                          (url) =>
+                            `<p style="word-break:break-word;"><a href="${escapeHtml(url)}" style="color:#18345b;">${escapeHtml(url)}</a></p>`,
+                        )
+                        .join('')}
                       ${note ? `<div style="margin: 0 0 24px; padding: 17px 19px; background: #f3f2ed; border: 1px solid #ced2d6; border-left: 4px solid #ad343b; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 22px; color: #606a76;">${escapeTextHtml(note)}</div>` : ''}
 
                       ${

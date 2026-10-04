@@ -153,6 +153,14 @@ export function MarketingEmailDetailDialog({
                 <DetailItem label="Contenu" value={marketingEmail.content} />
                 <DetailItem label="Note" value={marketingEmail.note ?? '-'} />
                 <DetailItem
+                  label="Image"
+                  value={marketingEmail.imageUrl ?? '-'}
+                />
+                <DetailItem
+                  label="Liens"
+                  value={marketingEmail.links.join('\n') || '-'}
+                />
+                <DetailItem
                   label="Email créateur"
                   value={marketingEmail.createdByEmail ?? '-'}
                 />

@@ -2,7 +2,7 @@ import { AppError } from '@/features/core/error/error.AppError';
 import { ERROR_CODES } from '@/features/core/error/error.handling';
 import { isNotFoundError } from '@/lib/prisma/prisma.helpers';
 import { prisma } from '@/lib/prisma/prisma';
-import type { MarketingEmail } from '@prisma/client';
+import type { MarketingEmail, Prisma } from '@prisma/client';
 import type {
   TCreateMarketingEmailOutput,
   TDeleteMarketingEmailOutput,
@@ -56,16 +56,14 @@ export async function getMarketingEmailsFromPrismaRepository(
 
 export async function createMarketingEmailInPrismaRepository(
   data: TCreateMarketingEmailRepositoryData,
+  transaction?: Prisma.TransactionClient,
 ): Promise<TMarketingEmailListItem> {
   try {
-    const [eligibleRecipientCount, marketingEmail] = await prisma.$transaction([
-      prisma.user.count({
-        where: {
-          emailVerified: true,
-          canReceiveMarketingEmails: true,
-        },
-      }),
-      prisma.marketingEmail.create({
+    const create = async (tx: Prisma.TransactionClient) => {
+      const eligibleRecipientCount = await tx.user.count({
+        where: { emailVerified: true, canReceiveMarketingEmails: true },
+      });
+      const marketingEmail = await tx.marketingEmail.create({
         data: {
           subject: data.subject,
           eyebrow: data.eyebrow ?? null,
@@ -73,21 +71,19 @@ export async function createMarketingEmailInPrismaRepository(
           intro: data.intro ?? null,
           content: data.content,
           note: data.note ?? null,
+          imageUrl: data.imageUrl ?? null,
+          links: data.links,
           scheduledFor: getNextNightSendDate(),
           createdByUserId: data.createdByUserId,
           createdByEmail: data.createdByEmail,
+          eligibleRecipientCount,
         },
-      }),
-    ]);
-
-    const updatedMarketingEmail = await prisma.marketingEmail.update({
-      where: { id: marketingEmail.id },
-      data: {
-        eligibleRecipientCount,
-      },
-    });
-
-    return toMarketingEmailListItem(updatedMarketingEmail);
+      });
+      return toMarketingEmailListItem(marketingEmail);
+    };
+    return transaction
+      ? await create(transaction)
+      : await prisma.$transaction(create);
   } catch (error) {
     console.error('Error in createMarketingEmailInPrismaRepository:', error);
     if (error instanceof AppError) throw error;
@@ -287,6 +283,8 @@ function toMarketingEmailListItem(
     intro: marketingEmail.intro,
     content: marketingEmail.content,
     note: marketingEmail.note,
+    imageUrl: marketingEmail.imageUrl,
+    links: marketingEmail.links,
     status: marketingEmail.status,
     scheduledFor: marketingEmail.scheduledFor.toISOString(),
     sentAt: marketingEmail.sentAt?.toISOString() ?? null,

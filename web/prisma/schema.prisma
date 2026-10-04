@@ -463,7 +463,25 @@ model CarouselImage {
     @@map("carousel_image")
 }
 
-model CurrentEvent {
+model BlogPost {
+    id               String    @id @unique @default(uuid())
+    title            String
+    subTitle         String?
+    tag              String?
+    content          String
+    author           String?
+    eventStartDate   DateTime?
+    eventEndDate     DateTime?
+    imageUrl         String?
+    links            String[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("blog_post")
+}
+
+model Event {
     id               String    @id @unique @default(uuid())
     title            String
     subTitle         String?
@@ -480,14 +498,14 @@ model CurrentEvent {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@map("current_event")
+    @@map("event")
 }
 
 enum NotificationType {
     NEW_RESERVATION
     RESERVATION_REMINDER
     RESERVATION_CANCELLATION
-    CURRENT_EVENT_ANNOUNCEMENT
+    BLOG_POST_ANNOUNCEMENT
     NEW_USER_ADMIN_NOTIFICATION
     NEW_USER_WELCOME
     USER_ACCOUNT_DELETED_ADMIN_NOTIFICATION
@@ -525,6 +543,8 @@ model Notification {
 }
 
 model MarketingEmail {
+    links String[] @default([])
+    imageUrl String?
     id String @id @default(uuid())
 
     subject String

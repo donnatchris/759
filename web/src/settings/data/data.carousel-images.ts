@@ -4,12 +4,15 @@ type TCarouselImage = Omit<CarouselImage, 'id' | 'createdAt' | 'updatedAt'>;
 
 export const carouselImages: TCarouselImage[] = [
   {
-    url: '/plat-rustique.png',
+    url: '/uploads/plat-rustique.png',
   },
   {
-    url: '/tchin.png',
+	url: '/uploads/france-catalogne.png',
   },
   {
-    url: '/logo.png',
+    url: '/uploads/tchin.png',
+  },
+  {
+    url: '/uploads/logo-noir.jpg',
   },
 ];

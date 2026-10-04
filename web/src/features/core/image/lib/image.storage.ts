@@ -21,8 +21,9 @@ const IMAGE_CONTENT_TYPES: Record<string, string> = {
 
 export function isImageFile(fileName: string): boolean {
   return ALLOWED_IMAGE_EXTENSIONS.includes(
-    path.extname(fileName).toLowerCase() as
-      (typeof ALLOWED_IMAGE_EXTENSIONS)[number],
+    path
+      .extname(fileName)
+      .toLowerCase() as (typeof ALLOWED_IMAGE_EXTENSIONS)[number],
   );
 }
 

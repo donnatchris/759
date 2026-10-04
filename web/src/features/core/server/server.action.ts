@@ -15,8 +15,7 @@ type TExecuteActionWithInput<T> = {
 };
 
 type TExecuteActionProps<T> =
-  | TExecuteActionWithoutInput<T>
-  | TExecuteActionWithInput<T>;
+  TExecuteActionWithoutInput<T> | TExecuteActionWithInput<T>;
 
 export async function executeAction<T>(
   props: TExecuteActionProps<T>,

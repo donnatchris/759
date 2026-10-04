@@ -12,13 +12,12 @@ const usersToSeed = [
     password: 'Test123!flex',
     role: 'ADMIN' as const,
   },
-    {
+  {
     name: 'Christophe Donnat',
     email: 'donnatchris@live.fr',
     password: 'Test123!flex',
     role: 'ADMIN' as const,
   },
-
 ];
 
 async function seedUser({

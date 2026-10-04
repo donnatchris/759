@@ -4,6 +4,26 @@ import { z } from 'zod';
 export const MARKETING_EMAILS_PAGE_SIZE = 100;
 
 export const marketingEmailSchema = z.object({
+  links: z
+    .array(z.url({ protocol: /^https?$/ }))
+    .max(21)
+    .default([]),
+  imageUrl: nullableInput(
+    z
+      .string()
+      .trim()
+      .max(1000)
+      .refine(
+        (value) => {
+          try {
+            return ['https:', 'http:'].includes(new URL(value).protocol);
+          } catch {
+            return false;
+          }
+        },
+        { error: 'URL d’image invalide' },
+      ),
+  ).optional(),
   subject: z
     .string()
     .trim()

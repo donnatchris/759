@@ -12,10 +12,7 @@ import {
   isImageFile,
   resolveImagePath,
 } from './image.storage';
-import {
-  MAX_IMAGE_FILE_SIZE_BYTES,
-  MAX_IMAGES_COUNT,
-} from './image.const';
+import { MAX_IMAGE_FILE_SIZE_BYTES, MAX_IMAGES_COUNT } from './image.const';
 
 export type TPublicImage = {
   name: string;

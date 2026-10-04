@@ -9,17 +9,19 @@ type Props = {
 	label?: string;
 	Icon?: LucideIcon;
 	destination?: string;
-	buttonVariant?: VariantProps<typeof Button>['variant']
+	buttonVariant?: VariantProps<typeof Button>['variant'];
 };
 
-export function CTAButton({ label = 'Voir les actualités du 7.59', Icon = CalendarDays, destination = 'actualites', buttonVariant = 'hero' }: Props) {
+export function CTAButton({
+	label = 'Voir les Événements à venir',
+	Icon = CalendarDays,
+	destination = 'evenements',
+	buttonVariant = 'hero',
+}: Props) {
 	const router = useRouter();
 
 	return (
-		<Button
-			variant={buttonVariant}
-			onClick={() => router.push(destination)}
-		>
+		<Button variant={buttonVariant} onClick={() => router.push(destination)}>
 			<Icon />
 			<span>{label}</span>
 		</Button>

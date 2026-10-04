@@ -1,10 +1,12 @@
 import {
-  isActualitesEnabled,
+  isBlogEnabled,
+  isEventsEnabled,
   isHorairesEnabled,
+  isPrestationsEnabled,
 } from '@/settings/settings.helpers';
 import { Hero } from '@/components/landing-page/hero';
-// import { OfferingsSummary } from '@/features/services/components/offerings-summary';
-// import { getCachedAllServicesCategoriesService } from '@/features/services/lib/services.service';
+import { OfferingsSummary } from '@/features/services/components/offerings-summary';
+import { getCachedAllServicesCategoriesService } from '@/features/services/lib/services.service';
 import { getCachedSiteSettingsService } from '@/features/site-settings/lib/site-settings.service';
 import { getCachedAllSocialMediasService } from '@/features/social-media/lib/social-media.service';
 import { getCachedAllCarouselImagesService } from '@/features/carousel/lib/carousel.service';
@@ -13,15 +15,13 @@ import {
   getCachedPresentationService,
 } from '@/features/presentation/lib/presentation.service';
 import { getGoogleRatingsService } from '@/features/google-ratings/lib/google-ratings.service';
-import {
-  getLatestCurrentEventService,
-  getMaxFiveCurrentEventsToDisplayService,
-} from '@/features/current-events/lib/current-events.service';
+import { getLatestBlogPostService } from '@/features/blog/lib/blog.service';
 import { Carousel } from '@/features/carousel/components/carousel';
 import { Presentation } from '@/features/presentation';
 import { ScrollReveal } from '@/components/system/scroll-reveal';
-import { CurrentEventsPreview } from '@/features/current-events/components/current-events-preview';
-import { LatestCurrentEvent } from '@/features/current-events/components/latest-current-event';
+import { EventsPreview } from '@/features/events/components/events-preview';
+import { getMaxFiveEventsToDisplayService } from '@/features/events/lib/events.service';
+import { LatestBlogPost } from '@/features/blog/components/latest-blog-post';
 import { CTAButton } from '@/components/landing-page/CTAButton';
 import {
   getCachedAllOpeningSlotsService,
@@ -33,27 +33,29 @@ import { OpeningSlots } from '@/features/opening-slots';
 export default async function HomePage() {
   const [
     siteSettings,
-    // servicesCategories,
+    servicesCategories,
     socialMedias,
     carouselImages,
     presentation,
-    lastCurrentEvent,
-    latestCurrentEvent,
+    featuredEvents,
+    latestBlogPost,
     googleRatings,
     openingSlots,
     openingClosures,
     openingSlotsPresentation,
   ] = await Promise.all([
     getCachedSiteSettingsService(),
-    // getCachedAllServicesCategoriesService(),
+    isPrestationsEnabled()
+      ? getCachedAllServicesCategoriesService()
+      : Promise.resolve([]),
     getCachedAllSocialMediasService(),
     getCachedAllCarouselImagesService(),
     getCachedPresentationService(),
-    isActualitesEnabled()
-      ? getMaxFiveCurrentEventsToDisplayService().catch(() => [])
+    isEventsEnabled()
+      ? getMaxFiveEventsToDisplayService().catch(() => [])
       : Promise.resolve([]),
-    isActualitesEnabled()
-      ? getLatestCurrentEventService().catch(() => null)
+    isBlogEnabled()
+      ? getLatestBlogPostService().catch(() => null)
       : Promise.resolve(null),
     getGoogleRatingsService().catch(() => null),
     isHorairesEnabled()
@@ -69,16 +71,16 @@ export default async function HomePage() {
 
   return (
     <section className="relative overflow-hidden bg-background">
-      {isActualitesEnabled() && (
+      {isBlogEnabled() && (
         <div className="fixed bottom-5 right-4 z-50 sm:bottom-12 sm:right-12">
           <CTAButton />
         </div>
       )}
-      <CurrentEventsPreview events={lastCurrentEvent} />
+      <EventsPreview events={featuredEvents} />
       <Hero siteSettings={siteSettings} socialMedias={socialMedias} />
       <Carousel images={carouselImages} />
       <Presentation presentation={presentation} />
-      <LatestCurrentEvent currentEvent={latestCurrentEvent} />
+      <LatestBlogPost blogPost={latestBlogPost} />
       {/* <DishesSummary dishCategories={dishCategories} /> */}
       {/* <OfferingsSummary servicesCategories={servicesCategories} /> */}
       {/* <MoreInfos /> */}

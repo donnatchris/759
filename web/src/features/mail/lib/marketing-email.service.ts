@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { executeServiceOrThrow } from '@/features/core';
 import { requireStaffPermissionOrThrow } from '@/features/permission/lib/permission.service';
 import { requireStaffOrThrow } from '@/features/auth/server/require-staff';
@@ -46,6 +47,7 @@ export async function getMarketingEmailsService(
 
 export async function createMarketingEmailService(
   data: unknown,
+  transaction?: Prisma.TransactionClient,
 ): Promise<TMarketingEmailListItem> {
   const currentUser = await requireStaffPermissionOrThrow(
     'canManageMarketingEmails',
@@ -54,11 +56,14 @@ export async function createMarketingEmailService(
   return await executeServiceOrThrow({
     serviceName: 'createMarketingEmailService',
     repositoryMethod: (parsedData) =>
-      createMarketingEmailInPrismaRepository({
-        ...parsedData,
-        createdByUserId: currentUser.id,
-        createdByEmail: currentUser.email,
-      }),
+      createMarketingEmailInPrismaRepository(
+        {
+          ...parsedData,
+          createdByUserId: currentUser.id,
+          createdByEmail: currentUser.email,
+        },
+        transaction,
+      ),
     data,
     zodSchema: createMarketingEmailSchema,
   });
@@ -194,6 +199,8 @@ async function sendMarketingEmailToRecipients({
     intro: string | null;
     content: string;
     note: string | null;
+    imageUrl?: string | null;
+    links?: string[];
   };
   recipients: TMarketingEmailRecipient[];
 }): Promise<number> {
@@ -203,6 +210,8 @@ async function sendMarketingEmailToRecipients({
     intro: marketingEmail.intro,
     content: marketingEmail.content,
     note: marketingEmail.note,
+    imageUrl: marketingEmail.imageUrl,
+    links: marketingEmail.links,
   });
   const from = getMarketingEmailFromAddress();
   let sentRecipientCount = 0;

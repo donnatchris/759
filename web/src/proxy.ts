@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import {
-  isActualitesEnabled,
+  isBlogEnabled,
+  isEventsEnabled,
   isMenuEnabled,
   isPrestationsEnabled,
 } from '@/settings/settings.helpers';
@@ -11,7 +12,8 @@ export function proxy(request: NextRequest) {
   const disabled =
     (segment === 'menu' && !isMenuEnabled()) ||
     (segment === 'prestations' && !isPrestationsEnabled()) ||
-    (segment === 'actualites' && !isActualitesEnabled());
+    (segment === 'evenements' && !isEventsEnabled()) ||
+    (segment === 'blog' && !isBlogEnabled());
 
   if (disabled) {
     const url = request.nextUrl.clone();
@@ -24,5 +26,10 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/menu/:path*', '/prestations/:path*', '/actualites/:path*'],
+  matcher: [
+    '/evenements/:path*',
+    '/menu/:path*',
+    '/prestations/:path*',
+    '/blog/:path*',
+  ],
 };

@@ -7,6 +7,8 @@ type MarketingEmailTemplateParams = {
   intro?: string | null;
   content: string;
   note?: string | null;
+  imageUrl?: string | null;
+  links?: string[];
 };
 
 export function getMarketingEmailHtml({
@@ -15,6 +17,8 @@ export function getMarketingEmailHtml({
   intro,
   content,
   note,
+  imageUrl,
+  links,
 }: MarketingEmailTemplateParams) {
   return getGenericEmailHtml({
     eyebrow: eyebrow ?? null,
@@ -22,6 +26,8 @@ export function getMarketingEmailHtml({
     intro: intro ?? '',
     content,
     note,
+    imageUrl,
+    links,
     showAction: false,
     footerText:
       "Actualités et informations\n\nSi vous souhaitez ne plus recevoir d'emails commerciaux de notre part, vous pouvez modifier vos préférences en vous connectant à votre compte.",

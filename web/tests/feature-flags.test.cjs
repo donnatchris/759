@@ -32,6 +32,7 @@ const prisma = new Proxy(
 // services, action wrappers, sitemap and metadata generators.
 Module._load = function (request, parent, isMain) {
   if (request === '@/lib/prisma/prisma') return { prisma };
+  if (request === '@/lib/resend/resend') return { resend: {} };
   if (request === 'server-only') return {};
   if (request === 'next/cache')
     return {
@@ -95,15 +96,19 @@ const { AppError } = require('../src/features/core/error/error.AppError.ts');
 const modules = [
   ['prestations', 'services'],
   ['menu', 'dishes'],
-  ['actualites', 'current-events'],
+  ['blog', 'blog'],
+  ['events', 'events'],
 ].map(([flag, feature]) => ({
   flag,
+  route: flag === 'events' ? 'evenements' : flag,
   repository: require(
     `../src/features/${feature}/lib/${feature}.repository.ts`,
   ),
   service: require(`../src/features/${feature}/lib/${feature}.service.ts`),
   action: require(`../src/features/${feature}/lib/${feature}.action.ts`),
-  metadata: require(`../src/app/(public)/${flag}/layout.tsx`).generateMetadata,
+  metadata: require(
+    `../src/app/(public)/${flag === 'events' ? 'evenements' : flag}/layout.tsx`,
+  ).generateMetadata,
 }));
 const reservations = require('../src/features/reservations/lib/reservations.service.ts');
 const reservationRepository = require('../src/features/reservations/lib/reservations.repository.ts');
@@ -117,21 +122,21 @@ const disabled = (error) =>
   error instanceof AppError && error.code === 'FEATURE_DISABLED';
 const originalFlags = { ...SETTINGS.features };
 
-test('all eight combinations enforce disabled modules before database, cache and validation', async (t) => {
+test('all sixteen combinations enforce disabled modules before database, cache and validation', async (t) => {
   t.mock.method(console, 'error', () => {});
   try {
-    for (let mask = 0; mask < 8; mask++) {
+    for (let mask = 0; mask < 16; mask++) {
       modules.forEach(({ flag }, index) => {
         SETTINGS.features[flag] = Boolean(mask & (1 << index));
       });
       const routes = sitemap().map((route) => new URL(route.url).pathname);
       for (const featureModule of modules) {
         assert.equal(
-          routes.includes('/' + featureModule.flag),
+          routes.includes('/' + featureModule.route),
           SETTINGS.features[featureModule.flag],
         );
         const response = proxy(
-          new NextRequest('http://localhost/' + featureModule.flag),
+          new NextRequest('http://localhost/' + featureModule.route),
         );
         assert.equal(
           response.status,
@@ -143,9 +148,14 @@ test('all eight combinations enforce disabled modules before database, cache and
           assert.equal(databaseCalls, before + 2);
           const read = Object.entries(featureModule.service).find(
             ([name]) =>
-              name.startsWith('getAll') || name.startsWith('getMaxFive'),
+              name.startsWith('getAll') ||
+              name.startsWith('getMaxFive') ||
+              (featureModule.flag === 'blog' && name.startsWith('getLatest')),
           )[1];
-          assert.deepEqual(await read(), []);
+          assert.deepEqual(
+            await read(),
+            featureModule.flag === 'blog' ? null : [],
+          );
           assert.equal(databaseCalls, before + 3);
           continue;
         }
@@ -175,8 +185,8 @@ test('all eight combinations enforce disabled modules before database, cache and
         );
       }
       assert.equal(
-        getNotificationAction('CURRENT_EVENT_ANNOUNCEMENT', 'ADMIN') === null,
-        !SETTINGS.features.actualites,
+        getNotificationAction('BLOG_POST_ANNOUNCEMENT', 'ADMIN') === null,
+        !SETTINGS.features.blog,
       );
     }
   } finally {
@@ -245,7 +255,7 @@ test('MoreInfos renders only enabled links and no empty section across all combi
     MoreInfos,
   } = require('../src/components/landing-page/more-infos.tsx');
   try {
-    for (let mask = 0; mask < 8; mask++) {
+    for (let mask = 0; mask < 16; mask++) {
       modules.forEach(({ flag }, index) => {
         SETTINGS.features[flag] = Boolean(mask & (1 << index));
       });
@@ -254,15 +264,12 @@ test('MoreInfos renders only enabled links and no empty section across all combi
         html.includes('href="/prestations"'),
         SETTINGS.features.prestations,
       );
-      assert.equal(
-        html.includes('href="/actualites"'),
-        SETTINGS.features.actualites,
-      );
+      assert.equal(html.includes('href="/blog"'), SETTINGS.features.blog);
       assert.equal(
         html.includes('h-5 w-px shrink-0'),
-        SETTINGS.features.prestations && SETTINGS.features.actualites,
+        SETTINGS.features.prestations && SETTINGS.features.blog,
       );
-      if (!SETTINGS.features.prestations && !SETTINGS.features.actualites)
+      if (!SETTINGS.features.prestations && !SETTINGS.features.blog)
         assert.equal(html, '');
     }
   } finally {
@@ -402,7 +409,7 @@ test('opening-hours section disappears when disabled and renders again when enab
       }),
     );
     assert.ok(html.includes('Nos horaires'));
-    assert.ok(html.includes('Fermé'));
+    assert.ok(html.includes('Sur événement'));
   } finally {
     Module._load = loadWithBoundaries;
     Object.assign(SETTINGS.features, originalFlags);

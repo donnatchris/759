@@ -16,7 +16,7 @@ export function LogoLink({ size = 190, name = 'Le 7.59' }: Props) {
 		>
 			<span className="relative size-12 shrink-0 overflow-hidden rounded-full border border-heritage-gold bg-heritage-ink">
 				<Image
-					src="/logo.png"
+					src="/uploads/logo-noir.jpg"
 					alt=""
 					fill
 					sizes="48px"

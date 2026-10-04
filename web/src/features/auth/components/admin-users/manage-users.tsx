@@ -573,6 +573,8 @@ export function ManageUsers({
   );
 }
 
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
+
 function UserAccountsTab({
   table,
   selectedUserCount,
@@ -618,16 +620,20 @@ function UserAccountsTab({
             loading={bulkUserAction === roleAction}
             onClick={onUpdateRoleClick}
           />
-          <AllowUsersReservationsButton
-            disabled={!hasSelectedUsers || isBulkUserActionPending}
-            loading={bulkUserAction === 'allow-reservations'}
-            onClick={onAllowReservationsClick}
-          />
-          <BlockUsersReservationsButton
-            disabled={!hasSelectedUsers || isBulkUserActionPending}
-            loading={bulkUserAction === 'block-reservations'}
-            onClick={onBlockReservationsClick}
-          />
+          {isPrestationsEnabled() && (
+            <AllowUsersReservationsButton
+              disabled={!hasSelectedUsers || isBulkUserActionPending}
+              loading={bulkUserAction === 'allow-reservations'}
+              onClick={onAllowReservationsClick}
+            />
+          )}
+          {isPrestationsEnabled() && (
+            <BlockUsersReservationsButton
+              disabled={!hasSelectedUsers || isBulkUserActionPending}
+              loading={bulkUserAction === 'block-reservations'}
+              onClick={onBlockReservationsClick}
+            />
+          )}
           <DeleteUserAccountsButton
             disabled={!hasSelectedUsers || isBulkUserActionPending}
             loading={bulkUserAction === 'delete'}

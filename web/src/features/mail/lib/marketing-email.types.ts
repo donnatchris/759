@@ -10,6 +10,8 @@ export type TMarketingEmailListItem = {
   intro: string | null;
   content: string;
   note: string | null;
+  imageUrl: string | null;
+  links: string[];
   status: MarketingEmailStatus;
   scheduledFor: string;
   sentAt: string | null;

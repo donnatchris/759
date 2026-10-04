@@ -40,6 +40,10 @@ db-studio:
 	@printf "\n$(YELLOW)Lancement de prisma studio...$(RESET)\n"
 	@cd web && npx prisma studio
 
+db-local-studio:
+	@printf "\n$(YELLOW)Lancement de prisma studio sur la base locale...$(RESET)\n"
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npx prisma studio'
+
 db-local-migrate:
 	@printf "\n$(YELLOW)Migration de la base de données locale...$(RESET)\n"
 	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npx prisma migrate dev'
@@ -67,6 +71,16 @@ db-local-seed-user:
 	@printf "\n$(YELLOW)Exécution du seed administrateur sur la base locale...$(RESET)\n"
 	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" SEEDING_ADMIN=true npm run prisma:seed-user'
 	@printf "\n$(GREEN)Administrateur local créé ou mis à jour avec succès !$(RESET)\n"
+
+mail-local:
+	@printf "\n$(YELLOW)Appel du webhook de mail avec la db locale...$(RESET)\n"
+	@set -a; . ./web/.env; set +a; \
+	curl -X POST http://localhost:3000/api/cron/marketing-emails -H "Authorization: Bearer $$CRON_SECRET"
+
+mail-prod:
+	@printf "\n$(YELLOW)Appel du webhook de mail en production...$(RESET)\n"
+	@set -a; . ./web/.env; set +a; \
+	curl -X POST https://delice-et-tradition-du-roussillon.fr/api/cron/marketing-emails -H "Authorization: Bearer $$CRON_SECRET"
 
 generate-favicons:
 	@printf "\n$(YELLOW)Génération des favicons...$(RESET)\n"

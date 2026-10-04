@@ -56,8 +56,8 @@ export function Footer({ siteSettings }: Props) {
 					<div className="flex items-center gap-4">
 						<span className="relative size-16 shrink-0 overflow-hidden rounded-full border-2 border-secondary bg-black">
 							<Image
-								src="/logo-noir.jpg"
-								alt=""
+								src="/uploads/logo-noir.jpg"
+								alt="Logo du 7.59"
 								fill
 								sizes="64px"
 								className="object-cover"
@@ -120,7 +120,8 @@ export function Footer({ siteSettings }: Props) {
 				</div>
 			</div>
 			<div className="border-t border-white/10 px-6 py-5 text-center text-[0.6rem] uppercase tracking-[0.16em] text-heritage-paper/70">
-				© {currentYear} {fullName} · Délice et tradition du Roussillon · Tous droits réservés
+				© {currentYear} {fullName} · Délice et tradition du Roussillon · Tous
+				droits réservés
 			</div>
 		</footer>
 	);

@@ -1,7 +1,8 @@
 import { AppError } from '@/features/core/error/error.AppError';
 import { ERROR_CODES } from '@/features/core/error/error.handling';
 import {
-  isActualitesEnabled,
+  isBlogEnabled,
+  isEventsEnabled,
   isMenuEnabled,
   isHorairesEnabled,
   isPrestationsEnabled,
@@ -19,10 +20,14 @@ export function requireMenuEnabled(): void {
   requireEnabled(isMenuEnabled());
 }
 
-export function requireActualitesEnabled(): void {
-  requireEnabled(isActualitesEnabled());
+export function requireBlogEnabled(): void {
+  requireEnabled(isBlogEnabled());
 }
 
 export function requireHorairesEnabled(): void {
   requireEnabled(isHorairesEnabled());
+}
+
+export function requireEventsEnabled(): void {
+  requireEnabled(isEventsEnabled());
 }

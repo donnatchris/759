@@ -1,4 +1,4 @@
-import { isActualitesEnabled } from '@/settings/settings.helpers';
+import { isBlogEnabled } from '@/settings/settings.helpers';
 import type { NotificationType, UserRole } from '@prisma/client';
 
 export type TNotificationAction = {
@@ -14,7 +14,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   NEW_RESERVATION: 'Nouvelle réservation',
   RESERVATION_REMINDER: 'Rappel de réservation',
   RESERVATION_CANCELLATION: 'Annulation de réservation',
-  CURRENT_EVENT_ANNOUNCEMENT: 'Actualité',
+  BLOG_POST_ANNOUNCEMENT: 'Blog',
   NEW_USER_ADMIN_NOTIFICATION: 'Nouvel utilisateur',
   NEW_USER_WELCOME: 'Bienvenue',
   USER_ACCOUNT_DELETED_ADMIN_NOTIFICATION: 'Compte supprimé',
@@ -39,9 +39,9 @@ export const NOTIFICATION_TYPE_ACTIONS: Record<
     href:
       role === 'ADMIN' || role === 'STAFF' ? '/staff/calendrier' : '/dashboard',
   }),
-  CURRENT_EVENT_ANNOUNCEMENT: () => ({
-    label: "Voir l'actualité",
-    href: '/actualites',
+  BLOG_POST_ANNOUNCEMENT: () => ({
+    label: "Voir l'article",
+    href: '/blog',
   }),
   NEW_USER_ADMIN_NOTIFICATION: () => ({
     label: 'Gérer les utilisateurs',
@@ -61,8 +61,7 @@ export function getNotificationAction(
   type: NotificationType,
   role: UserRole,
 ): TNotificationAction | null {
-  if (type === 'CURRENT_EVENT_ANNOUNCEMENT' && !isActualitesEnabled())
-    return null;
+  if (type === 'BLOG_POST_ANNOUNCEMENT' && !isBlogEnabled()) return null;
   return NOTIFICATION_TYPE_ACTIONS[type](role);
 }
 

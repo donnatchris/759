@@ -1,3 +1,4 @@
+import { eventsSeed } from '../data/data.events';
 import { PrismaClient } from '@prisma/client';
 import {
   initialRessources,
@@ -10,7 +11,7 @@ import { siteSocialMedias } from '../data/data.socialMedias';
 import { sitePages } from '../data/data.pages';
 import { carouselImages } from '../data/data.carousel-images';
 import { siteSectionSeeds } from '../data/data.site-sections';
-import { currentEventsSeed } from '../data/data.current-events';
+import { blogPostsSeed } from '../data/data.blog';
 import { openingSlots } from '../data/data.opening-slots';
 import { bookingSettingsSeed } from '../data/data.booking-settings';
 import { legalTermsSeed } from '../data/data.legal-terms';
@@ -155,12 +156,15 @@ async function main() {
     });
   }
 
-  await prisma.currentEvent.deleteMany();
-  for (const currentEvent of currentEventsSeed) {
-    console.log(`Creating current event: ${currentEvent.title}`);
-    await prisma.currentEvent.create({
+  await prisma.event.deleteMany();
+  await prisma.event.createMany({ data: eventsSeed });
+
+  await prisma.blogPost.deleteMany();
+  for (const blogPost of blogPostsSeed) {
+    console.log(`Creating blog post: ${blogPost.title}`);
+    await prisma.blogPost.create({
       data: {
-        ...currentEvent,
+        ...blogPost,
       },
     });
   }

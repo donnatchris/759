@@ -28,10 +28,14 @@ export function isMenuEnabled() {
   return SETTINGS.features.menu;
 }
 
-export function isActualitesEnabled() {
-  return SETTINGS.features.actualites;
+export function isBlogEnabled() {
+  return SETTINGS.features.blog;
 }
 
 export function isHorairesEnabled() {
   return SETTINGS.features.horaires;
+}
+
+export function isEventsEnabled() {
+  return SETTINGS.features.events;
 }

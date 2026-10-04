@@ -10,6 +10,7 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "images:convert": "tsx src/settings/scripts/convert-public-images.ts",
+    "prisma:seed-events": "tsx src/settings/scripts/events-seed.ts",
     "prisma:seed": "tsx src/settings/scripts/prisma-seed.ts",
     "prisma:seed-user": "tsx src/settings/scripts/user-seed.ts",
     "prisma:generate": "prisma generate",

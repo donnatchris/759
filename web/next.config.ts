@@ -11,11 +11,19 @@ const nextConfig: NextConfig = {
     },
   },
   async redirects() {
-    if (!canonicalSiteUrl) return [];
+    const blogRedirects = [
+      {
+        source: '/actualites/:path*',
+        destination: '/blog/:path*',
+        permanent: true,
+      },
+    ];
+    if (!canonicalSiteUrl) return blogRedirects;
 
     const canonicalUrl = new URL(canonicalSiteUrl);
 
     return [
+      ...blogRedirects,
       {
         source: '/:path*',
         has: [

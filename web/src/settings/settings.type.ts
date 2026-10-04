@@ -10,7 +10,8 @@ export type TFeatures = {
   signup: boolean;
   login: boolean;
   umami: boolean;
-  actualites: boolean;
+  blog: boolean;
+  events: boolean;
   prestations: boolean;
   menu: boolean;
   horaires: boolean;
