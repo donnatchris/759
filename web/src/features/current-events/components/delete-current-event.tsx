@@ -1,5 +1,7 @@
 'use client';
 
+import { isActualitesEnabled } from '@/settings/settings.helpers';
+
 import { DeleteButton } from '@/components/custom-ui/delete-button';
 import { useUser } from '@/features/auth/auth.context';
 import { useEditMode } from '@/features/core';
@@ -13,7 +15,7 @@ export function DeleteCurrentEvent({ id }: Props) {
   const { isAdmin } = useUser();
   const { editMode } = useEditMode();
 
-  if (!isAdmin || !editMode) return null;
+  if (!isActualitesEnabled() || !isAdmin || !editMode) return null;
 
   return (
     <DeleteButton

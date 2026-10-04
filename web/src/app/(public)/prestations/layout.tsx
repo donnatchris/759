@@ -1,3 +1,5 @@
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
+import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getCachedPageTitleService } from '@/features/pages/lib/page-title.service';
 import {
@@ -14,6 +16,7 @@ const DEFAULT_PRESTATIONS_DESCRIPTION =
   'Découvrez les services proposés et réservez votre créneau en ligne.';
 
 export async function generateMetadata(): Promise<Metadata> {
+  if (!isPrestationsEnabled()) notFound();
   const [siteSettings, page] = await Promise.all([
     getSeoSiteSettings(),
     getCachedPageTitleService({ slug: 'prestations' }).catch(() => null),

@@ -1,3 +1,4 @@
+import { requirePrestationsEnabled } from '@/settings/settings.guards';
 import { prisma } from '@/lib/prisma/prisma';
 import { AppError } from '@/features/core/error/error.AppError';
 import { ERROR_CODES } from '@/features/core/error/error.handling';
@@ -94,6 +95,7 @@ export type TCancelAdminReservationRepositoryData = TCancelReservationOutput;
 export async function getReservableServiceFromPrismaRepository(
   serviceId: string,
 ): Promise<TReservableService> {
+  requirePrestationsEnabled();
   try {
     const service = await prisma.service.findUnique({
       where: { id: serviceId },
@@ -250,6 +252,7 @@ export async function getReservationConflictDataFromPrismaRepository(
 export async function createReservationInPrismaRepository(
   data: TCreateReservationRepositoryData,
 ): Promise<TReservationWithResourceUsages> {
+  requirePrestationsEnabled();
   try {
     return await prisma.$transaction(async (tx) => {
       const reservation = await tx.reservation.create({
@@ -289,6 +292,7 @@ export async function createReservationInPrismaRepository(
 export async function createAdminReservationInPrismaRepository(
   data: TCreateAdminReservationRepositoryData,
 ): Promise<TReservationWithResourceUsages> {
+  requirePrestationsEnabled();
   try {
     const userId = await getUserIdByEmail(data.customerEmail);
 
@@ -330,6 +334,7 @@ async function getUserIdByEmail(email: string | null): Promise<string | null> {
 export async function getReservableServiceOptionsFromPrismaRepository(): Promise<
   TReservableServiceOption[]
 > {
+  requirePrestationsEnabled();
   try {
     const services = await prisma.service.findMany({
       where: {

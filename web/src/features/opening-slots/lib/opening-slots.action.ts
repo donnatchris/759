@@ -44,7 +44,7 @@ export async function updateAllOpeningSlotsAction(
     service: updateAllOpeningSlotsService,
     input: data,
   });
-  safeUpdateTag(OPENING_SLOT_CACHE_TAG);
+  if (res.success) safeUpdateTag(OPENING_SLOT_CACHE_TAG);
   return res;
 }
 
@@ -56,7 +56,7 @@ export async function createOpeningClosureAction(
     service: createOpeningClosureService,
     input: data,
   });
-  safeUpdateTag(OPENING_SLOT_CACHE_TAG);
+  if (res.success) safeUpdateTag(OPENING_SLOT_CACHE_TAG);
   return res;
 }
 
@@ -78,7 +78,7 @@ export async function updateOpeningClosureAction(
     service: updateOpeningClosureService,
     input: data,
   });
-  safeUpdateTag(OPENING_SLOT_CACHE_TAG);
+  if (res.success) safeUpdateTag(OPENING_SLOT_CACHE_TAG);
   return res;
 }
 
@@ -90,6 +90,6 @@ export async function deleteOpeningClosureAction(
     service: deleteOpeningClosureService,
     input: data,
   });
-  safeUpdateTag(OPENING_SLOT_CACHE_TAG);
+  if (res.success) safeUpdateTag(OPENING_SLOT_CACHE_TAG);
   return res;
 }

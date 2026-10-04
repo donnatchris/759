@@ -1,3 +1,4 @@
+import { requireHorairesEnabled } from '@/settings/settings.guards';
 import { executeServiceOrThrow } from '@/features/core';
 import { requireAdminOrThrow } from '@/features/auth/server/require-admin';
 import { requireStaffOrThrow } from '@/features/auth/server/require-staff';
@@ -31,13 +32,14 @@ import {
 } from './opening-slots.types';
 
 export async function getAllOpeningSlotsService(): Promise<OpeningSlot[]> {
+  requireHorairesEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getAllOpeningSlotsService',
     repositoryMethod: getAllOpeningSlotsFromPrismaRepository,
   });
 }
 
-export const getCachedAllOpeningSlotsService = unstable_cache(
+const readCachedOpeningSlots = unstable_cache(
   async (): Promise<OpeningSlot[]> => {
     return getAllOpeningSlotsService();
   },
@@ -51,13 +53,14 @@ export const getCachedAllOpeningSlotsService = unstable_cache(
 export async function getNextOpeningClosurePeriodsService(): Promise<
   TOpeningClosurePeriod[]
 > {
+  requireHorairesEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getNextOpeningClosurePeriodsService',
     repositoryMethod: getNextOpeningClosurePeriodsFromPrismaRepository,
   });
 }
 
-export const getCachedNextOpeningClosurePeriodsService = unstable_cache(
+const readCachedOpeningClosures = unstable_cache(
   async (): Promise<TOpeningClosurePeriod[]> => {
     return getNextOpeningClosurePeriodsService();
   },
@@ -71,6 +74,7 @@ export const getCachedNextOpeningClosurePeriodsService = unstable_cache(
 export async function updateAllOpeningSlotsService(
   data: unknown,
 ): Promise<OpeningSlot[]> {
+  requireHorairesEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -84,6 +88,7 @@ export async function updateAllOpeningSlotsService(
 export async function createOpeningClosureService(
   data: unknown,
 ): Promise<void> {
+  requireHorairesEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -97,6 +102,7 @@ export async function createOpeningClosureService(
 export async function getOpeningClosureCalendarEventsService(
   data: unknown,
 ): Promise<TOpeningClosureCalendarEvent[]> {
+  requireHorairesEnabled();
   await requireStaffOrThrow();
 
   return await executeServiceOrThrow({
@@ -110,6 +116,7 @@ export async function getOpeningClosureCalendarEventsService(
 export async function updateOpeningClosureService(
   data: unknown,
 ): Promise<void> {
+  requireHorairesEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -123,6 +130,7 @@ export async function updateOpeningClosureService(
 export async function deleteOpeningClosureService(
   data: unknown,
 ): Promise<void> {
+  requireHorairesEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -131,4 +139,18 @@ export async function deleteOpeningClosureService(
     data,
     zodSchema: deleteOpeningClosureSchema,
   });
+}
+
+export async function getCachedAllOpeningSlotsService(): Promise<
+  OpeningSlot[]
+> {
+  requireHorairesEnabled();
+  return readCachedOpeningSlots();
+}
+
+export async function getCachedNextOpeningClosurePeriodsService(): Promise<
+  TOpeningClosurePeriod[]
+> {
+  requireHorairesEnabled();
+  return readCachedOpeningClosures();
 }

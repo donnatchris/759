@@ -1,3 +1,4 @@
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
 import { type TServiceWithRessources, Ressource } from '../lib/services.types';
 import { DeleteService } from './delete-service';
 import { EditServiceAdminButton } from './edit-service-admin-button';
@@ -16,6 +17,8 @@ export function Service({
   reservationPhone,
   onlineBookingEnabled,
 }: Props) {
+  if (!isPrestationsEnabled()) return null;
+
   const bookable = service.bookable && onlineBookingEnabled;
   return (
     <div className="group relative rounded-md bg-background/65 p-5 transition-colors hover:bg-muted/60">

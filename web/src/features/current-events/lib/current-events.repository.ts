@@ -1,3 +1,4 @@
+import { requireActualitesEnabled } from '@/settings/settings.guards';
 import { AppError } from '@/features/core/error/error.AppError';
 import { ERROR_CODES } from '@/features/core/error/error.handling';
 import { isNotFoundError } from '@/lib/prisma/prisma.helpers';
@@ -16,6 +17,7 @@ import type {
 export async function getMaxFiveCurrentEventsToDisplayFromPrismaRepository(): Promise<
   CurrentEvent[]
 > {
+  requireActualitesEnabled();
   try {
     const now = new Date();
     return await prisma.currentEvent.findMany({
@@ -37,6 +39,7 @@ export async function getMaxFiveCurrentEventsToDisplayFromPrismaRepository(): Pr
 }
 
 export async function getLatestCurrentEventFromPrismaRepository(): Promise<CurrentEvent | null> {
+  requireActualitesEnabled();
   try {
     return await prisma.currentEvent.findFirst({
       orderBy: { createdAt: 'desc' },
@@ -51,6 +54,7 @@ export async function getLatestCurrentEventFromPrismaRepository(): Promise<Curre
 export async function getCurrentEventsFromPrismaRepository(
   data: TGetCurrentEventsOutput,
 ): Promise<TCurrentEventsPagination> {
+  requireActualitesEnabled();
   try {
     const skip = (data.page - 1) * data.pageSize;
     const take = data.pageSize;
@@ -86,6 +90,7 @@ export async function getCurrentEventsFromPrismaRepository(
 export async function createCurrentEventInPrismaRepository(
   data: TCreateCurrentEventOutput,
 ): Promise<CurrentEvent> {
+  requireActualitesEnabled();
   try {
     if (!data.title || !data.content) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -116,6 +121,7 @@ export async function createCurrentEventInPrismaRepository(
 export async function editCurrentEventFromPrismaRepository(
   data: TUpdateCurrentEventOutput,
 ): Promise<CurrentEvent> {
+  requireActualitesEnabled();
   try {
     if (!data.id || !data.title || !data.content) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -148,6 +154,7 @@ export async function editCurrentEventFromPrismaRepository(
 export async function deleteCurrentEventFromPrismaRepository(
   data: TDeleteCurrentEventOutput,
 ): Promise<void> {
+  requireActualitesEnabled();
   try {
     if (!data.id) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);

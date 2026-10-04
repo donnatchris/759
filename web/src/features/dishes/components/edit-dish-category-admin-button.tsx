@@ -1,5 +1,7 @@
 'use client';
 
+import { isMenuEnabled } from '@/settings/settings.helpers';
+
 import { EditDialogButton } from '@/components/custom-ui/edit-dialog-button';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/features/auth/auth.context';
@@ -17,7 +19,7 @@ export function EditDishCategoryAdminButton({ category }: Props) {
   const { editMode } = useEditMode();
   const router = useRouter();
 
-  if (!isAdmin || !editMode) return null;
+  if (!isMenuEnabled() || !isAdmin || !editMode) return null;
 
   const onSuccess = () => {
     toast.success('Catégorie de plats mise à jour avec succès !', {

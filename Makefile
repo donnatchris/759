@@ -42,7 +42,7 @@ db-studio:
 
 db-local-migrate:
 	@printf "\n$(YELLOW)Migration de la base de données locale...$(RESET)\n"
-	@cd web && npx dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npx prisma migrate dev'
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npx prisma migrate dev'
 
 db-prod-migrate:
 	@printf "\n$(YELLOW)Migration de la base de données en production...$(RESET)\n"
@@ -55,7 +55,7 @@ db-prod-seed-data:
 
 db-local-seed-data:
 	@printf "\n$(YELLOW)Exécution du seed Prisma sur la base locale...$(RESET)\n"
-	@cd web && npx dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npm run prisma:seed'
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npm run prisma:seed'
 	@printf "\n$(GREEN)Seeds locaux exécutés avec succès !$(RESET)\n"
 
 db-seed-user:
@@ -65,7 +65,7 @@ db-seed-user:
 
 db-local-seed-user:
 	@printf "\n$(YELLOW)Exécution du seed administrateur sur la base locale...$(RESET)\n"
-	@cd web && npx dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" SEEDING_ADMIN=true npm run prisma:seed-user'
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" SEEDING_ADMIN=true npm run prisma:seed-user'
 	@printf "\n$(GREEN)Administrateur local créé ou mis à jour avec succès !$(RESET)\n"
 
 generate-favicons:

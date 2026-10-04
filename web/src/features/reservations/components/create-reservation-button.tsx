@@ -1,5 +1,7 @@
 'use client';
 
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CalendarPlus, LogIn, Phone, UserRound } from 'lucide-react';
@@ -44,6 +46,8 @@ export function CreateReservationButton({
       ? 'Choisissez un créneau disponible pour réserver avec vos informations de compte.'
       : 'Ajoutez votre numéro de téléphone avant de réserver en ligne.'
     : 'Connectez-vous pour réserver en ligne, ou contactez-nous par téléphone.';
+
+  if (!isPrestationsEnabled()) return null;
 
   return (
     <DialogButton

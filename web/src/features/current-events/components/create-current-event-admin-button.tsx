@@ -1,5 +1,7 @@
 'use client';
 
+import { isActualitesEnabled } from '@/settings/settings.helpers';
+
 import { CreateDialogButton } from '@/components/custom-ui/create-dialog-button';
 import { useUser } from '@/features/auth/auth.context';
 import { useEditMode } from '@/features/core';
@@ -12,7 +14,7 @@ export function CreateCurrentEventAdminButton() {
   const { editMode } = useEditMode();
   const router = useRouter();
 
-  if (!isAdmin || !editMode) return null;
+  if (!isActualitesEnabled() || !isAdmin || !editMode) return null;
 
   const onSuccess = () => {
     toast.success('Actualité créée avec succès !', { position: 'top-center' });

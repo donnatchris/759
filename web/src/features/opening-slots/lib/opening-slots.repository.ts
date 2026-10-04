@@ -1,3 +1,4 @@
+import { requireHorairesEnabled } from '@/settings/settings.guards';
 import { prisma } from '@/lib/prisma/prisma';
 import { AppError } from '@/features/core/error/error.AppError';
 import { ERROR_CODES } from '@/features/core/error/error.handling';
@@ -21,6 +22,7 @@ import type {
 export async function getAllOpeningSlotsFromPrismaRepository(): Promise<
   OpeningSlot[]
 > {
+  requireHorairesEnabled();
   try {
     return await prisma.openingSlot.findMany({
       orderBy: [{ dayOfWeek: 'asc' }, { slotIndex: 'asc' }],
@@ -35,6 +37,7 @@ export async function getAllOpeningSlotsFromPrismaRepository(): Promise<
 export async function updateAllOpeningSlotsInPrismaRepository(
   data: TUpdateOpeningSlotsOutput,
 ): Promise<OpeningSlot[]> {
+  requireHorairesEnabled();
   try {
     const slotsToCreate = data.slots.flatMap((day) =>
       day.slots
@@ -74,6 +77,7 @@ export async function updateAllOpeningSlotsInPrismaRepository(
 export async function createOpeningClosureInPrismaRepository(
   data: TCreateOpeningClosureOutput,
 ): Promise<void> {
+  requireHorairesEnabled();
   try {
     await prisma.$transaction(async (tx) => {
       await upsertOpeningClosureRange(tx, data);
@@ -88,6 +92,7 @@ export async function createOpeningClosureInPrismaRepository(
 export async function updateOpeningClosureInPrismaRepository(
   data: TUpdateOpeningClosureOutput,
 ): Promise<void> {
+  requireHorairesEnabled();
   try {
     await prisma.$transaction(async (tx) => {
       await deleteOpeningClosureRange(tx, {
@@ -106,6 +111,7 @@ export async function updateOpeningClosureInPrismaRepository(
 export async function deleteOpeningClosureFromPrismaRepository(
   data: TDeleteOpeningClosureOutput,
 ): Promise<void> {
+  requireHorairesEnabled();
   try {
     await prisma.$transaction(async (tx) => {
       await deleteOpeningClosureRange(tx, data);
@@ -120,6 +126,7 @@ export async function deleteOpeningClosureFromPrismaRepository(
 export async function getOpeningClosureCalendarEventsFromPrismaRepository(
   data: TGetOpeningClosuresCalendarOutput,
 ): Promise<TOpeningClosureCalendarEvent[]> {
+  requireHorairesEnabled();
   try {
     const exceptions = await prisma.openingException.findMany({
       where: {
@@ -146,6 +153,7 @@ export async function getOpeningClosureCalendarEventsFromPrismaRepository(
 export async function getNextOpeningClosurePeriodsFromPrismaRepository(): Promise<
   TOpeningClosurePeriod[]
 > {
+  requireHorairesEnabled();
   try {
     const today = formatDateInputValue(new Date());
     const exceptions = await prisma.openingException.findMany({

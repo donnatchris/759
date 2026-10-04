@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  isPrestationsEnabled,
+  isHorairesEnabled,
+} from '@/settings/settings.helpers';
+
 import { useCallback, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -117,7 +122,8 @@ export function ReservationsCalendar({
   const canShowStaffActions = showAdminActions ?? (mode === 'admin' && !userId);
   const canShowAdminActions = canShowStaffActions && isAdmin;
   const canShowCreateReservationAction =
-    showCreateReservationAction ?? canShowStaffActions;
+    isPrestationsEnabled() &&
+    (showCreateReservationAction ?? canShowStaffActions);
 
   const handleReservationCancelled = useCallback(
     (reservation: TReservationDetails) => {
@@ -208,7 +214,7 @@ export function ReservationsCalendar({
             ? await getReservationsCalendarAction(input)
             : await getCurrentUserReservationsCalendarAction(input);
       const closureResponse =
-        mode === 'admin'
+        mode === 'admin' && isHorairesEnabled()
           ? await getOpeningClosureCalendarEventsAction(input)
           : null;
       const resourceUnavailableResponse =
@@ -323,14 +329,16 @@ export function ReservationsCalendar({
         <div className="flex flex-wrap justify-start gap-2">
           {canShowAdminActions && (
             <>
-              <Button
-                type="button"
-                variant="default"
-                onClick={openCreateOpeningClosureDialog}
-              >
-                <CalendarX className="h-4 w-4" aria-hidden="true" />
-                Déclarer une fermeture
-              </Button>
+              {isHorairesEnabled() && (
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={openCreateOpeningClosureDialog}
+                >
+                  <CalendarX className="h-4 w-4" aria-hidden="true" />
+                  Déclarer une fermeture
+                </Button>
+              )}
               <Button
                 type="button"
                 variant="default"
@@ -383,25 +391,29 @@ export function ReservationsCalendar({
         onReservationCancelled={handleReservationCancelled}
       />
 
-      <CreateReservationDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        initialDate={createDate}
-        adminUsers={reservationUser ? [reservationUser] : adminUsers}
-        initialUser={reservationUser}
-        onReservationCreated={handleReservationCreated}
-      />
+      {canShowCreateReservationAction && (
+        <CreateReservationDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          initialDate={createDate}
+          adminUsers={reservationUser ? [reservationUser] : adminUsers}
+          initialUser={reservationUser}
+          onReservationCreated={handleReservationCreated}
+        />
+      )}
 
-      <CreateOpeningClosureDialog
-        open={closureOpen}
-        onOpenChange={(open) => {
-          setClosureOpen(open);
-          if (!open) setSelectedOpeningClosure(null);
-        }}
-        selectedClosure={selectedOpeningClosure}
-        onClosureCreated={handleClosureCreated}
-        onClosureUpdated={handleClosureUpdated}
-      />
+      {isHorairesEnabled() && (
+        <CreateOpeningClosureDialog
+          open={closureOpen}
+          onOpenChange={(open) => {
+            setClosureOpen(open);
+            if (!open) setSelectedOpeningClosure(null);
+          }}
+          selectedClosure={selectedOpeningClosure}
+          onClosureCreated={handleClosureCreated}
+          onClosureUpdated={handleClosureUpdated}
+        />
+      )}
 
       <CreateResourceUnavailableDialog
         open={resourceUnavailableOpen}

@@ -1,5 +1,7 @@
 'use client';
 
+import { isActualitesEnabled } from '@/settings/settings.helpers';
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { getCurrentEventsAction } from '../lib/current-events.action';
@@ -45,6 +47,8 @@ export function CurrentEventsFeed({ initialItems, initialNextPage }: Props) {
       setIsLoading(false);
     }
   };
+
+  if (!isActualitesEnabled()) return null;
 
   return (
     <div className="flex flex-col gap-6">

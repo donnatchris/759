@@ -1,3 +1,4 @@
+import { isMenuEnabled } from '@/settings/settings.helpers';
 import Image from 'next/image';
 import type { Dish as DishModel } from '../lib/dishes.types';
 import { DeleteDish } from './delete-dish';
@@ -8,6 +9,8 @@ type Props = {
 };
 
 export function Dish({ dish }: Props) {
+  if (!isMenuEnabled()) return null;
+
   return (
     <div className="group relative rounded-sm border border-border bg-background/60 p-4 transition-colors hover:bg-muted/60">
       <div className="absolute -top-2 right-2 z-20 flex gap-2">

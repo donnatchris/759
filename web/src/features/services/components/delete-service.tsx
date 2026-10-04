@@ -1,5 +1,7 @@
 'use client';
 
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
+
 import { DeleteButton } from '@/components/custom-ui/delete-button';
 import { deleteServiceAction } from '@/features/services/lib/services.action';
 import { useUser } from '@/features/auth/auth.context';
@@ -12,7 +14,7 @@ type Props = {
 export function DeleteService({ id }: Props) {
   const { isAdmin } = useUser();
   const { editMode } = useEditMode();
-  if (!isAdmin || !editMode) return null;
+  if (!isPrestationsEnabled() || !isAdmin || !editMode) return null;
 
   return (
     <DeleteButton

@@ -1,3 +1,4 @@
+import { isActualitesEnabled } from '@/settings/settings.helpers';
 import Link from 'next/link';
 import { ArrowRight, Bell, Calendar } from 'lucide-react';
 import type { CurrentEvent } from '@prisma/client';
@@ -9,6 +10,8 @@ type Props = {
 };
 
 export async function CurrentEventsPreview({ events }: Props) {
+  if (!isActualitesEnabled()) return null;
+
   if (!events?.length) return null;
 
   const eventsToDisplay =

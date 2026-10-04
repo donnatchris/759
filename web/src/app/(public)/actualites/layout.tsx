@@ -1,3 +1,5 @@
+import { isActualitesEnabled } from '@/settings/settings.helpers';
+import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getCachedPageTitleService } from '@/features/pages/lib/page-title.service';
 import {
@@ -14,6 +16,7 @@ const DEFAULT_ACTUALITES_DESCRIPTION =
   'Retrouvez nos actualités, nouveautés, offres et annonces.';
 
 export async function generateMetadata(): Promise<Metadata> {
+  if (!isActualitesEnabled()) notFound();
   const [siteSettings, page] = await Promise.all([
     getSeoSiteSettings(),
     getCachedPageTitleService({ slug: 'actualite' }).catch(() => null),

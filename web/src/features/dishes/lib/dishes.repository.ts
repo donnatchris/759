@@ -1,3 +1,4 @@
+import { requireMenuEnabled } from '@/settings/settings.guards';
 import { prisma } from '@/lib/prisma/prisma';
 import { type Dish, type DishCategory } from '@prisma/client';
 import { isNotFoundError } from '@/lib/prisma/prisma.helpers';
@@ -16,6 +17,7 @@ import type { TDishCategoryWithDishes } from './dishes.types';
 export async function getAllDishCategoriesFromPrismaRepository(): Promise<
   DishCategory[]
 > {
+  requireMenuEnabled();
   try {
     return await prisma.dishCategory.findMany({
       orderBy: { orderIndex: 'asc' },
@@ -30,6 +32,7 @@ export async function getAllDishCategoriesFromPrismaRepository(): Promise<
 export async function getAllDishesAndCategoriesFromPrismaRepository(): Promise<
   TDishCategoryWithDishes[]
 > {
+  requireMenuEnabled();
   try {
     return await prisma.dishCategory.findMany({
       include: {
@@ -52,6 +55,7 @@ export async function getAllDishesAndCategoriesFromPrismaRepository(): Promise<
 export async function createDishCategoryInPrismaRepository(
   data: TDishCategoryOutput,
 ): Promise<DishCategory> {
+  requireMenuEnabled();
   try {
     if (!data.label || !data.shortDescription || !data.imageUrl) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -77,6 +81,7 @@ export async function createDishCategoryInPrismaRepository(
 export async function updateDishCategoryFromPrismaRepository(
   data: TUpdateDishCategoryOutput,
 ): Promise<DishCategory> {
+  requireMenuEnabled();
   try {
     if (!data.id || !data.label || !data.shortDescription || !data.imageUrl) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -103,6 +108,7 @@ export async function updateDishCategoryFromPrismaRepository(
 export async function deleteDishCategoryFromPrismaRepository(
   data: TDeleteDishCategoryOutput,
 ): Promise<void> {
+  requireMenuEnabled();
   try {
     if (!data.id) throw new AppError(ERROR_CODES.BAD_REQUEST);
     await prisma.dishCategory.delete({ where: { id: data.id } });
@@ -117,6 +123,7 @@ export async function deleteDishCategoryFromPrismaRepository(
 export async function createDishInPrismaRepository(
   data: TCreateDishOutput,
 ): Promise<Dish> {
+  requireMenuEnabled();
   try {
     if (!data.categoryId || !data.label || !data.imageUrl) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -142,6 +149,7 @@ export async function createDishInPrismaRepository(
 export async function updateDishFromPrismaRepository(
   data: TUpdateDishOutput,
 ): Promise<Dish> {
+  requireMenuEnabled();
   try {
     if (!data.id || !data.label || !data.imageUrl) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -167,6 +175,7 @@ export async function updateDishFromPrismaRepository(
 export async function deleteDishFromPrismaRepository(
   data: TDeleteDishOutput,
 ): Promise<void> {
+  requireMenuEnabled();
   try {
     if (!data.id) throw new AppError(ERROR_CODES.BAD_REQUEST);
     await prisma.dish.delete({ where: { id: data.id } });

@@ -1,3 +1,4 @@
+import { isActualitesEnabled } from '@/settings/settings.helpers';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,8 @@ type Props = {
 };
 
 export function LatestCurrentEvent({ currentEvent }: Props) {
+  if (!isActualitesEnabled()) return null;
+
   if (!currentEvent) return null;
 
   return (

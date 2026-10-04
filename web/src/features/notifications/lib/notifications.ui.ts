@@ -1,3 +1,4 @@
+import { isActualitesEnabled } from '@/settings/settings.helpers';
 import type { NotificationType, UserRole } from '@prisma/client';
 
 export type TNotificationAction = {
@@ -60,6 +61,8 @@ export function getNotificationAction(
   type: NotificationType,
   role: UserRole,
 ): TNotificationAction | null {
+  if (type === 'CURRENT_EVENT_ANNOUNCEMENT' && !isActualitesEnabled())
+    return null;
   return NOTIFICATION_TYPE_ACTIONS[type](role);
 }
 

@@ -1,3 +1,5 @@
+import { isMenuEnabled } from '@/settings/settings.helpers';
+import { notFound } from 'next/navigation';
 import { ScrollReveal } from '@/components/system/scroll-reveal';
 import { Category } from '@/features/dishes/components/category';
 import { CreateDishCategoryAdminButton } from '@/features/dishes/components/create-dish-category-admin-button';
@@ -7,6 +9,7 @@ import { PageTitle } from '@/features/pages/components/page-title';
 import { getCachedPageTitleService } from '@/features/pages/lib/page-title.service';
 
 export default async function MenuPage() {
+  if (!isMenuEnabled()) notFound();
   const [page, dishCategories]: [
     Awaited<ReturnType<typeof getCachedPageTitleService>>,
     TDishCategoryWithDishes[],

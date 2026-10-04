@@ -1,9 +1,11 @@
+import { requireHorairesEnabled } from '@/settings/settings.guards';
 import { prisma } from '@/lib/prisma/prisma';
 import { isNotFoundError } from '@/lib/prisma/prisma.helpers';
 import { AppError } from '@/features/core/error/error.AppError';
 import { ERROR_CODES } from '@/features/core/error/error.handling';
 import {
   PRESENTATION_SECTION_ID,
+  OPENING_SLOTS_SECTION_ID,
   type TPresentation,
 } from './presentation.types';
 import type { TUpdatePresentationOutput } from './presentation.schema';
@@ -11,6 +13,7 @@ import type { TUpdatePresentationOutput } from './presentation.schema';
 export async function getPresentationFromPrismaRepository(
   id = PRESENTATION_SECTION_ID,
 ): Promise<TPresentation> {
+  if (id === OPENING_SLOTS_SECTION_ID) requireHorairesEnabled();
   try {
     const presentation = await prisma.siteSection.findUnique({
       where: { id },
@@ -31,6 +34,7 @@ export async function updatePresentationInPrismaRepository(
   data: TUpdatePresentationOutput,
   id = PRESENTATION_SECTION_ID,
 ): Promise<TPresentation> {
+  if (id === OPENING_SLOTS_SECTION_ID) requireHorairesEnabled();
   try {
     return await prisma.siteSection.update({
       where: { id },

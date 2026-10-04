@@ -1,3 +1,5 @@
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
+import { notFound } from 'next/navigation';
 import {
   type TServicesCategoryWithServicesAndRessources,
   type Ressource,
@@ -23,6 +25,7 @@ import { getPublicBookingSettingsService } from '@/features/reservations/lib/res
 import { MoreInfos } from '@/components/landing-page/more-infos';
 
 export default async function PrestationsPage() {
+  if (!isPrestationsEnabled()) notFound();
   const session = await auth.api.getSession({ headers: await headers() });
   const isAdmin = session?.user.role === 'ADMIN';
 

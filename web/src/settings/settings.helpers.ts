@@ -19,3 +19,19 @@ export function getSiteActivities() {
 export function getSiteIcon() {
   return SETTINGS.site.icon;
 }
+
+export function isPrestationsEnabled() {
+  return SETTINGS.features.prestations;
+}
+
+export function isMenuEnabled() {
+  return SETTINGS.features.menu;
+}
+
+export function isActualitesEnabled() {
+  return SETTINGS.features.actualites;
+}
+
+export function isHorairesEnabled() {
+  return SETTINGS.features.horaires;
+}

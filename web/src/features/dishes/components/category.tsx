@@ -1,3 +1,4 @@
+import { isMenuEnabled } from '@/settings/settings.helpers';
 import Image from 'next/image';
 import { Info } from 'lucide-react';
 import type { TDishCategoryWithDishes } from '../lib/dishes.types';
@@ -12,6 +13,8 @@ type Props = {
 };
 
 export function Category({ dishCategory, imagePriority = false }: Props) {
+  if (!isMenuEnabled()) return null;
+
   const id = String(dishCategory.id);
   const text = dishCategory.longDescription ?? dishCategory.shortDescription;
 

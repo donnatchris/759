@@ -1,3 +1,4 @@
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ServicesCategory } from '../lib/services.types';
@@ -8,6 +9,8 @@ type Props = {
 };
 
 export async function OfferingsSummary({ servicesCategories }: Props) {
+  if (!isPrestationsEnabled()) return null;
+
   const { title } = await getCachedPageTitleService({ slug: 'prestations' });
   const hoverText = 'Cliquez pour découvrir...';
   return (

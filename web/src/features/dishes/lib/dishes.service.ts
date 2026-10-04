@@ -1,3 +1,4 @@
+import { requireMenuEnabled } from '@/settings/settings.guards';
 import { unstable_cache } from 'next/cache';
 import { executeServiceOrThrow } from '@/features/core';
 import { requireAdminOrThrow } from '@/features/auth/server/require-admin';
@@ -31,13 +32,14 @@ import {
 } from './dishes.types';
 
 export async function getAllDishCategoriesService(): Promise<DishCategory[]> {
+  requireMenuEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getAllDishCategoriesService',
     repositoryMethod: getAllDishCategoriesFromPrismaRepository,
   });
 }
 
-export const getCachedAllDishCategoriesService = unstable_cache(
+const readCachedCategories = unstable_cache(
   async (): Promise<DishCategory[]> => getAllDishCategoriesService(),
   DISH_CATEGORIES_CACHE_KEY,
   {
@@ -49,6 +51,7 @@ export const getCachedAllDishCategoriesService = unstable_cache(
 export async function getAllDishesAndCategoriesService(): Promise<
   TDishCategoryWithDishes[]
 > {
+  requireMenuEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getAllDishesAndCategoriesService',
     repositoryMethod: getAllDishesAndCategoriesFromPrismaRepository,
@@ -58,6 +61,7 @@ export async function getAllDishesAndCategoriesService(): Promise<
 export async function createDishCategoryService(
   data: unknown,
 ): Promise<DishCategory> {
+  requireMenuEnabled();
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'createDishCategoryService',
@@ -70,6 +74,7 @@ export async function createDishCategoryService(
 export async function updateDishCategoryService(
   data: unknown,
 ): Promise<DishCategory> {
+  requireMenuEnabled();
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'updateDishCategoryService',
@@ -80,6 +85,7 @@ export async function updateDishCategoryService(
 }
 
 export async function deleteDishCategoryService(data: unknown): Promise<void> {
+  requireMenuEnabled();
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'deleteDishCategoryService',
@@ -90,6 +96,7 @@ export async function deleteDishCategoryService(data: unknown): Promise<void> {
 }
 
 export async function createDishService(data: unknown): Promise<Dish> {
+  requireMenuEnabled();
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'createDishService',
@@ -100,6 +107,7 @@ export async function createDishService(data: unknown): Promise<Dish> {
 }
 
 export async function updateDishService(data: unknown): Promise<Dish> {
+  requireMenuEnabled();
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'updateDishService',
@@ -110,6 +118,7 @@ export async function updateDishService(data: unknown): Promise<Dish> {
 }
 
 export async function deleteDishService(data: unknown): Promise<void> {
+  requireMenuEnabled();
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'deleteDishService',
@@ -117,4 +126,11 @@ export async function deleteDishService(data: unknown): Promise<void> {
     data,
     zodSchema: deleteDishSchema,
   });
+}
+
+export async function getCachedAllDishCategoriesService(): Promise<
+  DishCategory[]
+> {
+  requireMenuEnabled();
+  return readCachedCategories();
 }

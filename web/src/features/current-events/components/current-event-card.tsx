@@ -1,3 +1,4 @@
+import { isActualitesEnabled } from '@/settings/settings.helpers';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CurrentEvent } from '../lib/current-events.types';
@@ -14,6 +15,8 @@ type Props = {
 };
 
 export function CurrentEventCard({ currentEvent }: Props) {
+  if (!isActualitesEnabled()) return null;
+
   const publishedAt = formatCurrentEventDate(currentEvent.createdAt);
   const editedAt = formatCurrentEventDate(currentEvent.updatedAt);
   const isEdited = publishedAt !== editedAt;

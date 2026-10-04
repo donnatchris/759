@@ -56,7 +56,7 @@ export async function createServiceCategoryAction(
     service: createServiceCategoryService,
     input: data,
   });
-  safeUpdateTag(SERVICES_CATEGORIES_CACHE_TAG);
+  if (res.success) safeUpdateTag(SERVICES_CATEGORIES_CACHE_TAG);
   return res;
 }
 
@@ -68,7 +68,7 @@ export async function updateServiceCategoryAction(
     service: updateServiceCategoryService,
     input: data,
   });
-  safeUpdateTag(SERVICES_CATEGORIES_CACHE_TAG);
+  if (res.success) safeUpdateTag(SERVICES_CATEGORIES_CACHE_TAG);
   return res;
 }
 

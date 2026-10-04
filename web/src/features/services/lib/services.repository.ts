@@ -1,3 +1,4 @@
+import { requirePrestationsEnabled } from '@/settings/settings.guards';
 import { prisma } from '@/lib/prisma/prisma';
 import { type ServicesCategory, type Service } from '@prisma/client';
 import { isNotFoundError } from '@/lib/prisma/prisma.helpers';
@@ -20,6 +21,7 @@ import type {
 export async function getAllServicesCategoriesFromPrismaRepository(): Promise<
   ServicesCategory[]
 > {
+  requirePrestationsEnabled();
   try {
     return await prisma.servicesCategory.findMany({
       orderBy: { orderIndex: 'asc' },
@@ -37,6 +39,7 @@ export async function getAllServicesCategoriesFromPrismaRepository(): Promise<
 export async function getAllServicesAndCategoriesFromPrismaRepository(): Promise<
   TServicesCategoryWithServices[]
 > {
+  requirePrestationsEnabled();
   try {
     const res = await prisma.servicesCategory.findMany({
       include: {
@@ -58,6 +61,7 @@ export async function getAllServicesAndCategoriesFromPrismaRepository(): Promise
 export async function getAllServicesWithRessourcesAndCategoriesFromPrismaRepository(): Promise<
   TServicesCategoryWithServicesAndRessources[]
 > {
+  requirePrestationsEnabled();
   try {
     const res = await prisma.servicesCategory.findMany({
       include: {
@@ -87,6 +91,7 @@ export async function getAllServicesWithRessourcesAndCategoriesFromPrismaReposit
 export async function createServiceCategoryInPrismaRepository(
   data: TServicesCategoryOutput,
 ): Promise<ServicesCategory> {
+  requirePrestationsEnabled();
   try {
     if (!data.label || !data.shortDescription || !data.imageUrl) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -112,6 +117,7 @@ export async function createServiceCategoryInPrismaRepository(
 export async function updateServiceCategoryFromPrismaRepository(
   data: TUpdateServicesCategoryOutput,
 ): Promise<ServicesCategory> {
+  requirePrestationsEnabled();
   try {
     if (!data.id || !data.label || !data.shortDescription || !data.imageUrl) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -138,6 +144,7 @@ export async function updateServiceCategoryFromPrismaRepository(
 export async function deleteServiceCategoryFromPrismaRepository(
   data: TDeleteServicesCategoryOutput,
 ): Promise<void> {
+  requirePrestationsEnabled();
   try {
     if (!data.id) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -157,6 +164,7 @@ export async function deleteServiceCategoryFromPrismaRepository(
 export async function updateServiceFromPrismaRepository(
   data: TUpdateServiceOutput,
 ): Promise<Service> {
+  requirePrestationsEnabled();
   try {
     if (!data.id) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -197,6 +205,7 @@ export async function updateServiceFromPrismaRepository(
 export async function deleteServiceFromPrismaRepository(
   data: TDeleteServiceOutput,
 ): Promise<void> {
+  requirePrestationsEnabled();
   try {
     if (!data.id) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);
@@ -215,6 +224,7 @@ export async function deleteServiceFromPrismaRepository(
 export async function createServiceInPrismaRepository(
   data: TCreateServiceOutput,
 ): Promise<Service> {
+  requirePrestationsEnabled();
   try {
     if (!data.categoryId || !data.label) {
       throw new AppError(ERROR_CODES.BAD_REQUEST);

@@ -1,5 +1,7 @@
 'use client';
 
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
+
 import { EditDialogButton } from '@/components/custom-ui/edit-dialog-button';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/features/auth/auth.context';
@@ -18,7 +20,7 @@ export function EditServiceAdminButton({ service, ressources }: Props) {
   const { editMode } = useEditMode();
   const router = useRouter();
 
-  if (!isAdmin || !editMode) return null;
+  if (!isPrestationsEnabled() || !isAdmin || !editMode) return null;
 
   const onSuccess = () => {
     toast.success('Paramètres du site mis à jour avec succès', {

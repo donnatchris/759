@@ -1,3 +1,4 @@
+import { requirePrestationsEnabled } from '@/settings/settings.guards';
 import { executeServiceOrThrow } from '@/features/core';
 import { requireAdminOrThrow } from '@/features/auth/server/require-admin';
 import {
@@ -37,13 +38,14 @@ import {
 export async function getAllServicesCategoriesService(): Promise<
   ServicesCategory[]
 > {
+  requirePrestationsEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getServicesCategoriesService',
     repositoryMethod: getAllServicesCategoriesFromPrismaRepository,
   });
 }
 
-export const getCachedAllServicesCategoriesService = unstable_cache(
+const readCachedCategories = unstable_cache(
   async (): Promise<ServicesCategory[]> => {
     return getAllServicesCategoriesService();
   },
@@ -57,6 +59,7 @@ export const getCachedAllServicesCategoriesService = unstable_cache(
 export async function getAllServicesAndCategoriesService(): Promise<
   TServicesCategoryWithServices[]
 > {
+  requirePrestationsEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getAllServicesAndCategoriesService',
     repositoryMethod: getAllServicesAndCategoriesFromPrismaRepository,
@@ -66,6 +69,7 @@ export async function getAllServicesAndCategoriesService(): Promise<
 export async function getAllServicesWithRessourcesAndCategoriesService(): Promise<
   TServicesCategoryWithServicesAndRessources[]
 > {
+  requirePrestationsEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getAllServicesWithRessourcesAndCategoriesService',
     repositoryMethod:
@@ -76,6 +80,7 @@ export async function getAllServicesWithRessourcesAndCategoriesService(): Promis
 export async function createServiceCategoryService(
   data: unknown,
 ): Promise<ServicesCategory> {
+  requirePrestationsEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -89,6 +94,7 @@ export async function createServiceCategoryService(
 export async function updateServiceCategoryService(
   data: unknown,
 ): Promise<ServicesCategory> {
+  requirePrestationsEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -102,6 +108,7 @@ export async function updateServiceCategoryService(
 export async function deleteServiceCategoryService(
   data: unknown,
 ): Promise<void> {
+  requirePrestationsEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -113,6 +120,7 @@ export async function deleteServiceCategoryService(
 }
 
 export async function updateServiceService(data: unknown): Promise<Service> {
+  requirePrestationsEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -124,6 +132,7 @@ export async function updateServiceService(data: unknown): Promise<Service> {
 }
 
 export async function deleteServiceService(data: unknown): Promise<void> {
+  requirePrestationsEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -135,6 +144,7 @@ export async function deleteServiceService(data: unknown): Promise<void> {
 }
 
 export async function createServiceService(data: unknown): Promise<Service> {
+  requirePrestationsEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({
@@ -150,4 +160,11 @@ export async function getRessourcesService(): Promise<Ressource[]> {
     serviceName: 'getRessourcesService',
     repositoryMethod: getRessourcesFromPrismaRepository,
   });
+}
+
+export async function getCachedAllServicesCategoriesService(): Promise<
+  ServicesCategory[]
+> {
+  requirePrestationsEnabled();
+  return readCachedCategories();
 }

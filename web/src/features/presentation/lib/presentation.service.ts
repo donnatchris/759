@@ -1,3 +1,4 @@
+import { requireHorairesEnabled } from '@/settings/settings.guards';
 import { zodValidationOrThrow } from '@/features/core/validation/zod-validation';
 import { AppError, ERROR_CODES, isClassAppError } from '@/features/core';
 import { requireAdminOrThrow } from '@/features/auth/server/require-admin';
@@ -22,6 +23,7 @@ import {
 export async function getPresentationService(
   id = PRESENTATION_SECTION_ID,
 ): Promise<TPresentation> {
+  if (id === OPENING_SLOTS_SECTION_ID) requireHorairesEnabled();
   try {
     return await getPresentationFromPrismaRepository(id);
   } catch (error) {
@@ -31,7 +33,7 @@ export async function getPresentationService(
   }
 }
 
-export const getCachedPresentationService = unstable_cache(
+const readCachedPresentation = unstable_cache(
   async (id = PRESENTATION_SECTION_ID): Promise<TPresentation> => {
     return getPresentationService(id);
   },
@@ -43,10 +45,11 @@ export const getCachedPresentationService = unstable_cache(
 );
 
 export async function getOpeningSlotsPresentationService(): Promise<TPresentation> {
+  requireHorairesEnabled();
   return getPresentationService(OPENING_SLOTS_SECTION_ID);
 }
 
-export const getCachedOpeningSlotsPresentationService = unstable_cache(
+const readCachedOpeningSlotsPresentation = unstable_cache(
   async (): Promise<TPresentation> => {
     return getOpeningSlotsPresentationService();
   },
@@ -74,6 +77,7 @@ export async function updatePresentationService(
 export async function updateOpeningSlotsPresentationService(
   data: unknown,
 ): Promise<TPresentation> {
+  requireHorairesEnabled();
   try {
     await requireAdminOrThrow();
     const parsedData = zodValidationOrThrow(data, updatePresentationSchema);
@@ -86,4 +90,16 @@ export async function updateOpeningSlotsPresentationService(
     if (isClassAppError(error)) throw error;
     throw new AppError(ERROR_CODES.SERVICE_ERROR);
   }
+}
+
+export async function getCachedPresentationService(
+  id = PRESENTATION_SECTION_ID,
+): Promise<TPresentation> {
+  if (id === OPENING_SLOTS_SECTION_ID) requireHorairesEnabled();
+  return readCachedPresentation(id);
+}
+
+export async function getCachedOpeningSlotsPresentationService(): Promise<TPresentation> {
+  requireHorairesEnabled();
+  return readCachedOpeningSlotsPresentation();
 }

@@ -1,3 +1,4 @@
+import { requireActualitesEnabled } from '@/settings/settings.guards';
 import { executeServiceOrThrow } from '@/features/core';
 import {
   createCurrentEventInPrismaRepository,
@@ -22,6 +23,7 @@ import { requireAdminOrThrow } from '@/features/auth/server/require-admin';
 export async function getMaxFiveCurrentEventsToDisplayService(): Promise<
   CurrentEvent[]
 > {
+  requireActualitesEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getCurrentEventsToDisplayService',
     repositoryMethod: getMaxFiveCurrentEventsToDisplayFromPrismaRepository,
@@ -29,6 +31,7 @@ export async function getMaxFiveCurrentEventsToDisplayService(): Promise<
 }
 
 export async function getLatestCurrentEventService(): Promise<CurrentEvent | null> {
+  requireActualitesEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getLatestCurrentEventService',
     repositoryMethod: getLatestCurrentEventFromPrismaRepository,
@@ -38,6 +41,7 @@ export async function getLatestCurrentEventService(): Promise<CurrentEvent | nul
 export async function getCurrentEventsService(
   data: unknown,
 ): Promise<TCurrentEventsPagination> {
+  requireActualitesEnabled();
   return await executeServiceOrThrow({
     serviceName: 'getCurrentEventsService',
     repositoryMethod: getCurrentEventsFromPrismaRepository,
@@ -49,6 +53,7 @@ export async function getCurrentEventsService(
 export async function createCurrentEventService(
   data: unknown,
 ): Promise<CurrentEvent> {
+  requireActualitesEnabled();
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'createCurrentEventService',
@@ -61,6 +66,7 @@ export async function createCurrentEventService(
 export async function editCurrentEventService(
   data: unknown,
 ): Promise<CurrentEvent> {
+  requireActualitesEnabled();
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'editCurrentEventService',
@@ -71,6 +77,7 @@ export async function editCurrentEventService(
 }
 
 export async function deleteCurrentEventService(data: unknown): Promise<void> {
+  requireActualitesEnabled();
   await requireAdminOrThrow();
 
   return await executeServiceOrThrow({

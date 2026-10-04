@@ -1,3 +1,4 @@
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
 import {
   DeleteServiceCategory,
   EditOfferingSummaryAdminButton,
@@ -24,6 +25,8 @@ export function Category({
   reservationPhone,
   onlineBookingEnabled,
 }: Props) {
+  if (!isPrestationsEnabled()) return null;
+
   const id = String(servicesCategory.id);
   const text =
     servicesCategory.longDescription ?? servicesCategory.shortDescription;

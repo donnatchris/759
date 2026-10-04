@@ -1,5 +1,7 @@
 'use client';
 
+import { isHorairesEnabled } from '@/settings/settings.helpers';
+
 import { EditDialogButton } from '@/components/custom-ui/edit-dialog-button';
 import { useUser } from '@/features/auth/auth.context';
 import { useEditMode } from '@/features/core';
@@ -22,7 +24,7 @@ export function EditOpeningSlotsPresentationAdminButton({
   const { editMode } = useEditMode();
   const router = useRouter();
 
-  if (!isAdmin || !editMode) return null;
+  if (!isHorairesEnabled() || !isAdmin || !editMode) return null;
 
   const onSuccess = () => {
     toast.success("Textes des horaires d'ouverture mis à jour avec succès", {

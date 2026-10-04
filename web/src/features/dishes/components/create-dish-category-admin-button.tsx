@@ -1,5 +1,7 @@
 'use client';
 
+import { isMenuEnabled } from '@/settings/settings.helpers';
+
 import { CreateDialogButton } from '@/components/custom-ui/create-dialog-button';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/features/auth/auth.context';
@@ -12,7 +14,7 @@ export function CreateDishCategoryAdminButton() {
   const { editMode } = useEditMode();
   const router = useRouter();
 
-  if (!isAdmin || !editMode) return null;
+  if (!isMenuEnabled() || !isAdmin || !editMode) return null;
 
   const onSuccess = () => {
     toast.success('Catégorie de plats créée avec succès !', {

@@ -1,3 +1,4 @@
+import { isMenuEnabled } from '@/settings/settings.helpers';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { DishCategory } from '../lib/dishes.types';
@@ -7,6 +8,8 @@ type Props = {
 };
 
 export async function DishesSummary({ dishCategories }: Props) {
+  if (!isMenuEnabled()) return null;
+
   const title = 'Les plaisirs de la table';
   const hoverText = 'Découvrir la table';
 

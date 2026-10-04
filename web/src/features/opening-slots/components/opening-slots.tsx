@@ -8,7 +8,7 @@ import {
 } from '../lib/opening-slots.types';
 import { EditOpeningSlotsAdminButton } from './edit-opening-slots-admin-button';
 import { EditOpeningSlotsPresentationAdminButton } from './edit-opening-slots-presentation-admin-button';
-import { getSiteIcon } from '@/settings/settings.helpers';
+import { getSiteIcon, isHorairesEnabled } from '@/settings/settings.helpers';
 import type { TPresentation } from '@/features/presentation';
 
 type Props = {
@@ -24,6 +24,8 @@ export function OpeningSlots({
   openingClosures,
   presentation,
 }: Props) {
+  if (!isHorairesEnabled()) return null;
+
   const slotsByDay = new Map<number, OpeningSlot[]>();
   const { title, subTitle, content, footer } = presentation;
 

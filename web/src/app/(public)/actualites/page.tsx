@@ -1,3 +1,5 @@
+import { isActualitesEnabled } from '@/settings/settings.helpers';
+import { notFound } from 'next/navigation';
 import {
   CreateCurrentEventAdminButton,
   CurrentEventsFeed,
@@ -10,6 +12,7 @@ import { PageTitle } from '@/features/pages/components/page-title';
 export const dynamic = 'force-dynamic';
 
 export default async function PageActualites() {
+  if (!isActualitesEnabled()) notFound();
   const page = await getCachedPageTitleService({ slug: 'actualite' });
   const currentEvents = await getCurrentEventsService({ page: 1, pageSize: 5 });
 

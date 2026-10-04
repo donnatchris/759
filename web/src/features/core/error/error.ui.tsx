@@ -6,6 +6,7 @@ const ERROR_MESSAGES: Record<TErrorCode, string> = {
     'Vous devez être connecté pour accéder à cette ressource.',
   [ERROR_CODES.FORBIDDEN]:
     "Vous n'avez pas les permissions nécessaires pour effectuer cette action.",
+  [ERROR_CODES.FEATURE_DISABLED]: 'Cette fonctionnalité est désactivée.',
   [ERROR_CODES.NOT_FOUND]: 'La ressource demandée est introuvable.',
   [ERROR_CODES.INTERNAL_SERVER_ERROR]:
     'Une erreur est survenue sur le serveur.',

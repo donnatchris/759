@@ -45,7 +45,7 @@ export async function createDishCategoryAction(
     service: createDishCategoryService,
     input: data,
   });
-  safeUpdateTag(DISH_CATEGORIES_CACHE_TAG);
+  if (response.success) safeUpdateTag(DISH_CATEGORIES_CACHE_TAG);
   return response;
 }
 
@@ -57,7 +57,7 @@ export async function updateDishCategoryAction(
     service: updateDishCategoryService,
     input: data,
   });
-  safeUpdateTag(DISH_CATEGORIES_CACHE_TAG);
+  if (response.success) safeUpdateTag(DISH_CATEGORIES_CACHE_TAG);
   return response;
 }
 
@@ -69,7 +69,7 @@ export async function deleteDishCategoryAction(
     service: deleteDishCategoryService,
     input: data,
   });
-  safeUpdateTag(DISH_CATEGORIES_CACHE_TAG);
+  if (response.success) safeUpdateTag(DISH_CATEGORIES_CACHE_TAG);
   return response;
 }
 

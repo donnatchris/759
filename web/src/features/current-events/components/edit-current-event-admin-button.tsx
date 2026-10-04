@@ -1,5 +1,7 @@
 'use client';
 
+import { isActualitesEnabled } from '@/settings/settings.helpers';
+
 import { EditDialogButton } from '@/components/custom-ui/edit-dialog-button';
 import { useUser } from '@/features/auth/auth.context';
 import { useEditMode } from '@/features/core';
@@ -17,7 +19,7 @@ export function EditCurrentEventAdminButton({ currentEvent }: Props) {
   const { editMode } = useEditMode();
   const router = useRouter();
 
-  if (!isAdmin || !editMode) return null;
+  if (!isActualitesEnabled() || !isAdmin || !editMode) return null;
 
   const onSuccess = () => {
     toast.success('Actualité mise à jour avec succès !', {

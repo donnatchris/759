@@ -1,3 +1,4 @@
+import { requirePrestationsEnabled } from '@/settings/settings.guards';
 import { headers } from 'next/headers';
 import { auth } from '@/features/auth/auth';
 import { AppError, ERROR_CODES, isClassAppError } from '@/features/core';
@@ -93,6 +94,7 @@ type TAvailabilityRequester = 'admin' | 'user';
 export async function getReservationAvailabilityService(
   data: unknown,
 ): Promise<TReservationAvailability> {
+  requirePrestationsEnabled();
   try {
     const parsedData = zodValidationOrThrow(
       data,
@@ -145,6 +147,7 @@ export async function updateBookingSettingsService(
 export async function getReservationWeekAvailabilityService(
   data: unknown,
 ): Promise<TReservationWeekAvailability> {
+  requirePrestationsEnabled();
   try {
     const parsedData = zodValidationOrThrow(
       data,
@@ -259,6 +262,7 @@ async function getAvailableSlotsForDate({
 export async function createReservationService(
   data: unknown,
 ): Promise<TReservationWithResourceUsages> {
+  requirePrestationsEnabled();
   try {
     const parsedData = zodValidationOrThrow(data, createReservationSchema);
     const session = await getSessionOrNull();
@@ -337,6 +341,7 @@ export async function createReservationService(
 export async function createAdminReservationService(
   data: unknown,
 ): Promise<TReservationWithResourceUsages> {
+  requirePrestationsEnabled();
   const currentUser = await requireStaffPermissionOrThrow(
     'canManageAppointments',
   );
@@ -401,6 +406,7 @@ export async function createAdminReservationService(
 export async function getReservableServiceOptionsService(): Promise<
   TReservableServiceOption[]
 > {
+  requirePrestationsEnabled();
   await requireStaffOrThrow();
 
   return await getReservableServiceOptionsFromPrismaRepository();
