@@ -1,9 +1,26 @@
 import type { Event } from '@prisma/client';
 
-const now = new Date();
-const inDays = (days: number) => new Date(now.getTime() + days * 86400000);
-
 export const eventsSeed: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>[] = [
+  {
+    title: 'Commémoration du 07 octobre',
+    subTitle: 'Soirée de communion et de deuil pour le 07 octobre.',
+    tag: 'Soirée',
+    content: `Commémorons en mémoire des tragiques événements du 07 octobre.
+	  
+	  Au programme:
+
+	  Une petite intervention d'Olivier, une minute de silence, suivi d'un verre de l'amitié.
+      Petite restauration disponible sur place.
+	  
+	 Cette soirée sera suivie d'une conférence le samedi 17 otcobre sur le thème de la guerre des religions.`,
+    author: 'L’équipe du 7.59',
+    imageUrl: '/uploads/conference-07-10-2026.webp',
+    links: [],
+    eventStartDate: new Date('2026-10-07T19:00:00'),
+    eventEndDate: new Date('2026-10-07T23:00:00'),
+    displayStartDate: new Date('2026-10-02T00:00:00'),
+    displayEndDate: new Date('2026-10-08T23:59:59'),
+  },
   {
     title: "Repas-triote d'Octobre 2026",
     subTitle: 'La rentrée du 7.59.',
@@ -17,33 +34,13 @@ export const eventsSeed: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>[] = [
 	  
 	 Inscription obligatoire, via le lien Hello-Asso plus bas.`,
     author: 'L’équipe du 7.59',
-    imageUrl: '/uploads/repas-triote-10-2026.jpg',
+    imageUrl: '/uploads/repas-triote-10-2026.webp',
     links: [
       'https://www.helloasso.com/associations/delices-et-traditions-du-roussillon/evenements/le-repas-triote?_gl=1%2a1y5jg9f%2a_gcl_au%2aMjA0NjYzNDQ3My4xNzkwMjkyNzc0LjQ3NjcwNDY4NC4xNzkwNDIwNTQ1LjE3OTA0MjA1ODAuOTQ4NTc0NjQzLjE3OTA0MTEzNDYuMTc5MDQyMDU4MA..',
     ],
     eventStartDate: new Date('2026-10-03T12:00:00'),
     eventEndDate: new Date('2026-10-03T17:00:00'),
-    displayStartDate: inDays(-1),
-    displayEndDate: inDays(8),
-  },
-  {
-    title: 'Commémoration du 07 octobre',
-    subTitle: 'Soirée de communion et de deuil pour le 07 octobre.',
-    tag: 'Conférence',
-    content: `Commémorons en mémoire des tragiques événements du 07 octobre.
-	  
-	  Au programme:
-
-	  Une petite intervention d'Olivier, une minute de silence, suivi d'un verre de l'amitié.
-      Petite restauration disponible sur place.
-	  
-	 Cette soirée sera suivie d'une conférence le samedi 17 otcobre sur le thème de la guerre des religions.`,
-    author: 'L’équipe du 7.59',
-    imageUrl: '/uploads/conference-07-10-2026.jpg',
-    links: [],
-    eventStartDate: new Date('2026-10-07T19:00:00'),
-    eventEndDate: new Date('2026-10-07T23:00:00'),
-    displayStartDate: new Date('2026-10-02T00:00:00'),
-    displayEndDate: new Date('2026-10-08T23:59:59'),
+    displayStartDate: null,
+    displayEndDate: null,
   },
 ];

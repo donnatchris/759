@@ -63,7 +63,7 @@ export function EventsCalendar() {
             ? 'Certaines informations du calendrier n’ont pas pu être chargées. Réessayez en changeant de mois.'
             : empty
               ? 'Aucun événement ni fermeture sur cette période.'
-              : 'Sélectionnez un événement ou une fermeture pour découvrir les détails.'}
+              : 'Sélectionnez un événement pour découvrir les détails.'}
       </div>
       {isHorairesEnabled() && (
         <div

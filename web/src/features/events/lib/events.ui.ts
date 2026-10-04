@@ -14,6 +14,13 @@ export function formatEventDateRange(
   const formattedStartDate = formatEventDate(startDate);
   const formattedEndDate = formatEventDate(endDate);
 
+  if (
+    formattedStartDate &&
+    formattedEndDate &&
+    formattedStartDate === formattedEndDate
+  ) {
+    return `Le ${formattedEndDate}`;
+  }
   if (formattedStartDate && formattedEndDate) {
     return `Du ${formattedStartDate} au ${formattedEndDate}`;
   }
