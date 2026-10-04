@@ -18,7 +18,7 @@ export const siteSettings: TSiteSettings = {
     'Faire vivre notre héritage français et catalan',
     'Rassembler, transmettre et agir au service du pays catalan',
   ],
-  seoTitle: `${fullName} - Association patriote catalane`,
-  seoDescription: `Découvrez ${fullName}, une association patriote catalane animée par l’esprit français, l’enracinement, la transmission et le rassemblement.`,
+  seoTitle: `${fullName} - Association patriote`,
+  seoDescription: `Découvrez ${fullName}, une association patriote animée par l’esprit français, l’enracinement, la transmission et le rassemblement.`,
   ogImageUrl: null,
 };
