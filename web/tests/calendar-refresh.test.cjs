@@ -7,7 +7,12 @@ test('calendar refreshes after mutations, across tabs and on returning; cleans u
   let cleanup;
   const originalLoad = Module._load;
   Module._load = function (request, parent, isMain) {
-    if (request === 'react') return { useEffect: (effect) => { cleanup = effect(); } };
+    if (request === 'react')
+      return {
+        useEffect: (effect) => {
+          cleanup = effect();
+        },
+      };
     return originalLoad.call(this, request, parent, isMain);
   };
   let calendar;
@@ -21,21 +26,41 @@ test('calendar refreshes after mutations, across tabs and on returning; cleans u
   browserDocument.visibilityState = 'visible';
   const channels = new Set();
   class Channel {
-    constructor(name) { this.name = name; channels.add(this); }
+    constructor(name) {
+      this.name = name;
+      channels.add(this);
+    }
     postMessage(data) {
       for (const channel of channels) {
-        if (channel !== this && channel.name === this.name) channel.onmessage?.({ data });
+        if (channel !== this && channel.name === this.name)
+          channel.onmessage?.({ data });
       }
     }
-    close() { channels.delete(this); }
+    close() {
+      channels.delete(this);
+    }
   }
-  for (const [name, value] of Object.entries({ window: browserWindow, document: browserDocument, BroadcastChannel: Channel })) {
+  for (const [name, value] of Object.entries({
+    window: browserWindow,
+    document: browserDocument,
+    BroadcastChannel: Channel,
+  })) {
     const descriptor = Object.getOwnPropertyDescriptor(globalThis, name);
-    Object.defineProperty(globalThis, name, { configurable: true, writable: true, value });
-    t.after(() => descriptor ? Object.defineProperty(globalThis, name, descriptor) : delete globalThis[name]);
+    Object.defineProperty(globalThis, name, {
+      configurable: true,
+      writable: true,
+      value,
+    });
+    t.after(() =>
+      descriptor
+        ? Object.defineProperty(globalThis, name, descriptor)
+        : delete globalThis[name],
+    );
   }
   let refreshes = 0;
-  calendar.useCalendarEventsRefresh({ current: { getApi: () => ({ refetchEvents: () => refreshes++ }) } });
+  calendar.useCalendarEventsRefresh({
+    current: { getApi: () => ({ refetchEvents: () => refreshes++ }) },
+  });
   calendar.notifyCalendarEventsChanged();
   assert.ok(refreshes >= 1, 'mutation refreshes the current calendar');
   const otherTab = new Channel('calendar-events-changed');

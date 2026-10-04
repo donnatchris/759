@@ -14,6 +14,8 @@ const DEFAULT_SITE_NAME = process.env.SITE_FULL_NAME || 'Mon site';
 
 export const DEFAULT_SEO_TITLE = `${DEFAULT_SITE_NAME} - Site officiel`;
 
+export const DEFAULT_OG_IMAGE = '/images/logo-social.jpg';
+
 export const DEFAULT_SEO_DESCRIPTION = `Découvrez ${DEFAULT_SITE_NAME}, ses services, son Blog et ses informations pratiques.`;
 
 type PublicPageMetadataOptions = {
@@ -69,7 +71,7 @@ export function createPublicPageMetadata(
 ): Metadata {
   const metadataBase = getMetadataBase();
   const ogImage =
-    options.ogImage || siteSettings.ogImageUrl || '/placeholder.svg';
+    options.ogImage || siteSettings.ogImageUrl || DEFAULT_OG_IMAGE;
   const ogImageAlt = options.ogImageAlt || options.title;
 
   return {
@@ -108,7 +110,7 @@ export function createPublicPageMetadata(
       card: 'summary_large_image',
       title: options.title,
       description: options.description,
-      images: [ogImage],
+      images: [{ url: ogImage, alt: ogImageAlt }],
     },
 
     robots: {
@@ -129,10 +131,18 @@ export function createIconsMetadata(): Metadata['icons'] {
   return {
     icon: [
       {
-        url: '/placeholder.svg',
-        type: 'image/svg+xml',
+        url: '/favicons/favicon-32x32.png',
+        type: 'image/png',
+        sizes: '32x32',
+      },
+      {
+        url: '/favicons/favicon-16x16.png',
+        type: 'image/png',
+        sizes: '16x16',
       },
     ],
+    shortcut: '/favicon.ico',
+    apple: [{ url: '/favicons/apple-touch-icon.png', sizes: '180x180' }],
   };
 }
 
@@ -154,7 +164,7 @@ export function createLocalBusinessJsonLd(siteSettings: SiteSettings) {
     description: siteSettings.seoDescription || DEFAULT_SEO_DESCRIPTION,
     ...(siteUrl ? { url: siteUrl } : {}),
     image: getAbsoluteOrRelativeUrl(
-      siteSettings.ogImageUrl || '/placeholder.svg',
+      siteSettings.ogImageUrl || DEFAULT_OG_IMAGE,
       metadataBase,
     ),
     telephone: siteSettings.tel ?? undefined,

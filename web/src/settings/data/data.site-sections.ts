@@ -18,7 +18,7 @@ export const siteSectionSeeds: TSiteSectionSeed[] = [
     title: 'Quand la porte est ouverte',
     subTitle: 'Venir au local',
     content:
-      'Retrouvez-nous au local pendant les permanences et les soirées annoncées.',
+      'Retrouvez-nous au local pendant les permanences et les événements annoncées.',
     footer: 'Pour un événement particulier, consultez nos rendez-vous.',
   },
 ];

@@ -1,5 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { RHFPublicImageSelector } from '@/features/core/image/components/rhf-public-image-selector';
+import { getPublicImages } from '@/features/core/image/lib/image.action';
+import type { TPublicImage } from '@/features/core/image/lib/image.service';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RotateCcw, Save } from 'lucide-react';
@@ -26,9 +30,35 @@ const defaultValues: TCreateMarketingEmailInput = {
   intro: '',
   content: '',
   note: '',
+  imageUrl: '',
 };
 
 export function CreateMarketingEmailForm({ onCreated }: Props) {
+  const [images, setImages] = useState<TPublicImage[]>([]);
+  const [imagesError, setImagesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    async function fetchImages() {
+      try {
+        const response = await getPublicImages();
+        if (!active) return;
+        if (response.success) {
+          setImages(response.data);
+        } else {
+          setImagesError('Impossible de charger les images disponibles.');
+        }
+      } catch {
+        if (active)
+          setImagesError('Impossible de charger les images disponibles.');
+      }
+    }
+    void fetchImages();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const form = useForm<
     TCreateMarketingEmailInput,
     unknown,
@@ -118,6 +148,19 @@ export function CreateMarketingEmailForm({ onCreated }: Props) {
           required
           popoverContent="Corps détaillé du message. Les retours à la ligne et sauts de ligne seront conservés dans l'email."
         />
+        <RHFPublicImageSelector
+          name="imageUrl"
+          label="Image"
+          images={images}
+          allowEmpty
+          emptyLabel="Aucune image"
+          popoverContent="Image optionnelle affichée dans l'email. Sélectionnez une image de la bibliothèque du site."
+        />
+        {imagesError && (
+          <p role="alert" className="text-sm text-destructive">
+            {imagesError}
+          </p>
+        )}
         <RHFInput
           name="note"
           label="Note"

@@ -473,10 +473,13 @@ export function ManageUsers({
   const handleBanSelectedUsersClick = () => {
     if (!hasSelectedUsers) return;
 
+    const BanToastDescription = isPrestationsEnabled()
+      ? "Cette action supprime les comptes sélectionnés et ajoute leurs emails à la liste des emails bannis. Elle sera refusée si au moins un utilisateur possède une réservation prévue aujourd'hui ou plus tard."
+      : 'Cette action supprime les comptes sélectionnés et ajoute leurs emails à la liste des emails bannis.';
+
     ConfirmToast({
       title: `Bannir définitivement ${formatUserCount(selectedUserCount)} ?`,
-      description:
-        "Cette action supprime les comptes sélectionnés et ajoute leurs emails à la liste des emails bannis. Elle sera refusée si au moins un utilisateur possède une réservation prévue aujourd'hui ou plus tard.",
+      description: BanToastDescription,
       confirmText: 'Bannir',
       cancelText: 'Annuler',
       onConfirm: async () => {

@@ -423,20 +423,30 @@ test('public closure calendar requires no authentication, validates ranges and r
   const beforeAuth = authCalls;
   try {
     SETTINGS.features.horaires = true;
-    assert.deepEqual(await service.getPublicOpeningClosureCalendarEventsService({
-      start: '2026-10-01T00:00:00.000Z', end: '2026-11-01T00:00:00.000Z',
-    }), []);
+    assert.deepEqual(
+      await service.getPublicOpeningClosureCalendarEventsService({
+        start: '2026-10-01T00:00:00.000Z',
+        end: '2026-11-01T00:00:00.000Z',
+      }),
+      [],
+    );
     assert.equal(authCalls, beforeAuth);
     const beforeDb = databaseCalls;
     for (const range of [
       { start: 'invalid', end: '2026-11-01T00:00:00.000Z' },
       { start: '2026-11-01T00:00:00.000Z', end: '2026-10-01T00:00:00.000Z' },
       { start: '2026-10-01T00:00:00.000Z', end: '2028-10-01T00:00:00.000Z' },
-    ]) await assert.rejects(() => service.getPublicOpeningClosureCalendarEventsService(range));
+    ])
+      await assert.rejects(() =>
+        service.getPublicOpeningClosureCalendarEventsService(range),
+      );
     SETTINGS.features.horaires = false;
-    await assert.rejects(() => service.getPublicOpeningClosureCalendarEventsService({
-      start: '2026-10-01T00:00:00.000Z', end: '2026-11-01T00:00:00.000Z',
-    }));
+    await assert.rejects(() =>
+      service.getPublicOpeningClosureCalendarEventsService({
+        start: '2026-10-01T00:00:00.000Z',
+        end: '2026-11-01T00:00:00.000Z',
+      }),
+    );
     assert.equal(databaseCalls, beforeDb);
     assert.equal(authCalls, beforeAuth);
   } finally {

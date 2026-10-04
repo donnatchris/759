@@ -14,6 +14,7 @@ import {
   deleteMarketingEmailSchema,
   getMarketingEmailsSchema,
 } from './marketing-email.schema';
+import { getAppHomeUrl } from './email-layout';
 import { getMarketingEmailHtml } from './marketing-email.templates';
 import type {
   TMarketingEmailListItem,
@@ -65,6 +66,9 @@ export async function createMarketingEmailService(
       createMarketingEmailInPrismaRepository(
         {
           ...parsedData,
+          imageUrl: parsedData.imageUrl
+            ? new URL(parsedData.imageUrl, getAppHomeUrl()).toString()
+            : null,
           createdByUserId: currentUser.id,
           createdByEmail: currentUser.email,
         },

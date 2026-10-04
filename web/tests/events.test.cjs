@@ -291,8 +291,19 @@ test('public calendar reads only event fields without staff access and validates
 });
 
 test('public closures preserve exclusive calendar end and inclusive detail dates', () => {
-  const { toPublicClosureCalendarEvent } = require('../src/features/events/lib/events.calendar.ts');
-  const closure = { id: 'opening-closure-7', title: 'Fermeture', label: 'Congés', startDate: '2026-12-28', endDate: '2027-01-03', start: '2026-12-28', end: '2027-01-04', allDay: true };
+  const {
+    toPublicClosureCalendarEvent,
+  } = require('../src/features/events/lib/events.calendar.ts');
+  const closure = {
+    id: 'opening-closure-7',
+    title: 'Fermeture',
+    label: 'Congés',
+    startDate: '2026-12-28',
+    endDate: '2027-01-03',
+    start: '2026-12-28',
+    end: '2027-01-04',
+    allDay: true,
+  };
   const event = toPublicClosureCalendarEvent(closure);
   assert.equal(event.start, '2026-12-28');
   assert.equal(event.end, '2027-01-04');

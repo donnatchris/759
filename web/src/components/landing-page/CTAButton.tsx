@@ -6,24 +6,24 @@ import { CalendarDays, type LucideIcon } from 'lucide-react';
 import { type VariantProps } from 'class-variance-authority';
 
 type Props = {
-	label?: string;
-	Icon?: LucideIcon;
-	destination?: string;
-	buttonVariant?: VariantProps<typeof Button>['variant'];
+  label?: string;
+  Icon?: LucideIcon;
+  destination?: string;
+  buttonVariant?: VariantProps<typeof Button>['variant'];
 };
 
 export function CTAButton({
-	label = 'Voir les Événements à venir',
-	Icon = CalendarDays,
-	destination = 'evenements',
-	buttonVariant = 'hero',
+  label = 'Voir les Événements à venir',
+  Icon = CalendarDays,
+  destination = 'evenements',
+  buttonVariant = 'hero',
 }: Props) {
-	const router = useRouter();
+  const router = useRouter();
 
-	return (
-		<Button variant={buttonVariant} onClick={() => router.push(destination)}>
-			<Icon />
-			<span>{label}</span>
-		</Button>
-	);
+  return (
+    <Button variant={buttonVariant} onClick={() => router.push(destination)}>
+      <Icon />
+      <span>{label}</span>
+    </Button>
+  );
 }

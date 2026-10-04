@@ -13,150 +13,152 @@ import { EditModeProvider } from '@/features/core';
 import { getSiteSettingsService } from '@/features/site-settings/lib/site-settings.service';
 import { countUnreadNotificationsForUserService } from '@/features/notifications/lib/notifications.service';
 import {
-	createIconsMetadata,
-	createLocalBusinessJsonLd,
-	DEFAULT_SEO_DESCRIPTION,
-	DEFAULT_SEO_TITLE,
-	getMetadataBase,
-	getSeoSiteSettings,
+  createIconsMetadata,
+  createLocalBusinessJsonLd,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_SEO_DESCRIPTION,
+  DEFAULT_SEO_TITLE,
+  getMetadataBase,
+  getSeoSiteSettings,
 } from '@/features/seo/lib/seo-metadata';
 import { UmamiAnalytics } from '@/features/analytics/umami-analytics';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
-	const siteSettings = await getSeoSiteSettings();
-	const title = siteSettings.seoTitle || DEFAULT_SEO_TITLE;
-	const description = siteSettings.seoDescription || DEFAULT_SEO_DESCRIPTION;
-	const metadataBase = getMetadataBase();
-	const ogImage = siteSettings.ogImageUrl || '/placeholder.svg';
+  const siteSettings = await getSeoSiteSettings();
+  const title = siteSettings.seoTitle || DEFAULT_SEO_TITLE;
+  const description = siteSettings.seoDescription || DEFAULT_SEO_DESCRIPTION;
+  const metadataBase = getMetadataBase();
+  const ogImage = siteSettings.ogImageUrl || DEFAULT_OG_IMAGE;
+  const ogImageAlt = `Logo de ${siteSettings.fullName}`;
 
-	return {
-		...(metadataBase ? { metadataBase } : {}),
+  return {
+    ...(metadataBase ? { metadataBase } : {}),
 
-		title: {
-			default: title,
-			template: `%s | ${siteSettings.fullName}`,
-		},
+    title: {
+      default: title,
+      template: `%s | ${siteSettings.fullName}`,
+    },
 
-		alternates: {
-			canonical: '/',
-		},
+    alternates: {
+      canonical: '/',
+    },
 
-		icons: createIconsMetadata(),
+    icons: createIconsMetadata(),
 
-		description,
-		applicationName: siteSettings.fullName,
-		authors: [{ name: siteSettings.fullName }],
-		creator: siteSettings.fullName,
-		publisher: siteSettings.fullName,
-		category: 'services',
+    description,
+    applicationName: siteSettings.fullName,
+    authors: [{ name: siteSettings.fullName }],
+    creator: siteSettings.fullName,
+    publisher: siteSettings.fullName,
+    category: 'services',
 
-		openGraph: {
-			type: 'website',
-			locale: 'fr_FR',
-			siteName: siteSettings.fullName,
-			title,
-			description,
-			url: '/',
-			images: [
-				{
-					url: ogImage,
-					width: 1200,
-					height: 630,
-					alt: `${siteSettings.seoTitle || DEFAULT_SEO_TITLE}`,
-				},
-			],
-		},
+    openGraph: {
+      type: 'website',
+      locale: 'fr_FR',
+      siteName: siteSettings.fullName,
+      title,
+      description,
+      url: '/',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: ogImageAlt,
+        },
+      ],
+    },
 
-		twitter: {
-			card: 'summary_large_image',
-			title,
-			description,
-			images: [ogImage],
-		},
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [{ url: ogImage, alt: ogImageAlt }],
+    },
 
-		robots: {
-			index: true,
-			follow: true,
-			googleBot: {
-				index: true,
-				follow: true,
-				'max-image-preview': 'large',
-				'max-snippet': -1,
-				'max-video-preview': -1,
-			},
-		},
-	};
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+  };
 }
 
 type Props = {
-	children: React.ReactNode;
+  children: React.ReactNode;
 };
 
 export default async function RootLayout({ children }: Props) {
-	const siteSettingsPromise = getSiteSettingsService();
+  const siteSettingsPromise = getSiteSettingsService();
 
-	let session: TAuthSession = null;
+  let session: TAuthSession = null;
 
-	try {
-		session = await auth.api.getSession({
-			headers: await headers(),
-		});
-	} catch {
-		session = null;
-	}
+  try {
+    session = await auth.api.getSession({
+      headers: await headers(),
+    });
+  } catch {
+    session = null;
+  }
 
-	const user: TAuthUser = session?.user ?? null;
+  const user: TAuthUser = session?.user ?? null;
 
-	const unreadNotificationsCountPromise = user
-		? countUnreadNotificationsForUserService(user.id).catch(() => 0)
-		: Promise.resolve(0);
+  const unreadNotificationsCountPromise = user
+    ? countUnreadNotificationsForUserService(user.id).catch(() => 0)
+    : Promise.resolve(0);
 
-	const [siteSettings, unreadNotificationsCount] = await Promise.all([
-		siteSettingsPromise,
-		unreadNotificationsCountPromise,
-	]);
+  const [siteSettings, unreadNotificationsCount] = await Promise.all([
+    siteSettingsPromise,
+    unreadNotificationsCountPromise,
+  ]);
 
-	const localBusinessJsonLd = createLocalBusinessJsonLd(siteSettings);
+  const localBusinessJsonLd = createLocalBusinessJsonLd(siteSettings);
 
-	return (
-		<html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth">
-			<body className="min-h-full">
-				<script
-					type="application/ld+json"
-					suppressHydrationWarning
-					dangerouslySetInnerHTML={{
-						__html: JSON.stringify(localBusinessJsonLd).replace(
-							/</g,
-							'\\u003c',
-						),
-					}}
-				/>
+  return (
+    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth">
+      <body className="min-h-full">
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(localBusinessJsonLd).replace(
+              /</g,
+              '\\u003c',
+            ),
+          }}
+        />
 
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="light"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Toaster />
 
-					<TooltipProvider>
-						<UserProvider user={user}>
-							<EditModeProvider>
-								<Navbar
-									initialUnreadNotificationsCount={unreadNotificationsCount}
-									siteName={siteSettings.shortName}
-								/>
-								{children}
-								<Footer siteSettings={siteSettings} />
-							</EditModeProvider>
-						</UserProvider>
-					</TooltipProvider>
-				</ThemeProvider>
-				<UmamiAnalytics />
-			</body>
-		</html>
-	);
+          <TooltipProvider>
+            <UserProvider user={user}>
+              <EditModeProvider>
+                <Navbar
+                  initialUnreadNotificationsCount={unreadNotificationsCount}
+                  siteName={siteSettings.shortName}
+                />
+                {children}
+                <Footer siteSettings={siteSettings} />
+              </EditModeProvider>
+            </UserProvider>
+          </TooltipProvider>
+        </ThemeProvider>
+        <UmamiAnalytics />
+      </body>
+    </html>
+  );
 }

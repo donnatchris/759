@@ -7,7 +7,7 @@ export const carouselImages: TCarouselImage[] = [
     url: '/uploads/plat-rustique.png',
   },
   {
-	url: '/uploads/france-catalogne.png',
+    url: '/uploads/france-catalogne.png',
   },
   {
     url: '/uploads/tchin.png',

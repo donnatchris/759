@@ -15,6 +15,8 @@ export const marketingEmailSchema = z.object({
       .max(1000)
       .refine(
         (value) => {
+          // The shared image selector returns a local library URL.
+          if (/^\/uploads\/[^/\\?#]+$/.test(value)) return true;
           try {
             return ['https:', 'http:'].includes(new URL(value).protocol);
           } catch {
