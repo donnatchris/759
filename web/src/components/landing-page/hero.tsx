@@ -1,5 +1,4 @@
-import { isHorairesEnabled } from '@/settings/settings.helpers';
-import { isBlogEnabled } from '@/settings/settings.helpers';
+import { isHorairesEnabled, isBlogEnabled } from '@/settings/settings.helpers';
 import Link from 'next/link';
 import Image from 'next/image';
 import {

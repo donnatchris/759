@@ -28,10 +28,32 @@ export function EventCard({ event }: Props) {
 
   return (
     <article
-      className={`relative overflow-hidden rounded-sm border border-border bg-card ${hasVisual ? 'grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]' : ''}`}
+      className={`relative overflow-hidden rounded-sm border border-border bg-card ${hasVisual ? 'grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-[auto_1fr]' : ''}`}
     >
+      <header
+        className={`relative min-w-0 p-6 pt-12 sm:p-10 sm:pt-12 lg:pb-0 ${hasVisual ? 'lg:col-start-2 lg:row-start-1' : ''}`}
+      >
+        <div className="absolute right-4 top-2 z-10 flex gap-1">
+          <EditEventAdminButton event={event} />
+          <DeleteEvent id={event.id} />
+        </div>
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <span className="section-kicker">À l’affiche</span>
+          {event.tag && (
+            <Badge
+              variant="outline"
+              className="max-w-full whitespace-normal rounded-sm border-border px-3 py-1 text-foreground"
+            >
+              {event.tag}
+            </Badge>
+          )}
+        </div>
+        <h2 className="font-heading text-3xl font-semibold leading-tight tracking-tight [overflow-wrap:anywhere] sm:text-4xl">
+          {event.title}
+        </h2>
+      </header>
       {hasVisual && (
-        <div className="min-w-0 bg-heritage-ink text-heritage-paper">
+        <div className="min-w-0 bg-heritage-ink text-heritage-paper lg:col-start-1 lg:row-span-2 lg:row-start-1">
           {event.imageUrl && (
             <div className="relative aspect-[4/3] overflow-hidden">
               <Image
@@ -72,27 +94,11 @@ export function EventCard({ event }: Props) {
           )}
         </div>
       )}
-      <div className="relative min-w-0 p-6 pt-12 sm:p-10 sm:pt-12">
-        <div className="absolute right-4 top-2 z-10 flex gap-1">
-          <EditEventAdminButton event={event} />
-          <DeleteEvent id={event.id} />
-        </div>
-        <div className="mb-5 flex flex-wrap items-center gap-3">
-          <span className="section-kicker">À l’affiche</span>
-          {event.tag && (
-            <Badge
-              variant="outline"
-              className="max-w-full whitespace-normal rounded-sm border-border px-3 py-1 text-foreground"
-            >
-              {event.tag}
-            </Badge>
-          )}
-        </div>
-        <h2 className="font-heading text-3xl font-semibold leading-tight tracking-tight [overflow-wrap:anywhere] sm:text-4xl">
-          {event.title}
-        </h2>
+      <div
+        className={`min-w-0 p-6 sm:p-10 lg:pt-0 ${hasVisual ? 'lg:col-start-2 lg:row-start-2' : ''}`}
+      >
         {event.subTitle && (
-          <p className="mt-5 border-l-4 border-heritage-gold pl-4 text-xl font-semibold leading-snug text-foreground [overflow-wrap:anywhere] sm:text-2xl">
+          <p className="lg:mt-5 border-l-4 border-heritage-gold pl-4 text-xl font-semibold leading-snug text-foreground [overflow-wrap:anywhere] sm:text-2xl">
             {event.subTitle}
           </p>
         )}
