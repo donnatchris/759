@@ -10,7 +10,7 @@ export const SETTINGS: TSettings = {
     icon: Handshake,
   },
   features: {
-    signup: false,
+    signup: true,
     login: true,
     umami: false,
     actualites: true,

@@ -1,16 +1,19 @@
 import {
   APP_NAME,
-  colors,
   escapeHtml,
   escapeTextHtml,
   getAppHomeUrl,
-  getButtonHtml,
 } from './email-layout';
 
 type GenericEmailTemplateParams = {
   title: string;
-  intro: string;
-  content: string;
+  intro?: string | null;
+  content?: string;
+  eyebrow?: string | null;
+  note?: string | null;
+  showAction?: boolean;
+  footerText?: string;
+  footerUrl?: string;
   actionUrl?: string;
   actionLabel?: string;
 };
@@ -21,23 +24,35 @@ export function getGenericEmailHtml({
   content,
   actionUrl,
   actionLabel,
+  eyebrow = "Message de l'association",
+  note,
+  showAction = true,
+  footerText = 'Message automatique — merci de ne pas répondre à cet email.',
+  footerUrl,
 }: GenericEmailTemplateParams) {
-  const buttonUrl = escapeHtml(actionUrl ?? getAppHomeUrl());
+  const buttonUrl = showAction ? escapeHtml(actionUrl ?? getAppHomeUrl()) : '';
+  const safeFooterUrl = footerUrl ? escapeHtml(footerUrl) : '';
   const buttonLabel = actionLabel ?? "Rejoindre la page d'accueil";
 
-
   return `
-  <div style="margin: 0; padding: 0; background: #F4F5F7;">
+  <style>
+    @media only screen and (max-width: 620px) {
+      .generic-email-padding { padding-right: 24px !important; padding-left: 24px !important; }
+      .generic-email-title { font-size: 40px !important; line-height: 42px !important; }
+      .generic-email-cta { display: block !important; text-align: center !important; }
+    }
+  </style>
+  <div style="margin: 0; padding: 0; background: #f3f2ed;">
     <table
       role="presentation"
       width="100%"
       cellspacing="0"
       cellpadding="0"
       border="0"
-      style="width: 100%; background: #F4F5F7;"
+      style="width: 100%; background: #f3f2ed;"
     >
       <tr>
-        <td align="center" style="padding: 32px 16px;">
+        <td align="center" style="padding: 28px 12px;">
           <table
             role="presentation"
             width="100%"
@@ -47,77 +62,21 @@ export function getGenericEmailHtml({
             style="width: 100%; max-width: 600px;"
           >
 
-            <!-- Header -->
-            <tr>
-              <td style="padding: 0 0 18px 0; text-align: center;">
-                <div
-                  style="
-                    font-family: Arial, sans-serif;
-                    font-size: 12px;
-                    line-height: 18px;
-                    color: #6B7280;
-                    letter-spacing: 0.14em;
-                    text-transform: uppercase;
-                  "
-                >
-                  Message de l'association
-                </div>
-
-                <div
-                  style="
-                    font-family: Georgia, 'Times New Roman', serif;
-                    font-size: 32px;
-                    line-height: 40px;
-                    font-weight: 700;
-                    color: #14213D;
-                    margin-top: 6px;
-                  "
-                >
-                  ${APP_NAME}
-                </div>
-              </td>
-            </tr>
-
             <!-- Card -->
             <tr>
               <td
                 style="
-                  border: 1px solid #D9DDE5;
-                  border-radius: 16px;
-                  background: #FFFFFF;
+                  border: 1px solid #ced2d6;
+                  border-radius: 0;
+                  background: #faf8f2;
                   overflow: hidden;
                 "
               >
 
-                <!-- Tricolore -->
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellspacing="0"
-                  cellpadding="0"
-                  border="0"
-                  style="width: 100%;"
-                >
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                   <tr>
-                    <td
-                      width="33.33%"
-                      style="height: 7px; background: #0055A4; font-size: 0; line-height: 0;"
-                    >
-                      &nbsp;
-                    </td>
-
-                    <td
-                      width="33.33%"
-                      style="height: 7px; background: #FFFFFF; font-size: 0; line-height: 0; border-bottom: 1px solid #E5E7EB;"
-                    >
-                      &nbsp;
-                    </td>
-
-                    <td
-                      width="33.33%"
-                      style="height: 7px; background: #EF4135; font-size: 0; line-height: 0;"
-                    >
-                      &nbsp;
+                    <td class="generic-email-padding" style="padding: 22px 42px; background-color: #18345b; border-bottom: 5px solid #dfb74e; font-family: Baskerville, Georgia, 'Times New Roman', serif; font-size: 32px; line-height: 34px; font-weight: 700; letter-spacing: -1px; color: #faf8f2;">
+                      ${APP_NAME}
                     </td>
                   </tr>
                 </table>
@@ -131,73 +90,92 @@ export function getGenericEmailHtml({
                   border="0"
                 >
                   <tr>
-                    <td style="padding: 38px 36px 34px 36px;">
+                    <td class="generic-email-padding" style="padding: 48px 42px 34px 42px;">
+                      ${
+                        eyebrow
+                          ? `<p style="margin: 0 0 13px; font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: #ad343b;">
+                        ${escapeTextHtml(eyebrow)}
+                      </p>`
+                          : ''
+                      }
 
-                      <h1
+                      <h1 class="generic-email-title"
                         style="
                           margin: 0 0 20px 0;
-                          font-family: Georgia, 'Times New Roman', serif;
-                          font-size: 27px;
-                          line-height: 35px;
-                          font-weight: 700;
-                          color: #14213D;
+                          font-family: Baskerville, Georgia, 'Times New Roman', serif;
+                          font-size: 50px;
+                          line-height: 51px;
+                          font-weight: 600;
+                          letter-spacing: -1.8px;
+                          color: #18345b;
                         "
                       >
                         ${escapeTextHtml(title)}
                       </h1>
 
-                      <p
+                      ${
+                        intro
+                          ? `<p
                         style="
                           margin: 0 0 20px 0;
-                          font-family: Arial, sans-serif;
+                          font-family: Arial, Helvetica, sans-serif;
                           font-size: 16px;
                           line-height: 26px;
-                          color: #596273;
+                          color: #1b2c43;
                         "
                       >
                         ${escapeTextHtml(intro)}
-                      </p>
+                      </p>`
+                          : ''
+                      }
 
-                      <div
+                      ${
+                        content !== undefined
+                          ? `<div
                         style="
                           margin: 0 0 28px 0;
-                          font-family: Arial, sans-serif;
+                          font-family: Arial, Helvetica, sans-serif;
                           font-size: 16px;
                           line-height: 27px;
-                          color: #202938;
+                          color: #1b2c43;
                         "
                       >
                         ${escapeTextHtml(content)}
-                      </div>
+                      </div>`
+                          : ''
+                      }
 
+                      ${
+                        showAction
+                          ? `
                       <!-- Button -->
                       <table
                         role="presentation"
                         cellspacing="0"
                         cellpadding="0"
                         border="0"
-                        style="margin: 0 0 26px 0;"
+                        width="100%" style="width: 100%; margin: 0 0 26px 0;"
                       >
                         <tr>
                           <td
-                            bgcolor="#0055A4"
+                            align="center" bgcolor="#ad343b"
                             style="
-                              border-radius: 8px;
-                              background: #0055A4;
+                              background: #ad343b;
                             "
                           >
                             <a
                               href="${buttonUrl}"
+                              class="generic-email-cta"
                               style="
                                 display: inline-block;
-                                padding: 13px 24px;
-                                font-family: Arial, sans-serif;
-                                font-size: 15px;
+                                padding: 17px 28px;
+                                font-family: Arial, Helvetica, sans-serif;
+                                font-size: 14px;
                                 line-height: 20px;
                                 font-weight: 700;
-                                color: #FFFFFF;
+                                color: #faf8f2;
                                 text-decoration: none;
-                                border-radius: 8px;
+                                letter-spacing: 0.3px;
                               "
                             >
                               ${escapeTextHtml(buttonLabel)}
@@ -206,11 +184,20 @@ export function getGenericEmailHtml({
                         </tr>
                       </table>
 
+                      `
+                          : ''
+                      }
+
+                      ${note ? `<div style="margin: 0 0 24px; padding: 17px 19px; background: #f3f2ed; border: 1px solid #ced2d6; border-left: 4px solid #ad343b; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 22px; color: #606a76;">${escapeTextHtml(note)}</div>` : ''}
+
+                      ${
+                        showAction
+                          ? `
                       <!-- Red accent -->
                       <div
                         style="
                           height: 1px;
-                          background: #E5E7EB;
+                          background: #ced2d6;
                           margin: 4px 0 22px 0;
                         "
                       ></div>
@@ -218,10 +205,10 @@ export function getGenericEmailHtml({
                       <p
                         style="
                           margin: 0 0 8px 0;
-                          font-family: Arial, sans-serif;
+                          font-family: Arial, Helvetica, sans-serif;
                           font-size: 13px;
                           line-height: 20px;
-                          color: #7A8391;
+                          color: #606a76;
                         "
                       >
                         Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :
@@ -230,7 +217,7 @@ export function getGenericEmailHtml({
                       <p
                         style="
                           margin: 0;
-                          font-family: Arial, sans-serif;
+                          font-family: Arial, Helvetica, sans-serif;
                           font-size: 12px;
                           line-height: 19px;
                           word-break: break-all;
@@ -239,13 +226,16 @@ export function getGenericEmailHtml({
                         <a
                           href="${buttonUrl}"
                           style="
-                            color: #0055A4;
+                            color: #18345b;
                             text-decoration: underline;
                           "
                         >
                           ${buttonUrl}
                         </a>
                       </p>
+                      `
+                          : ''
+                      }
 
                     </td>
                   </tr>
@@ -257,25 +247,22 @@ export function getGenericEmailHtml({
             <tr>
               <td
                 style="
-                  padding: 20px 8px 0 8px;
+                  padding: 28px 42px;
+                  background-color: #18345b;
+                  border-top: 5px solid #dfb74e;
                   text-align: center;
-                  font-family: Arial, sans-serif;
+                  font-family: Arial, Helvetica, sans-serif;
                   font-size: 12px;
                   line-height: 19px;
-                  color: #7A8391;
+                  color: #faf8f2;
                 "
               >
-                <div style="margin-bottom: 8px;">
-                  <span style="color: #0055A4;">●</span>
-                  <span style="color: #D1D5DB;">●</span>
-                  <span style="color: #EF4135;">●</span>
-                </div>
-
                 ${APP_NAME}
                 <br />
 
                 <span style="font-size: 11px;">
-                  Message automatique — merci de ne pas répondre à cet email.
+                  ${escapeTextHtml(footerText)}
+                  ${safeFooterUrl ? `<div style="margin-top: 8px;"><a href="${safeFooterUrl}" style="color: #dfb74e; text-decoration: underline;">${safeFooterUrl}</a></div>` : ''}
                 </span>
               </td>
             </tr>
@@ -286,66 +273,4 @@ export function getGenericEmailHtml({
     </table>
   </div>
 `;
-//   return `
-//     <div style="margin: 0; padding: 0; background: ${colors.background};">
-//       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; background: ${colors.background};">
-//         <tr>
-//           <td align="center" style="padding: 32px 16px;">
-//             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; max-width: 600px;">
-//               <tr>
-//                 <td style="padding: 0 0 14px 0; text-align: center;">
-//                   <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 18px; color: ${colors.mutedForeground}; letter-spacing: 0.08em; text-transform: uppercase;">
-//                     Message
-//                   </div>
-//                   <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 30px; line-height: 38px; font-weight: 700; color: ${colors.secondary}; margin-top: 8px;">
-//                     ${APP_NAME}
-//                   </div>
-//                 </td>
-//               </tr>
-
-//               <tr>
-//                 <td style="border: 1px solid ${colors.border}; border-radius: 18px; background: ${colors.card}; overflow: hidden;">
-//                   <div style="height: 8px; background: ${colors.primary}; border-bottom: 1px solid ${colors.border};"></div>
-
-//                   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-//                     <tr>
-//                       <td style="padding: 34px 34px 30px 34px;">
-//                         <h1 style="margin: 0 0 18px 0; font-family: Arial, sans-serif; font-size: 25px; line-height: 32px; color: ${colors.foreground};">
-//                           ${escapeTextHtml(title)}
-//                         </h1>
-
-//                         <p style="margin: 0 0 18px 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 25px; color: ${colors.mutedForeground};">
-//                           ${escapeTextHtml(intro)}
-//                         </p>
-
-//                         <div style="margin: 0 0 26px 0; font-family: Arial, sans-serif; font-size: 16px; line-height: 25px; color: ${colors.foreground};">
-//                           ${escapeTextHtml(content)}
-//                         </div>
-
-//                         ${getButtonHtml(buttonUrl, escapeTextHtml(buttonLabel))}
-
-//                         <p style="margin: 24px 0 8px 0; font-family: Arial, sans-serif; font-size: 13px; line-height: 20px; color: ${colors.mutedForeground};">
-//                           Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :
-//                         </p>
-
-//                         <p style="margin: 0; font-family: Arial, sans-serif; font-size: 12px; line-height: 19px; color: ${colors.primary}; word-break: break-all;">
-//                           <a href="${buttonUrl}" style="color: ${colors.primary}; text-decoration: underline;">${buttonUrl}</a>
-//                         </p>
-//                       </td>
-//                     </tr>
-//                   </table>
-//                 </td>
-//               </tr>
-
-//               <tr>
-//                 <td style="padding: 18px 8px 0 8px; text-align: center; font-family: Arial, sans-serif; font-size: 12px; line-height: 18px; color: ${colors.mutedForeground};">
-//                   ${APP_NAME} · Message automatique
-//                 </td>
-//               </tr>
-//             </table>
-//           </td>
-//         </tr>
-//       </table>
-//     </div>
-//   `;
 }

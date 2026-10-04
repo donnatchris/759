@@ -30,7 +30,7 @@ export default function SignInPage() {
 				<GoogleLoginButton />
 			</div>
 			{isSignUpEnabled() ? (
-				<p className="text-sm text-muted-foreground">
+				<p className="text-muted-foreground">
 					{'Pas encore de compte ?'}{' '}
 					<Link href="/auth/sign-up" className="text-primary underline">
 						{"S'inscrire"}
