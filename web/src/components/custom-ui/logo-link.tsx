@@ -28,7 +28,7 @@ export function LogoLink({ size = 190, name = 'Le 7.59' }: Props) {
           {name}
         </span>
         <span className="mt-1.5 block text-[0.52rem] font-bold uppercase tracking-[0.08em] text-accent">
-          Terroir · Amitié · Transmission
+          Nation · Amitié · Transmission
         </span>
       </span>
     </Link>

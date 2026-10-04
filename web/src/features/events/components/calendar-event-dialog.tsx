@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import type { TPublicCalendarEvent } from '../lib/events.types';
+import { EventCard } from './event-card';
 
 export function CalendarEventDialog({
   event,
@@ -31,8 +32,8 @@ export function CalendarEventDialog({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl lg:max-w-5xl">
+        <DialogHeader className={event?.details ? 'sr-only' : undefined}>
           <DialogTitle>{event?.title}</DialogTitle>
           <DialogDescription>
             {event &&
@@ -41,9 +42,13 @@ export function CalendarEventDialog({
                 : `Le ${format(event.start)}`)}
           </DialogDescription>
         </DialogHeader>
-        <p className="whitespace-pre-line break-words leading-7">
-          {event?.content}
-        </p>
+        {event?.details ? (
+          <EventCard event={event.details} />
+        ) : (
+          <p className="whitespace-pre-line break-words leading-7">
+            {event?.content}
+          </p>
+        )}
         {showEventsLink && (
           <Link
             href="/evenements"

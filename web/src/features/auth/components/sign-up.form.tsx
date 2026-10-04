@@ -16,6 +16,7 @@ import {
   type TSignUpFormOutput,
 } from '../auth.schema';
 import { getErrorMessageFromAuthError } from '../auth.error';
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
 
 export function SignUpForm() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export function SignUpForm() {
       name: data.name,
       email: data.email,
       password: data.password,
-      phone: data.phone,
+      phone: data.phone ?? undefined,
       canReceiveMarketingEmails: data.canReceiveMarketingEmails,
       legalTermsAccepted: data.legalTermsAccepted,
       callbackURL: EMAIL_VERIFICATION_CALLBACK_URL,
@@ -61,6 +62,10 @@ export function SignUpForm() {
     router.push('/auth/check-email');
     router.refresh();
   };
+
+  const phoneContent = isPrestationsEnabled()
+    ? 'Facultatif pour votre compte, mais nécessaire pour réserver une prestation.'
+    : 'Facultatif pour votre compte, mais pratique en cas de besoin.';
 
   return (
     <FormProvider {...form}>
@@ -77,10 +82,9 @@ export function SignUpForm() {
           <RHFInput name="email" label="Email" type="email" required />
           <RHFInput
             name="phone"
-            label="Téléphone"
+            label="Téléphone (facultatif)"
             type="tel"
-            required
-            popoverContent="Le numéro de téléphone sera utilisé pour confirmer les réservations."
+            popoverContent={phoneContent}
           />
           <RHFInput
             name="password"

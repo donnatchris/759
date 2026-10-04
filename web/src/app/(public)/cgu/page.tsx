@@ -34,7 +34,7 @@ export default async function CguPage() {
             <EditLegalTermsAdminButton legalTerms={legalTerms} />
           </div>
           {legalTerms && (
-            <p className="mt-3 text-xs text-secondary sm:text-sm">
+            <p className="mt-3 text-xs text-secondary bg-accent sm:text-sm">
               Publié le {formatLegalTermsDate(legalTerms.createdAt)}
               <span className="mx-2">•</span>
               Dernière édition le {formatLegalTermsDate(legalTerms.updatedAt)}

@@ -32,7 +32,7 @@ const ERROR_MESSAGES: Record<TErrorCode, string> = {
   [ERROR_CODES.SERVICE_NOT_BOOKABLE]:
     'Impossible de réserver cette prestation car elle est désactivée pour la réservation en ligne.',
   [ERROR_CODES.USER_PHONE_REQUIRED]:
-    'Veuillez renseigner votre numéro de téléphone dans votre compte avant de réserver.',
+    'Vous devez d’abord renseigner votre numéro de téléphone dans votre compte utilisateur pour pouvoir effectuer une réservation.',
   [ERROR_CODES.USER_CANNOT_BOOK]:
     "Votre compte n'est pas autorisé à prendre des réservations.",
   [ERROR_CODES.LEGAL_TERMS_ACCEPTANCE_REQUIRED]:

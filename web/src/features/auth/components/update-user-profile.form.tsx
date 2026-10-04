@@ -14,6 +14,7 @@ import {
   type TUpdateUserProfileOutput,
 } from '../auth.schema';
 import { updateCurrentUserProfileAction } from '../auth.action';
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
 
 type Props = {
   values: TUpdateUserProfileInput;
@@ -69,6 +70,10 @@ export function UpdateUserProfileForm({ values, onSuccess, onClose }: Props) {
     }
   };
 
+  const phoneContent = isPrestationsEnabled()
+    ? 'Facultatif pour votre compte, mais nécessaire pour réserver une prestation.'
+    : 'Facultatif pour votre compte, mais pratique en cas de besoin.';
+
   return (
     <FormProvider {...form}>
       <form
@@ -83,10 +88,9 @@ export function UpdateUserProfileForm({ values, onSuccess, onClose }: Props) {
         />
         <RHFInput
           name="phone"
-          label="Téléphone"
+          label="Téléphone (facultatif)"
           type="tel"
-          required
-          popoverContent="Le numéro de téléphone sera utilisé pour confirmer les réservations."
+          popoverContent={phoneContent}
         />
         <EmailPreferenceCheckbox<TUpdateUserProfileInput>
           name="canReceiveMarketingEmails"

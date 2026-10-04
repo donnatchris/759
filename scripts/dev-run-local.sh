@@ -20,7 +20,7 @@ printf '\nDémarrage de PostgreSQL…\n'
 compose -f docker-compose.dev.yml up -d
 
 attempt=0
-until compose -f docker-compose.dev.yml exec -T db pg_isready -U postgres >/dev/null 2>&1; do
+until compose -f docker-compose.dev.yml exec -T db sh -c 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"' >/dev/null 2>&1; do
   attempt=$((attempt + 1))
   if [ "$attempt" -ge 60 ]; then
     printf 'PostgreSQL n’est pas devenu disponible après 60 secondes.\n' >&2

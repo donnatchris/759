@@ -219,10 +219,11 @@ ADMIN_PASSWORD=$(prompt_secret 'Mot de passe du premier administrateur')
 
 DATABASE_SLUG=$(printf '%s' "$SITE_NAME" | tr '-' '_')
 DATABASE_NAME="${DATABASE_SLUG}_db"
+DATABASE_USER="759_user"
 DATABASE_PASSWORD=$(openssl rand -hex 24)
 BETTER_AUTH_SECRET=$(openssl rand -hex 48)
 CRON_SECRET=$(openssl rand -hex 32)
-DATABASE_URL="postgresql://postgres:${DATABASE_PASSWORD}@localhost:${POSTGRES_PORT}/${DATABASE_NAME}"
+DATABASE_URL="postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@localhost:${POSTGRES_PORT}/${DATABASE_NAME}"
 
 {
   write_env_line SITE_NAME "$SITE_NAME"
@@ -234,7 +235,7 @@ DATABASE_URL="postgresql://postgres:${DATABASE_PASSWORD}@localhost:${POSTGRES_PO
   write_env_line SITE_PHONE "$SITE_PHONE"
   write_env_line SITE_CONTACT_EMAIL "$SITE_CONTACT_EMAIL"
   write_env_line DATABASE_NAME "$DATABASE_NAME"
-  write_env_line DATABASE_USER postgres
+  write_env_line DATABASE_USER "$DATABASE_USER"
   write_env_line DATABASE_PASSWORD "$DATABASE_PASSWORD"
   write_env_line POSTGRES_PORT "$POSTGRES_PORT"
   write_env_line DATABASE_URL "$DATABASE_URL"
@@ -273,7 +274,7 @@ compose -f docker-compose.dev.yml up -d
 
 printf '%bAttente de PostgreSQL (60 secondes maximum)…%b\n' "$YELLOW" "$RESET"
 attempt=0
-until compose -f docker-compose.dev.yml exec -T db pg_isready -U postgres -d "$DATABASE_NAME" >/dev/null 2>&1; do
+until compose -f docker-compose.dev.yml exec -T db pg_isready -U "$DATABASE_USER" -d "$DATABASE_NAME" >/dev/null 2>&1; do
   attempt=$((attempt + 1))
   [ "$attempt" -lt 60 ] || fail "PostgreSQL n’est pas devenu disponible. Consultez : docker compose -f docker-compose.dev.yml logs db"
   sleep 1

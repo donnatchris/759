@@ -15,6 +15,7 @@ import {
   type TUpdateUserProfileInput,
   type TUpdateUserProfileOutput,
 } from '../auth.schema';
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
 
 type Props = {
   user: {
@@ -91,6 +92,10 @@ export function AuthRedirectCompletionForm({
     }
   };
 
+  const content = isPrestationsEnabled()
+    ? 'Facultatif pour votre compte, mais nécessaire pour réserver une prestation.'
+    : 'Facultatif pour votre compte, mais pratique en cas de besoin.';
+
   return (
     <FormProvider {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
@@ -98,15 +103,13 @@ export function AuthRedirectCompletionForm({
           <div className="space-y-2">
             <RHFInput<TUpdateUserProfileInput>
               name="phone"
-              label="Téléphone"
+              label="Téléphone (facultatif)"
               type="tel"
-              required
-              popoverContent="Le numéro de téléphone sera utilisé pour confirmer les réservations."
+              popoverContent={content}
             />
             <p className="text-xs text-muted-foreground">
-              Le numéro de téléphone est obligatoire pour confirmer vos
-              réservations, mais il ne sera pas partagé publiquement ni utilisé
-              à d&apos;autres fins.
+              Vous pouvez laisser ce champ vide et le renseigner plus tard dans
+              votre compte. Il sera nécessaire pour réserver une prestation.
             </p>
           </div>
         )}
@@ -119,8 +122,8 @@ export function AuthRedirectCompletionForm({
               description="J'accepte de recevoir des emails commerciaux, comme les actualités et offres promotionnelles."
             />
             <p className="text-xs text-muted-foreground">
-              Les emails commerciaux comprennent des actualités sur le site, des
-              offres promotionnelles et d&apos;autres communications marketing.
+              Les emails commerciaux comprennent des informations sur le site,
+              des événements et d&apos;autres communications.
             </p>
           </div>
         )}

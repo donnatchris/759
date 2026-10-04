@@ -190,9 +190,18 @@ export async function getCalendarEventsFromPrismaRepository(
     select: {
       id: true,
       title: true,
+      subTitle: true,
+      tag: true,
       content: true,
+      author: true,
+      imageUrl: true,
+      links: true,
       eventStartDate: true,
       eventEndDate: true,
+      displayStartDate: true,
+      displayEndDate: true,
+      createdAt: true,
+      updatedAt: true,
     },
     orderBy: { eventStartDate: 'asc' },
   });
@@ -202,5 +211,6 @@ export async function getCalendarEventsFromPrismaRepository(
     content: event.content,
     start: event.eventStartDate!.toISOString().slice(0, 10),
     end: event.eventEndDate?.toISOString().slice(0, 10) ?? null,
+    details: event,
   }));
 }

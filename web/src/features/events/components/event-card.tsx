@@ -55,7 +55,7 @@ export function EventCard({ event }: Props) {
       {hasVisual && (
         <div className="min-w-0 bg-heritage-ink text-heritage-paper lg:col-start-1 lg:row-span-2 lg:row-start-1">
           {event.imageUrl && (
-            <div className="relative aspect-[4/3] overflow-hidden">
+            <div className="relative aspect-[4/5] overflow-hidden">
               <Image
                 src={event.imageUrl}
                 alt={event.title}
@@ -77,12 +77,23 @@ export function EventCard({ event }: Props) {
                     <dd className="mt-2">
                       <time dateTime={date.toISOString()}>
                         <span className="block font-heading text-5xl leading-none text-heritage-gold tabular-nums">
-                          {date.toLocaleDateString('fr-FR', { day: '2-digit' })}
+                          {date.toLocaleDateString('fr-FR', {
+                            day: '2-digit',
+                            timeZone: 'Europe/Paris',
+                          })}
                         </span>
                         <span className="mt-2 block text-base font-semibold">
                           {date.toLocaleDateString('fr-FR', {
                             month: 'long',
                             year: 'numeric',
+                            timeZone: 'Europe/Paris',
+                          })}
+                        </span>
+                        <span className="mt-1 block text-base font-semibold tabular-nums">
+                          {date.toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            timeZone: 'Europe/Paris',
                           })}
                         </span>
                       </time>

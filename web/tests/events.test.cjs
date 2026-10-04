@@ -233,18 +233,26 @@ test('public calendar reads only event fields without staff access and validates
     getCalendarEventsService,
   } = require('../src/features/events/lib/events.service.ts');
   let query;
+  const publicEvent = {
+    id: 'public',
+    title: 'Public',
+    subTitle: 'Programme de la rencontre',
+    tag: 'Rencontre',
+    content: 'Details',
+    author: 'Équipe',
+    imageUrl: '/logo.png',
+    links: ['/contact'],
+    eventStartDate: new Date('2099-09-29'),
+    eventEndDate: new Date('2099-10-03'),
+    displayStartDate: null,
+    displayEndDate: null,
+    createdAt: now,
+    updatedAt: now,
+  };
   prisma.event = {
     findMany: async (args) => {
       query = args;
-      return [
-        {
-          id: 'public',
-          title: 'Public',
-          content: 'Details',
-          eventStartDate: new Date('2099-09-29'),
-          eventEndDate: new Date('2099-10-03'),
-        },
-      ];
+      return [publicEvent];
     },
   };
   admin = false;
@@ -260,14 +268,24 @@ test('public calendar reads only event fields without staff access and validates
       content: 'Details',
       start: '2099-09-29',
       end: '2099-10-03',
+      details: publicEvent,
     },
   ]);
   assert.deepEqual(query.select, {
     id: true,
     title: true,
+    subTitle: true,
+    tag: true,
     content: true,
+    author: true,
+    imageUrl: true,
+    links: true,
     eventStartDate: true,
     eventEndDate: true,
+    displayStartDate: true,
+    displayEndDate: true,
+    createdAt: true,
+    updatedAt: true,
   });
   assert.deepEqual(query.where, {
     eventStartDate: { not: null, lt: new Date('2099-11-01') },

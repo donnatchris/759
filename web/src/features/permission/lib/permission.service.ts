@@ -38,7 +38,7 @@ export async function requireStaffPermissionOrThrow(
     const currentUser = await getCurrentUserPermissionsService();
 
     if (currentUser.role === 'ADMIN') return currentUser;
-    if (currentUser.role === 'USER') {
+    if (currentUser.role !== 'STAFF') {
       throw new AppError(ERROR_CODES.FORBIDDEN);
     }
     if (!currentUser.permissions?.[permission]) {

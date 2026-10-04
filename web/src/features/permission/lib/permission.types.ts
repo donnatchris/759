@@ -1,10 +1,12 @@
 import type { StaffPermission, UserRole } from '@prisma/client';
 
+export type TUserRole = UserRole;
+
 export type TPermissionUser = {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
+  role: TUserRole;
   permissions: StaffPermission | null;
 };
 

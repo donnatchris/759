@@ -15,4 +15,5 @@ export type TPublicCalendarEvent = {
   content: string;
   start: string;
   end: string | null;
+  details?: Event;
 };

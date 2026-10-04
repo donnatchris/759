@@ -38,6 +38,7 @@ import { UpdateUsersRoleButton } from './update-users-role-button';
 type Props = {
   initialUsers: TAdminUserListItem[];
   initialStaff: TAdminUserListItem[];
+  initialMembers: TAdminUserListItem[];
   initialBannedEmails: TAdminBannedEmailListItem[];
 };
 
@@ -46,15 +47,21 @@ type BulkUserAction =
   | 'block-reservations'
   | 'set-staff-role'
   | 'set-user-role'
+  | 'set-member-role'
   | 'delete'
   | 'ban';
 
 export function ManageUsers({
   initialUsers,
   initialStaff,
+  initialMembers,
   initialBannedEmails,
 }: Props) {
-  const [users, setUsers] = useState([...initialUsers, ...initialStaff]);
+  const [users, setUsers] = useState([
+    ...initialUsers,
+    ...initialMembers,
+    ...initialStaff,
+  ]);
   const [bannedEmails, setBannedEmails] = useState(initialBannedEmails);
   const [userRowSelection, setUserRowSelection] = useState<RowSelectionState>(
     {},
@@ -62,6 +69,11 @@ export function ManageUsers({
   const [staffRowSelection, setStaffRowSelection] = useState<RowSelectionState>(
     {},
   );
+  const [memberRowSelection, setMemberRowSelection] =
+    useState<RowSelectionState>({});
+  const [memberSorting, setMemberSorting] = useState<SortingState>([
+    { id: 'emailVerified', desc: true },
+  ]);
   const [activeTab, setActiveTab] = useState('users');
   const numberOfUsers = users.length;
   const numerOfBannedEmails = bannedEmails.length;
@@ -128,6 +140,10 @@ export function ManageUsers({
     () => users.filter((user) => user.role === 'USER'),
     [users],
   );
+  const memberAccounts = useMemo(
+    () => users.filter((user) => user.role === 'MEMBER'),
+    [users],
+  );
   const staffAccounts = useMemo(
     () =>
       users.filter((user) => user.role === 'STAFF' || user.role === 'ADMIN'),
@@ -168,9 +184,34 @@ export function ManageUsers({
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const activeAccounts = activeTab === 'staff' ? staffAccounts : userAccounts;
+  const membersTable = useReactTable({
+    data: memberAccounts,
+    columns: userColumns,
+    getRowId: (row) => row.id,
+    enableRowSelection: true,
+    autoResetAll: false,
+    onRowSelectionChange: setMemberRowSelection,
+    state: {
+      sorting: memberSorting,
+      rowSelection: memberRowSelection,
+    },
+    onSortingChange: setMemberSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
+  const activeAccounts =
+    activeTab === 'staff'
+      ? staffAccounts
+      : activeTab === 'members'
+        ? memberAccounts
+        : userAccounts;
   const activeRowSelection =
-    activeTab === 'staff' ? staffRowSelection : userRowSelection;
+    activeTab === 'staff'
+      ? staffRowSelection
+      : activeTab === 'members'
+        ? memberRowSelection
+        : userRowSelection;
   const selectedUsers = useMemo(
     () =>
       activeAccounts
@@ -229,9 +270,9 @@ export function ManageUsers({
     role,
   }: {
     userIds: string[];
-    role: 'USER' | 'STAFF';
+    role: 'USER' | 'MEMBER' | 'STAFF';
   }) => {
-    setBulkUserAction(role === 'STAFF' ? 'set-staff-role' : 'set-user-role');
+    setBulkUserAction(getRoleAction(role));
     const response = await updateUsersRoleAction({ userIds, role });
     setBulkUserAction(null);
 
@@ -260,6 +301,9 @@ export function ManageUsers({
       removeUserIdsFromSelection(current, updatedUserIds),
     );
     setStaffRowSelection((current) =>
+      removeUserIdsFromSelection(current, updatedUserIds),
+    );
+    setMemberRowSelection((current) =>
       removeUserIdsFromSelection(current, updatedUserIds),
     );
 
@@ -306,6 +350,7 @@ export function ManageUsers({
     };
     setUserRowSelection(updateSelection);
     setStaffRowSelection(updateSelection);
+    setMemberRowSelection(updateSelection);
 
     return {
       deletedUsers,
@@ -353,6 +398,9 @@ export function ManageUsers({
       removeUserIdsFromSelection(current, bannedUserIds),
     );
     setStaffRowSelection((current) =>
+      removeUserIdsFromSelection(current, bannedUserIds),
+    );
+    setMemberRowSelection((current) =>
       removeUserIdsFromSelection(current, bannedUserIds),
     );
 
@@ -445,10 +493,16 @@ export function ManageUsers({
     });
   };
 
-  const handleUpdateSelectedUsersRoleClick = (role: 'USER' | 'STAFF') => {
+  const handleUpdateSelectedUsersRoleClick = (
+    role: 'USER' | 'MEMBER' | 'STAFF',
+  ) => {
     if (!hasSelectedUsers) return;
 
-    const roleLabel = role === 'STAFF' ? 'STAFF' : 'UTILISATEUR';
+    const roleLabel = {
+      USER: 'UTILISATEUR',
+      MEMBER: 'ADHÉRENT',
+      STAFF: 'STAFF',
+    }[role];
 
     ConfirmToast({
       title: `Passer ${formatUserCount(selectedUserCount)} en ${roleLabel} ?`,
@@ -525,41 +579,33 @@ export function ManageUsers({
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+          <TabsTrigger value="members">Adhérents</TabsTrigger>
           <TabsTrigger value="staff">Staff</TabsTrigger>
           <TabsTrigger value="banned-emails">Emails bannis</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="users">
-          <UserAccountsTab
-            table={usersTable}
-            selectedUserCount={selectedUserCount}
-            targetRole="STAFF"
-            bulkUserAction={bulkUserAction}
-            onUpdateRoleClick={() =>
-              handleUpdateSelectedUsersRoleClick('STAFF')
-            }
-            onAllowReservationsClick={handleAllowSelectedUsersClick}
-            onBlockReservationsClick={handleBlockSelectedUsersClick}
-            onDeleteClick={handleDeleteSelectedUsersClick}
-            onBanClick={handleBanSelectedUsersClick}
-            onOpenUserCalendar={openUserCalendar}
-          />
-        </TabsContent>
-
-        <TabsContent value="staff">
-          <UserAccountsTab
-            table={staffTable}
-            selectedUserCount={selectedUserCount}
-            targetRole="USER"
-            bulkUserAction={bulkUserAction}
-            onUpdateRoleClick={() => handleUpdateSelectedUsersRoleClick('USER')}
-            onAllowReservationsClick={handleAllowSelectedUsersClick}
-            onBlockReservationsClick={handleBlockSelectedUsersClick}
-            onDeleteClick={handleDeleteSelectedUsersClick}
-            onBanClick={handleBanSelectedUsersClick}
-            onOpenUserCalendar={openUserCalendar}
-          />
-        </TabsContent>
+        {(
+          [
+            { value: 'users', table: usersTable, roles: ['MEMBER', 'STAFF'] },
+            { value: 'members', table: membersTable, roles: ['USER', 'STAFF'] },
+            { value: 'staff', table: staffTable, roles: ['USER', 'MEMBER'] },
+          ] as const
+        ).map(({ value, table, roles }) => (
+          <TabsContent key={value} value={value}>
+            <UserAccountsTab
+              table={table}
+              selectedUserCount={selectedUserCount}
+              targetRoles={roles}
+              bulkUserAction={bulkUserAction}
+              onUpdateRoleClick={handleUpdateSelectedUsersRoleClick}
+              onAllowReservationsClick={handleAllowSelectedUsersClick}
+              onBlockReservationsClick={handleBlockSelectedUsersClick}
+              onDeleteClick={handleDeleteSelectedUsersClick}
+              onBanClick={handleBanSelectedUsersClick}
+              onOpenUserCalendar={openUserCalendar}
+            />
+          </TabsContent>
+        ))}
 
         <TabsContent value="banned-emails">
           <BannedEmailsTable table={bannedEmailsTable} />
@@ -581,7 +627,7 @@ import { isPrestationsEnabled } from '@/settings/settings.helpers';
 function UserAccountsTab({
   table,
   selectedUserCount,
-  targetRole,
+  targetRoles,
   bulkUserAction,
   onUpdateRoleClick,
   onAllowReservationsClick,
@@ -592,9 +638,9 @@ function UserAccountsTab({
 }: {
   table: Table<TAdminUserListItem>;
   selectedUserCount: number;
-  targetRole: 'USER' | 'STAFF';
+  targetRoles: readonly ('USER' | 'MEMBER' | 'STAFF')[];
   bulkUserAction: BulkUserAction | null;
-  onUpdateRoleClick: () => void;
+  onUpdateRoleClick: (role: 'USER' | 'MEMBER' | 'STAFF') => void;
   onAllowReservationsClick: () => void;
   onBlockReservationsClick: () => void;
   onDeleteClick: () => void;
@@ -603,8 +649,6 @@ function UserAccountsTab({
 }) {
   const hasSelectedUsers = selectedUserCount > 0;
   const isBulkUserActionPending = bulkUserAction !== null;
-  const roleAction =
-    targetRole === 'STAFF' ? 'set-staff-role' : 'set-user-role';
 
   return (
     <>
@@ -617,12 +661,15 @@ function UserAccountsTab({
           {selectedUserCount} sélectionné{selectedUserCount > 1 ? 's' : ''}
         </span>
         <div className="mt-2 flex flex-wrap gap-2">
-          <UpdateUsersRoleButton
-            role={targetRole}
-            disabled={!hasSelectedUsers || isBulkUserActionPending}
-            loading={bulkUserAction === roleAction}
-            onClick={onUpdateRoleClick}
-          />
+          {targetRoles.map((role) => (
+            <UpdateUsersRoleButton
+              key={role}
+              role={role}
+              disabled={!hasSelectedUsers || isBulkUserActionPending}
+              loading={bulkUserAction === getRoleAction(role)}
+              onClick={() => onUpdateRoleClick(role)}
+            />
+          ))}
           {isPrestationsEnabled() && (
             <AllowUsersReservationsButton
               disabled={!hasSelectedUsers || isBulkUserActionPending}
@@ -669,4 +716,13 @@ function removeUserIdsFromSelection(
   }
 
   return nextSelection;
+}
+
+function getRoleAction(role: 'USER' | 'MEMBER' | 'STAFF'): BulkUserAction {
+  const actions = {
+    USER: 'set-user-role',
+    MEMBER: 'set-member-role',
+    STAFF: 'set-staff-role',
+  } as const;
+  return actions[role];
 }

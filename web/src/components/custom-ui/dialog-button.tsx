@@ -48,23 +48,21 @@ export function DialogButton({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[90vh] overflow-hidden p-0 sm:max-w-2xl lg:max-w-3xl shadow-xl shadow-primary/50 border border-primary/20 hover:border-primary/70">
-        <div className="flex max-h-[90vh] flex-col">
-          <DialogHeader className="shrink-0 px-6 pt-6">
-            <DialogTitle>{title}</DialogTitle>
-            {subTitle && <DialogDescription>{subTitle}</DialogDescription>}
-          </DialogHeader>
+      <DialogContent className="flex max-h-[90dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl lg:max-w-3xl shadow-xl shadow-primary/50 border border-primary/20 hover:border-primary/70">
+        <DialogHeader className="shrink-0 px-6 pt-6">
+          <DialogTitle>{title}</DialogTitle>
+          {subTitle && <DialogDescription>{subTitle}</DialogDescription>}
+        </DialogHeader>
 
-          <div className="overflow-y-auto px-6 pb-6 pt-4">
-            {React.isValidElement(children)
-              ? React.cloneElement(
-                  children as React.ReactElement<{ onClose: () => void }>,
-                  {
-                    onClose: () => setOpen(false),
-                  },
-                )
-              : children}
-          </div>
+        <div className="min-h-0 min-w-0 overflow-y-auto overscroll-contain px-6 pb-6 pt-4">
+          {React.isValidElement(children)
+            ? React.cloneElement(
+                children as React.ReactElement<{ onClose: () => void }>,
+                {
+                  onClose: () => setOpen(false),
+                },
+              )
+            : children}
         </div>
       </DialogContent>
     </Dialog>

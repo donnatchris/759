@@ -18,6 +18,10 @@ export function UserRoleBadge({ role }: { role: TAdminUserListItem['role'] }) {
     return <Badge>Staff</Badge>;
   }
 
+  if (role === 'MEMBER') {
+    return <Badge variant="secondary">Adhérent</Badge>;
+  }
+
   return <Badge variant="secondary">Utilisateur</Badge>;
 }
 

@@ -1,3 +1,4 @@
+import type { TUserRole } from '@/features/permission/lib/permission.types';
 import { auth } from '@/features/auth/auth';
 
 type Session = typeof auth.$Infer.Session;
@@ -13,7 +14,7 @@ export type TAdminUserListItem = {
   emailVerified: boolean;
   createdAt: string;
   phone: string | null;
-  role: 'USER' | 'STAFF' | 'ADMIN';
+  role: TUserRole;
   canBook: boolean;
   canReceiveMarketingEmails: boolean;
   reservationCounts: {

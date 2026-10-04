@@ -11,6 +11,7 @@ export default async function AdminUsersPage() {
     getAdminBannedEmailsService(),
   ]);
   const userAccounts = users.filter((user) => user.role === 'USER');
+  const memberAccounts = users.filter((user) => user.role === 'MEMBER');
   const staffAccounts = users.filter(
     (user) => user.role === 'STAFF' || user.role === 'ADMIN',
   );
@@ -27,6 +28,7 @@ export default async function AdminUsersPage() {
       <ManageUsers
         initialUsers={userAccounts}
         initialStaff={staffAccounts}
+        initialMembers={memberAccounts}
         initialBannedEmails={bannedEmails}
       />
     </main>

@@ -52,7 +52,7 @@ export const resetPasswordFormSchema = z
 export type TResetPasswordFormInput = z.input<typeof resetPasswordFormSchema>;
 export type TResetPasswordFormOutput = z.output<typeof resetPasswordFormSchema>;
 
-export const phoneSchema = z
+const requiredPhoneSchema = z
   .string()
   .trim()
   .transform((value) => value.replace(/[\s.-]/g, ''))
@@ -66,6 +66,18 @@ export const phoneSchema = z
         error: 'Le numéro de téléphone doit être un numéro français valide',
       }),
   );
+
+export const phoneSchema = z
+  .union([
+    requiredPhoneSchema,
+    z
+      .string()
+      .trim()
+      .length(0)
+      .transform(() => null),
+    z.null(),
+  ])
+  .optional();
 
 export const signUpSchema = z.object({
   name: z
@@ -161,7 +173,7 @@ export type TUpdateUsersCanBookStatusOutput = z.output<
 
 export const updateUsersRoleSchema = z.object({
   userIds: userIdsSchema,
-  role: z.enum(['USER', 'STAFF']),
+  role: z.enum(['USER', 'MEMBER', 'STAFF']),
 });
 
 export type TUpdateUsersRoleInput = z.input<typeof updateUsersRoleSchema>;

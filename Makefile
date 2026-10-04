@@ -4,23 +4,22 @@ YELLOW=\033[33m
 BLUE=\033[34m
 RESET=\033[0m
 
-.PHONY: format lint typecheck check push dev-init dev-run dev-stop db-studio db-local-migrate db-prod-migrate db-seed-data db-seed-data-local db-seed-user db-local-seed-user generate-favicons convert-images clean dev-run-local
-
 # Initialisation de l'environnement de développement
 
 dev-init:
 	@sh scripts/dev-init.sh
 
-dev-run:
-	@printf "\n$(YELLOW)Lancement de l'environnement de développement...$(RESET)\n" && \
+# Tâches de développement avec Docker pour la db en local
+dev-local:
+	@sh scripts/dev-run-local.sh
+
+dev-prod:
+	@printf "\n$(YELLOW)Lancement de l'environnement de production...$(RESET)\n" && \
 	printf "\n$(YELLOW)Installation des dépendances...$(RESET)\n" && \
 	(cd web && npm ci) && \
 	printf "\n$(YELLOW)Démarrage de l'application Next.js...$(RESET)\n" && \
-	cd web && npm run dev
-
-# Tâches de développement avec Docker pour la db en local
-dev-run-local:
-	@sh scripts/dev-run-local.sh
+	set -a; . ./web/.env; set +a; \
+	cd web && DATABASE_URL="$$DATABASE_DISTANT_URL" npm run dev
 
 dev-stop:
 	@printf "\n$(YELLOW)Arrêt de l'environnement de développement...$(RESET)\n"
@@ -36,41 +35,41 @@ dev-stop:
 	$$DC -f docker-compose.dev.yml down --remove-orphans; \
 	printf "\n$(GREEN)Conteneurs de développement arrêtés, volumes conservés.$(RESET)\n"
 
-db-studio:
-	@printf "\n$(YELLOW)Lancement de prisma studio...$(RESET)\n"
-	@cd web && npx prisma studio
-
 db-local-studio:
 	@printf "\n$(YELLOW)Lancement de prisma studio sur la base locale...$(RESET)\n"
 	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npx prisma studio'
 
+db-prod-studio:
+	@printf "\n$(YELLOW)Lancement de prisma studio sur la base de production...$(RESET)\n"
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_DISTANT_URL" npx prisma studio'
+
 db-local-migrate:
 	@printf "\n$(YELLOW)Migration de la base de données locale...$(RESET)\n"
-	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npx prisma migrate dev'
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$${DATABASE_LOCAL_URL:?DATABASE_LOCAL_URL manquante}" npx prisma migrate dev'
 
 db-prod-migrate:
-	@printf "\n$(YELLOW)Migration de la base de données en production...$(RESET)\n"
-	@cd web && npx prisma migrate deploy
-
-db-prod-seed-data:
-	@printf "\n$(YELLOW)Exécution du seed Prisma...$(RESET)\n"
-	@cd web && npm run prisma:seed
-	@printf "\n$(GREEN)Seeds exécutés avec succès !$(RESET)\n"
+	@printf "\n$(YELLOW)Migration de la base de données de production...$(RESET)\n"
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$${DATABASE_DISTANT_URL:?DATABASE_DISTANT_URL manquante}" npx prisma migrate deploy'
 
 db-local-seed-data:
 	@printf "\n$(YELLOW)Exécution du seed Prisma sur la base locale...$(RESET)\n"
 	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" npm run prisma:seed'
 	@printf "\n$(GREEN)Seeds locaux exécutés avec succès !$(RESET)\n"
 
-db-seed-user:
-	@printf "\n$(YELLOW)Exécution du seed Prisma pour les utilisateurs...$(RESET)\n"
-	@cd web && SEEDING_ADMIN=true npm run prisma:seed-user
-	@printf "\n$(GREEN)Administrateur créé ou mis à jour avec succès !$(RESET)\n"
+db-prod-seed-data:
+	@printf "\n$(YELLOW)Exécution du seed Prisma sur la base de production...$(RESET)\n"
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_DISTANT_URL" npm run prisma:seed'
+	@printf "\n$(GREEN)Seeds de production exécutés avec succès !$(RESET)\n"
 
 db-local-seed-user:
 	@printf "\n$(YELLOW)Exécution du seed administrateur sur la base locale...$(RESET)\n"
 	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_LOCAL_URL" SEEDING_ADMIN=true npm run prisma:seed-user'
 	@printf "\n$(GREEN)Administrateur local créé ou mis à jour avec succès !$(RESET)\n"
+
+db-prod-seed-user:
+	@printf "\n$(YELLOW)Exécution du seed administrateur sur la base de production...$(RESET)\n"
+	@cd web && npx --yes --package=dotenv-cli@11.0.0 dotenv -e .env -- sh -c 'DATABASE_URL="$$DATABASE_DISTANT_URL" SEEDING_ADMIN=true npm run prisma:seed-user'
+	@printf "\n$(GREEN)Administrateur de production créé ou mis à jour avec succès !$(RESET)\n"
 
 mail-local:
 	@printf "\n$(YELLOW)Appel du webhook de mail avec la db locale...$(RESET)\n"
@@ -111,7 +110,7 @@ clean: dev-stop
 	@printf "\n$(YELLOW)Suppression des dépendances et fichiers régénérables...$(RESET)\n"
 	@rm -rf web/node_modules web/.next web/out web/dist web/build web/coverage web/.cache
 	@rm -f web/*.tsbuildinfo web/.eslintcache
-	@printf "\n$(GREEN)Nettoyage terminé. Pour relancer : make dev-run-local$(RESET)\n"
+	@printf "\n$(GREEN)Nettoyage terminé. Pour relancer : make dev-local$(RESET)\n"
 
 format:
 	@printf "\n$(YELLOW)Formattage du code avec Prettier...$(RESET)\n"
@@ -141,3 +140,7 @@ push: check
 	git commit -m "$$MSG" && \
 	git push
 	@printf "\n$(GREEN)Code poussé avec succès !$(RESET)\n"
+
+
+
+.PHONY: format lint typecheck check push dev-init dev-run dev-stop db-studio db-local-migrate db-prod-migrate db-seed-data db-seed-data-local db-seed-user db-local-seed-user generate-favicons convert-images clean dev-run-local

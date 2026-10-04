@@ -35,7 +35,7 @@ export function CreateReservationButton({
     );
     router.push('/dashboard#reservations');
   };
-  const hasPhone = Boolean(user?.phone);
+  const hasPhone = Boolean(user?.phone?.trim());
   const title = user
     ? hasPhone
       ? 'Réserver une prestation'
@@ -121,11 +121,16 @@ function ReservationLoginPrompt({
 function MissingPhonePrompt() {
   return (
     <div className="flex flex-col gap-4 p-4">
-      <div className="rounded-lg border border-primary/20 bg-primary/10 p-4">
-        <p className="font-semibold text-primary">Numéro de téléphone requis</p>
+      <div
+        role="alert"
+        className="rounded-lg border border-destructive/20 bg-destructive/10 p-4"
+      >
+        <p className="font-semibold text-destructive">
+          Numéro de téléphone requis
+        </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Votre numéro de téléphone sera utilisé pour confirmer les
-          réservations. Ajoutez-le dans votre compte avant de réserver.
+          Vous devez d’abord renseigner votre numéro de téléphone dans votre
+          compte utilisateur pour pouvoir effectuer une réservation.
         </p>
       </div>
 

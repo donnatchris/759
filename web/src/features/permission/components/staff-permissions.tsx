@@ -44,17 +44,27 @@ export function StaffPermissions({ permissionUser }: Props) {
   if (permissionUser.role === 'ADMIN') {
     return (
       <PermissionMessage>
-        Cet utilisateur est administrateur. Il dispose de tous les droits, y
-        compris celui de modifier les pages et les contenus du site.
+        Cet utilisateur est membre de de l&apos;organisation. Il dispose de tous
+        les droits, y compris celui de modifier les pages et les contenus du
+        site.
       </PermissionMessage>
     );
   }
 
-  if (permissionUser.role === 'USER') {
+  if (permissionUser.role === 'MEMBER') {
     return (
       <PermissionMessage>
-        Cet utilisateur est un simple utilisateur. Il ne dispose d’aucun droit
-        sur l’Espace Staff du site.
+        Cet utilisateur est membre de l'organisation. Il ne dispose d&apos;aucun
+        droit sur l&apos;Espace Staff du site, mais il peut accéder au forum.
+      </PermissionMessage>
+    );
+  }
+
+  if (permissionUser.role !== 'STAFF') {
+    return (
+      <PermissionMessage>
+        Cet utilisateur ne dispose d&apos;aucun droit sur l&apos;Espace Staff du
+        site.
       </PermissionMessage>
     );
   }

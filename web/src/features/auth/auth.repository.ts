@@ -251,7 +251,7 @@ export async function updateUsersRoleInPrismaRepository(
         throw new AppError(ERROR_CODES.ADMIN_ROLE_PROTECTED);
       }
 
-      if (data.role === 'USER') {
+      if (data.role !== 'STAFF') {
         await tx.staffPermission.deleteMany({
           where: { userId: { in: data.userIds } },
         });

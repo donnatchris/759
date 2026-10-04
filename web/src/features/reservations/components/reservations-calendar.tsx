@@ -884,6 +884,7 @@ function getBookedByRoleLabel(
   if (role === 'ADMIN') return 'admin';
   if (role === 'STAFF') return 'staff';
   if (role === 'USER') return 'client';
+  if (role === 'MEMBER') return 'adhérent';
   return null;
 }
 

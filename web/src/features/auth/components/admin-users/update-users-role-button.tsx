@@ -5,7 +5,7 @@ import type { TAdminUserListItem } from '../../auth.types';
 type Props = {
   disabled: boolean;
   loading: boolean;
-  role: Extract<TAdminUserListItem['role'], 'USER' | 'STAFF'>;
+  role: Extract<TAdminUserListItem['role'], 'USER' | 'MEMBER' | 'STAFF'>;
   onClick: () => void;
 };
 
@@ -15,7 +15,11 @@ export function UpdateUsersRoleButton({
   role,
   onClick,
 }: Props) {
-  const roleLabel = role === 'STAFF' ? 'Ajouter au Staff' : 'Retirer du Staff';
+  const roleLabel = {
+    USER: 'Passer en utilisateur',
+    MEMBER: 'Passer en adhérent',
+    STAFF: 'Ajouter au Staff',
+  }[role];
 
   return (
     <Button

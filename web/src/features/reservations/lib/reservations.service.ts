@@ -268,7 +268,7 @@ export async function createReservationService(
     const session = await getSessionOrNull();
     if (!session) throw new AppError(ERROR_CODES.UNAUTHORIZED);
     await requireLatestLegalTermsAcceptedOrThrow(session.user.id);
-    if (!session.user.phone)
+    if (!session.user.phone?.trim())
       throw new AppError(ERROR_CODES.USER_PHONE_REQUIRED);
     const userCanBook = await getUserCanBookStatusFromPrismaRepository(
       session.user.id,

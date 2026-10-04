@@ -89,7 +89,6 @@ export default async function HomePage() {
       <Hero siteSettings={siteSettings} socialMedias={socialMedias} />
       <Carousel images={carouselImages} />
       <Presentation presentation={presentation} />
-      <LatestBlogPost blogPost={latestBlogPost} />
       <DishesSummary dishCategories={dishCategories} />
       <OfferingsSummary servicesCategories={servicesCategories} />
       <MoreInfos />
@@ -101,6 +100,7 @@ export default async function HomePage() {
         />
       )}
       <HomeEventsCalendar />
+      <LatestBlogPost blogPost={latestBlogPost} />
       <ScrollReveal />
     </section>
   );
