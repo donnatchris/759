@@ -1,6 +1,27 @@
 import type { Event } from '@prisma/client';
 
 export const eventsSeed: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>[] = [
+	{
+    title: 'Conférence: La guerre des religions',
+    subTitle: 'Une conférence sur la guerre des religions, le 17 octobre à 15h00.',
+    tag: 'Conférence',
+    content: `Après la soirée de commémoration du 07 octobre, le 7.59 vous propose de poursuivre la réflexion avec une conférence sur le thème de la guerre des religions, animée par Olivier.
+	  
+	  Un sujet d'histoire et de société qui nous concerne tous, à travers les âges et les cultures.
+
+	  Un sujet qui pourrait bien revenir sur le devant de la scène, à travers les événements récents et les tensions actuelles.
+
+	  Venez nombreux pour échanger et débattre sur ce sujet passionnant, avant de partager un verre et de se retrouver en communauté.
+	  
+	 Samedi 17 octobre à 15h00.`,
+    author: 'L’équipe du 7.59',
+    imageUrl: '/uploads/france-catalogne.png',
+    links: [],
+    eventStartDate: new Date('2026-10-17T19:00:00'),
+    eventEndDate: new Date('2026-10-17T23:00:00'),
+    displayStartDate: new Date('2026-10-02T00:00:00'),
+    displayEndDate: new Date('2026-10-18T23:59:59'),
+  },
   {
     title: 'Commémoration du 07 octobre',
     subTitle: 'Soirée de communion et de deuil pour le 07 octobre.',
