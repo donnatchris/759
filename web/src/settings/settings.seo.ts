@@ -87,7 +87,7 @@ export const SEO_SETTINGS = {
     ],
   },
   identity: {
-    heading: 'Le 7.59 (759), association patriote et identitaire',
+    heading: 'Le 7.59, association patriote et identitaire',
     introduction:
       'À Canohès, près de Perpignan, dans les Pyrénées-Orientales (66), Le 7.59 — également appelé 759 — rassemble des patriotes attachés à l’identité française et catalane. L’association organise des rencontres, des repas, des conférences et des événements en pays catalan.',
   },
@@ -121,7 +121,7 @@ export const SEO_SETTINGS = {
     home: {
       path: '/',
       title:
-        'Le 7.59 (759) — Association patriote et identitaire près de Perpignan (66)',
+        'Le 7.59 — Association patriote et identitaire près de Perpignan (66)',
       description:
         'Le 7.59 (759), association patriote et identitaire à Canohès, près de Perpignan, dans les Pyrénées-Orientales (66). Rencontres et traditions catalanes.',
       index: true,

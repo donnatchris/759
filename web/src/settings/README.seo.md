@@ -2,7 +2,9 @@
 
 La source unique est `settings.seo.ts`. Le SEO ne lit plus les champs historiques
 `seoTitle`, `seoDescription` et `ogImageUrl` de Prisma, ni les titres de pages en
-base. Le formulaire d'administration ne propose plus de titre SEO. Les champs
+base pour générer les métadonnées. Les titres et sous-titres visibles des pages
+restent chargés depuis la base et modifiables par l’administration.
+Le formulaire d'administration ne propose plus de titre SEO. Les champs
 Prisma restent présents pour éviter une migration destructive des données.
 
 ## Modifier le référencement
@@ -11,11 +13,13 @@ Prisma restent présents pour éviter une migration destructive des données.
   fichier. Les variables d'environnement de développement ne le remplacent pas.
 - `siteName`, `siteAlternateNames`, `titleTemplate`, `language`, `locale`, `category` : identité commune.
 - `pages.home` : titre et description de l'accueil.
-- `identity` : titre principal visible et introduction de l'accueil (759, 7.59,
+- `identity` : présentation visible dans le footer (759, 7.59,
   identité patriote et identitaire, Canohès, proximité de Perpignan et Pyrénées-Orientales).
 - `collections` : pagination, longueur des descriptions, type de balisage et
   indications de sitemap des articles et annonces d'événements.
-- `pages.blog`, `pages.events`, etc. : titre, description et URL de chaque page.
+- `pages.blog`, `pages.events`, etc. : titre SEO, description SEO et URL de chaque
+  page. Ces valeurs ne remplacent pas le titre et le sous-titre affichés depuis
+  la base dans `PageTitle`.
   `image` peut remplacer l'image commune pour une page.
 - `image` : visuel des partages Open Graph et Twitter (URL, dimensions et texte
   alternatif). Les fichiers locaux sont placés dans `web/public`.

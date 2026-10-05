@@ -106,9 +106,11 @@ test('JSON-LD : échappe les balises sans altérer les données structurées', (
 
 test('Noms 759 et 7.59 : texte visible, titre, aliases et localisation cohérents', () => {
   const graph = createSiteJsonLd()['@graph'];
+  assert.ok(SEO_SETTINGS.pages.home.title.includes(SEO_SETTINGS.siteName));
+  assert.ok(SEO_SETTINGS.identity.heading.includes(SEO_SETTINGS.siteName));
   for (const name of ['759', '7.59']) {
-    assert.ok(SEO_SETTINGS.pages.home.title.includes(name));
-    assert.ok(SEO_SETTINGS.identity.heading.includes(name));
+    assert.ok(SEO_SETTINGS.pages.home.description.includes(name));
+    assert.ok(SEO_SETTINGS.identity.introduction.includes(name));
     assert.ok(SEO_SETTINGS.siteAlternateNames.includes(name));
     assert.ok(SEO_SETTINGS.organization.alternateName.includes(name));
   }

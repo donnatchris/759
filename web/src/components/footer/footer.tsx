@@ -1,3 +1,4 @@
+import { SEO_SETTINGS } from '@/settings/settings.seo';
 import Link from 'next/link';
 import { MapPin, Mail, Phone } from 'lucide-react';
 import { LinkWithIcon } from '@/components/custom-ui/link-with-icon';
@@ -16,26 +17,12 @@ type Props = {
 };
 
 export function Footer({ siteSettings }: Props) {
-  const {
-    fullName,
-    sloganHead,
-    sloganAccent,
-    sloganTail,
-    activities,
-    address,
-    tel,
-    mail,
-  } = siteSettings;
+  const { fullName, sloganHead, sloganAccent, sloganTail, address, tel, mail } =
+    siteSettings;
   const slogan = [sloganHead, sloganAccent, sloganTail]
     .filter(Boolean)
     .join(' ')
     .trim();
-  const cleanedActivities = activities
-    .map((activity) => activity.trim())
-    .filter(Boolean);
-  const description =
-    slogan ||
-    (cleanedActivities.length > 0 ? cleanedActivities.join(' • ') : '');
   const phoneLink = tel
     ? `tel:+33${tel.replace(/\s+/g, '').replace(/^0/, '')}`
     : null;
@@ -102,6 +89,16 @@ export function Footer({ siteSettings }: Props) {
             </Link>
           </div>
         </div>
+      </div>
+      <div className="border-t border-white/10">
+        <section className="container mx-auto px-6 py-8 sm:px-8">
+          <h2 className="text-base font-semibold text-heritage-paper">
+            {SEO_SETTINGS.identity.heading}
+          </h2>
+          <p className="mt-3 max-w-5xl text-sm leading-7 text-heritage-paper/80">
+            {SEO_SETTINGS.identity.introduction}
+          </p>
+        </section>
       </div>
       <div className="border-t border-white/10 px-6 py-5 text-center text-[0.6rem] uppercase tracking-[0.16em] text-heritage-paper/70">
         © {currentYear} {fullName} · Délice et tradition du Roussillon · Tous

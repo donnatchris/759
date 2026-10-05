@@ -1,3 +1,4 @@
+import { getCachedPageTitleService } from '@/features/pages/lib/page-title.service';
 import { ScrollReveal } from '@/components/system/scroll-reveal';
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
@@ -36,24 +37,16 @@ export default async function Page({ searchParams }: Props) {
   const page = parseSeoPage(query.page);
   if (page === null) notFound();
   if (query.page === '1') redirect(getCollectionPath('blog'));
-  const items = await getBlogPostsService({
-    page,
-    pageSize: SEO_SETTINGS.collections.pageSize,
-  });
+  const [pageTitle, items] = await Promise.all([
+    getCachedPageTitleService({ slug: 'blog' }),
+    getBlogPostsService({ page, pageSize: SEO_SETTINGS.collections.pageSize }),
+  ]);
   if (page > 1 && !items.items.length) notFound();
-  const settings = SEO_SETTINGS.pages.blog;
   return (
     <section className="min-h-screen bg-background">
       <SeoJsonLd data={createBreadcrumbJsonLd('blog')} />
       <div className="container mx-auto px-4 py-8 sm:py-12">
-        <PageTitle
-          editable={false}
-          pageTitle={{
-            slug: 'blog',
-            title: settings.title,
-            subTitle: settings.description,
-          }}
-        />
+        <PageTitle pageTitle={pageTitle} />
         <div className="my-3">
           <CreateBlogPostAdminButton />
         </div>
