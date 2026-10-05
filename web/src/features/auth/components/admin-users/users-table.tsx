@@ -1,12 +1,13 @@
 import { flexRender, type Table } from '@tanstack/react-table';
 import type { TAdminUserListItem } from '../../auth.types';
+import { cn } from '@/lib/utils';
 
 export function UsersTable({
   table,
   onOpenUserCalendar,
 }: {
   table: Table<TAdminUserListItem>;
-  onOpenUserCalendar: (user: TAdminUserListItem) => void;
+  onOpenUserCalendar?: (user: TAdminUserListItem) => void;
 }) {
   const rows = table.getRowModel().rows;
 
@@ -38,15 +39,27 @@ export function UsersTable({
                 return (
                   <tr
                     key={user.id}
-                    tabIndex={0}
-                    className="cursor-pointer border-b transition-colors last:border-b-0 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    onClick={() => onOpenUserCalendar(user)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        onOpenUserCalendar(user);
-                      }
-                    }}
+                    tabIndex={onOpenUserCalendar ? 0 : undefined}
+                    className={cn(
+                      'border-b last:border-b-0',
+                      onOpenUserCalendar &&
+                        'cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    )}
+                    onClick={
+                      onOpenUserCalendar
+                        ? () => onOpenUserCalendar(user)
+                        : undefined
+                    }
+                    onKeyDown={
+                      onOpenUserCalendar
+                        ? (event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              onOpenUserCalendar(user);
+                            }
+                          }
+                        : undefined
+                    }
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-2.5 py-2 align-middle">

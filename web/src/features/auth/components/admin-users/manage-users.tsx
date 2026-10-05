@@ -649,13 +649,15 @@ function UserAccountsTab({
 }) {
   const hasSelectedUsers = selectedUserCount > 0;
   const isBulkUserActionPending = bulkUserAction !== null;
+  const prestationsEnabled = isPrestationsEnabled();
 
   return (
     <>
       <div className="mb-4">
         <p className="text-sm text-muted-foreground">
-          Cliquez sur une ligne pour voir le calendrier de l&apos;utilisateur,
-          ou sélectionnez des utilisateurs pour appliquer une action groupée.
+          {prestationsEnabled
+            ? "Cliquez sur une ligne pour voir le calendrier de l'utilisateur, ou sélectionnez des utilisateurs pour appliquer une action groupée."
+            : 'Sélectionnez des utilisateurs pour appliquer une action groupée.'}
         </p>
         <span className="text-xs text-muted-foreground">
           {selectedUserCount} sélectionné{selectedUserCount > 1 ? 's' : ''}
@@ -696,7 +698,10 @@ function UserAccountsTab({
           />
         </div>
       </div>
-      <UsersTable table={table} onOpenUserCalendar={onOpenUserCalendar} />
+      <UsersTable
+        table={table}
+        onOpenUserCalendar={prestationsEnabled ? onOpenUserCalendar : undefined}
+      />
     </>
   );
 }

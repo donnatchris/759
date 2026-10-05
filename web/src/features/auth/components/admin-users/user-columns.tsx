@@ -21,14 +21,15 @@ import {
   UserRoleBadge,
 } from './user-status-badges';
 import { Checkbox } from '@/components/ui/checkbox';
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
 
 export function useUserColumns({
   showPermissionsAction = false,
 }: {
   showPermissionsAction?: boolean;
 }) {
-  return useMemo<ColumnDef<TAdminUserListItem>[]>(
-    () => [
+  return useMemo<ColumnDef<TAdminUserListItem>[]>(() => {
+    const columns: ColumnDef<TAdminUserListItem>[] = [
       {
         id: 'select',
         enableSorting: false,
@@ -151,9 +152,12 @@ export function useUserColumns({
         ),
         cell: ({ getValue }) => <NumberCell value={getValue<number>()} />,
       },
-    ],
-    [showPermissionsAction],
-  );
+    ];
+
+    return isPrestationsEnabled()
+      ? columns
+      : columns.filter((column) => column.id !== 'canBook');
+  }, [showPermissionsAction]);
 }
 
 const permissionsColumn: ColumnDef<TAdminUserListItem> = {
