@@ -276,6 +276,16 @@ export function getGenericEmailHtml({
                   ${escapeTextHtml(footerText)}
                   ${safeFooterUrl ? `<div style="margin-top: 8px;"><a href="${safeFooterUrl}" style="color: #dfb74e; text-decoration: underline;">${safeFooterUrl}</a></div>` : ''}
                 </span>
+
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 24px auto 0;">
+                  <tr>
+                    <td align="center" bgcolor="#dfb74e" style="background: #dfb74e; border-radius: 6px;">
+                      <a href="https://delice-et-tradition-du-roussillon.fr" style="display: inline-block; padding: 16px 40px; border: 1px solid #dfb74e; border-radius: 6px; font-family: Arial, Helvetica, sans-serif; font-size: 18px; line-height: 24px; font-weight: 700; color: #18345b; text-decoration: none;">
+                        Le 7.59
+                      </a>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
 
