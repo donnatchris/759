@@ -81,14 +81,6 @@ Module._load = function (request, parent, isMain) {
         return { title: 'Test' };
       },
     };
-  if (request === '@/features/seo/lib/seo-metadata')
-    return {
-      getSeoSiteSettings: async () => {
-        databaseCalls++;
-        return { fullName: 'Test' };
-      },
-      createPublicPageMetadata: (_, data) => data,
-    };
   return originalLoad.call(this, request, parent, isMain);
 };
 const { SETTINGS } = require('../src/settings/settings.current.ts');
@@ -106,9 +98,14 @@ const modules = [
   ),
   service: require(`../src/features/${feature}/lib/${feature}.service.ts`),
   action: require(`../src/features/${feature}/lib/${feature}.action.ts`),
-  metadata: require(
-    `../src/app/(public)/${flag === 'events' ? 'evenements' : flag}/layout.tsx`,
-  ).generateMetadata,
+  metadata: async () => {
+    const layout = require(
+      `../src/app/(public)/${flag === 'events' ? 'evenements' : flag}/layout.tsx`,
+    );
+    return layout.generateMetadata
+      ? layout.generateMetadata()
+      : layout.default({ children: null });
+  },
 }));
 const reservations = require('../src/features/reservations/lib/reservations.service.ts');
 const reservationRepository = require('../src/features/reservations/lib/reservations.repository.ts');
@@ -129,7 +126,9 @@ test('all sixteen combinations enforce disabled modules before database, cache a
       modules.forEach(({ flag }, index) => {
         SETTINGS.features[flag] = Boolean(mask & (1 << index));
       });
-      const routes = sitemap().map((route) => new URL(route.url).pathname);
+      const routes = (await sitemap()).map(
+        (route) => new URL(route.url).pathname,
+      );
       for (const featureModule of modules) {
         assert.equal(
           routes.includes('/' + featureModule.route),
@@ -145,7 +144,7 @@ test('all sixteen combinations enforce disabled modules before database, cache a
         if (SETTINGS.features[featureModule.flag]) {
           const before = databaseCalls;
           await featureModule.metadata();
-          assert.equal(databaseCalls, before + 2);
+          assert.equal(databaseCalls, before);
           const read = Object.entries(featureModule.service).find(
             ([name]) =>
               name.startsWith('getAll') ||
@@ -156,7 +155,7 @@ test('all sixteen combinations enforce disabled modules before database, cache a
             await read(),
             featureModule.flag === 'blog' ? null : [],
           );
-          assert.equal(databaseCalls, before + 3);
+          assert.equal(databaseCalls, before + 1);
           continue;
         }
         const before = [databaseCalls, cacheCalls, authCalls, invalidations];

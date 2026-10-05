@@ -1,3 +1,4 @@
+import { getContentPath } from '@/features/seo/lib/seo-pagination';
 import { isEventsEnabled } from '@/settings/settings.helpers';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,11 +10,13 @@ import { Badge } from '@/components/ui/badge';
 
 type Props = {
 	event: Event;
+	detail?: boolean;
 };
 
-export function EventCard({ event }: Props) {
+export function EventCard({ event, detail = false }: Props) {
 	if (!isEventsEnabled()) return null;
 
+	const Heading = detail ? 'h1' : 'h2';
 	const publishedAt = formatEventDate(event.createdAt);
 	const editedAt = formatEventDate(event.updatedAt);
 	const isEdited = publishedAt !== editedAt;
@@ -48,9 +51,13 @@ export function EventCard({ event }: Props) {
 						</Badge>
 					)}
 				</div>
-				<h2 className="font-heading text-3xl font-semibold leading-tight tracking-tight [overflow-wrap:anywhere] sm:text-4xl">
-					{event.title}
-				</h2>
+				<Heading className="font-heading text-3xl font-semibold leading-tight tracking-tight [overflow-wrap:anywhere] sm:text-4xl">
+					{detail ? (
+						event.title
+					) : (
+						<Link href={getContentPath('events', event.id)}>{event.title}</Link>
+					)}
+				</Heading>
 			</header>
 			{hasVisual && (
 				<div className="min-w-0 bg-heritage-ink text-heritage-paper lg:col-start-1 lg:row-span-2 lg:row-start-1">

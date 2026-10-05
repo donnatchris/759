@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
+import { SEO_SETTINGS } from './src/settings/settings.seo';
 
-const canonicalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+const canonicalSiteUrl = SEO_SETTINGS.siteUrl;
 
 const nextConfig: NextConfig = {
   output: 'standalone',

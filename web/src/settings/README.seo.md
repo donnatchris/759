@@ -9,8 +9,12 @@ Prisma restent présents pour éviter une migration destructive des données.
 
 - `siteUrl` : domaine public canonique, sans chemin, défini directement dans ce
   fichier. Les variables d'environnement de développement ne le remplacent pas.
-- `siteName`, `titleTemplate`, `language`, `locale`, `category` : identité commune.
+- `siteName`, `siteAlternateNames`, `titleTemplate`, `language`, `locale`, `category` : identité commune.
 - `pages.home` : titre et description de l'accueil.
+- `identity` : titre principal visible et introduction de l'accueil (759, 7.59,
+  identité patriote et identitaire, Canohès, proximité de Perpignan et Pyrénées-Orientales).
+- `collections` : pagination, longueur des descriptions, type de balisage et
+  indications de sitemap des articles et annonces d'événements.
 - `pages.blog`, `pages.events`, etc. : titre, description et URL de chaque page.
   `image` peut remplacer l'image commune pour une page.
 - `image` : visuel des partages Open Graph et Twitter (URL, dimensions et texte
@@ -36,16 +40,32 @@ sitemap ; `priority` et `changeFrequency` donnent les indications correspondante
 pas une date recalculée à chaque requête.
 
 Les pages optionnelles suivent `features` dans `settings.current.ts` : menu et
-prestations sont actuellement désactivés. Les espaces `/auth`, `/staff`,
-`/dashboard`, `/notifications`, les API et la redirection `/calendrier` sont exclus.
+prestations sont actuellement désactivés. Les espaces membres et la redirection `/calendrier` sont exclus du sitemap.
+Le crawl de `/auth` et `/calendrier` reste autorisé pour permettre aux moteurs de
+lire `noindex`. Les espaces protégés et les API sont exclus du crawl.
 Les layouts privés et d'authentification ajoutent `noindex, nofollow` et effacent
 la canonique et les cartes sociales héritées de l'accueil.
 
 Pour ajouter une page publique : ajouter son entrée dans `pages`, puis appeler
 `createPublicPageMetadata('cle')` dans son layout. Ajouter si utile
 `SeoJsonLd` avec `createBreadcrumbJsonLd('cle')`. Le sitemap suit automatiquement.
-Le blog et les événements n'ont pas de routes publiques individuelles dans ce
-projet : seules leurs pages listes ont des URLs à inclure.
+Les articles et événements possèdent désormais des URLs stables `/blog/[id]` et
+`/evenements/[id]`, sans migration de la base. Le titre, la description et les
+dates de chaque fiche proviennent de son contenu public ; les paramètres et
+règles de génération restent centralisés dans `settings.seo.ts`. Les annonces
+d'événements utilisent un balisage `Article` : aucune localisation ou condition
+d'admission n'est inventée pour obtenir artificiellement un résultat enrichi.
+
+Le sitemap est généré à la demande depuis les contenus publics et inclut leurs
+dates réelles de mise à jour. Une panne de la base doit être corrigée : elle ne
+produit pas silencieusement un sitemap incomplet. Les listes utilisent des liens
+`?page=2`, etc., et chaque page possède sa canonique. Les pages vides hors de la
+première page et les paramètres invalides répondent avec une page introuvable.
+
+La redirection `www` utilise aussi `siteUrl` ; les valeurs d'authentification ou
+de développement ne peuvent plus déplacer le domaine canonique. Les profils
+`sameAs` et codes `verification` sont à compléter avec les vraies valeurs. Aucun
+compte Search Console n'est créé ni sitemap soumis automatiquement.
 
 Après modification, reconstruire puis redéployer. Vérifier les URLs publiques
 `/sitemap.xml` et `/robots.txt`, puis soumettre le sitemap dans Google Search Console.

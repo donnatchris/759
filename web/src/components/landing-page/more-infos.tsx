@@ -24,6 +24,14 @@ export function MoreInfos() {
             aria-hidden="true"
           />
         )}
+        {isBlogEnabled() && (
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.12em] hover:text-accent sm:text-sm"
+          >
+            Actualités du 7.59 <ArrowUpRight className="size-4" />
+          </Link>
+        )}
       </div>
     </section>
   );

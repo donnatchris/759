@@ -1,3 +1,4 @@
+import { SEO_SETTINGS } from '@/settings/settings.seo';
 import { isHorairesEnabled, isBlogEnabled } from '@/settings/settings.helpers';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -77,7 +78,10 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
               </span>
               {fullName}
             </p>
-            <h1 className="max-w-2xl font-heading text-[clamp(3rem,5.8vw,5.5rem)] font-semibold leading-[1.02] tracking-[-.04em]">
+            <h1 className="mb-6 max-w-2xl text-xl font-semibold leading-snug sm:text-2xl">
+              {SEO_SETTINGS.identity.heading}
+            </h1>
+            <p className="max-w-2xl font-heading text-[clamp(3rem,5.8vw,5.5rem)] font-semibold leading-[1.02] tracking-[-.04em]">
               {sloganHead}
               {sloganAccent && (
                 <span className="mt-1 block italic text-heritage-gold">
@@ -85,7 +89,10 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
                 </span>
               )}
               {sloganTail && <span className="mt-2 block">{sloganTail}</span>}
-            </h1>
+            </p>
+            <p className="mt-7 max-w-xl text-sm leading-7 text-heritage-paper/80">
+              {SEO_SETTINGS.identity.introduction}
+            </p>
             <div className="mt-7 max-w-md space-y-2 text-sm leading-7 text-heritage-paper/80">
               {activities.map((activity, index) => (
                 <p key={index}>{activity}</p>

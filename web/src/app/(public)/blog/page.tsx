@@ -1,33 +1,68 @@
-import { isBlogEnabled } from '@/settings/settings.helpers';
-import { notFound } from 'next/navigation';
-import { CreateBlogPostAdminButton, BlogPostsFeed } from '@/features/blog';
-import { getBlogPostsService } from '@/features/blog/lib/blog.service';
 import { ScrollReveal } from '@/components/system/scroll-reveal';
-import { getCachedPageTitleService } from '@/features/pages/lib/page-title.service';
+import type { Metadata } from 'next';
+import { notFound, redirect } from 'next/navigation';
+import { isBlogEnabled } from '@/settings/settings.helpers';
+import { SEO_SETTINGS } from '@/settings/settings.seo';
+import { CreateBlogPostAdminButton } from '@/features/blog';
+import { BlogPostCard } from '@/features/blog/components/blog-post-card';
+import { getBlogPostsService } from '@/features/blog/lib/blog.service';
 import { PageTitle } from '@/features/pages/components/page-title';
+import { SeoPagination } from '@/features/seo/components/seo-pagination';
+import { SeoJsonLd } from '@/features/seo/components/seo-json-ld';
+import {
+  parseSeoPage,
+  getCollectionPath,
+} from '@/features/seo/lib/seo-pagination';
+import {
+  createCollectionMetadata,
+  createBreadcrumbJsonLd,
+} from '@/features/seo/lib/seo-metadata';
 
 export const dynamic = 'force-dynamic';
+type Props = { searchParams: Promise<{ page?: string | string[] }> };
 
-export default async function PageBlog() {
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
   if (!isBlogEnabled()) notFound();
-  const page = await getCachedPageTitleService({ slug: 'blog' });
-  const blogPosts = await getBlogPostsService({ page: 1, pageSize: 5 });
+  const page = parseSeoPage((await searchParams).page);
+  if (page === null) notFound();
+  return createCollectionMetadata('blog', page);
+}
 
+export default async function Page({ searchParams }: Props) {
+  if (!isBlogEnabled()) notFound();
+  const query = await searchParams;
+  const page = parseSeoPage(query.page);
+  if (page === null) notFound();
+  if (query.page === '1') redirect(getCollectionPath('blog'));
+  const items = await getBlogPostsService({
+    page,
+    pageSize: SEO_SETTINGS.collections.pageSize,
+  });
+  if (page > 1 && !items.items.length) notFound();
+  const settings = SEO_SETTINGS.pages.blog;
   return (
     <section className="min-h-screen bg-background">
+      <SeoJsonLd data={createBreadcrumbJsonLd('blog')} />
       <div className="container mx-auto px-4 py-8 sm:py-12">
-        <div className="relative">
-          <PageTitle pageTitle={page} />
-        </div>
-
+        <PageTitle
+          editable={false}
+          pageTitle={{
+            slug: 'blog',
+            title: settings.title,
+            subTitle: settings.description,
+          }}
+        />
         <div className="my-3">
           <CreateBlogPostAdminButton />
         </div>
-        <BlogPostsFeed
-          key={blogPosts.version}
-          initialItems={blogPosts.items}
-          initialNextPage={blogPosts.nextPage}
-        />
+        <div className="flex flex-col gap-6">
+          {items.items.map((item) => (
+            <BlogPostCard key={item.id} blogPost={item} />
+          ))}
+        </div>
+        <SeoPagination collection="blog" page={page} hasNext={items.hasMore} />
       </div>
       <ScrollReveal />
     </section>

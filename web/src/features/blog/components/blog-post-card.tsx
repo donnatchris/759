@@ -1,3 +1,4 @@
+import { getContentPath } from '@/features/seo/lib/seo-pagination';
 import { isBlogEnabled } from '@/settings/settings.helpers';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,11 +10,13 @@ import { Badge } from '@/components/ui/badge';
 
 type Props = {
   blogPost: BlogPost;
+  detail?: boolean;
 };
 
-export function BlogPostCard({ blogPost }: Props) {
+export function BlogPostCard({ blogPost, detail = false }: Props) {
   if (!isBlogEnabled()) return null;
 
+  const Heading = detail ? 'h1' : 'h2';
   const publishedAt = formatBlogPostDate(blogPost.createdAt);
   const editedAt = formatBlogPostDate(blogPost.updatedAt);
   const isEdited = publishedAt !== editedAt;
@@ -63,9 +66,15 @@ export function BlogPostCard({ blogPost }: Props) {
           <EditBlogPostAdminButton blogPost={blogPost} />
           <DeleteBlogPost id={blogPost.id} />
         </div>
-        <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-          {blogPost.title}
-        </h2>
+        <Heading className="mt-3 font-heading text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+          {detail ? (
+            blogPost.title
+          ) : (
+            <Link href={getContentPath('blog', blogPost.id)}>
+              {blogPost.title}
+            </Link>
+          )}
+        </Heading>
         {blogPost.subTitle && (
           <p className="mt-4 text-lg text-muted-foreground">
             {blogPost.subTitle}

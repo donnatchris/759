@@ -16,7 +16,7 @@ export async function getLatestBlogPostFromPrismaRepository(): Promise<BlogPost 
   requireBlogEnabled();
   try {
     return await prisma.blogPost.findFirst({
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     });
   } catch (error) {
     console.error('Error in getLatestBlogPostFromPrismaRepository:', error);
@@ -35,7 +35,7 @@ export async function getBlogPostsFromPrismaRepository(
 
     const [items, aggregate] = await Promise.all([
       prisma.blogPost.findMany({
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip,
         take,
       }),

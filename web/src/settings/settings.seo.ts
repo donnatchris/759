@@ -25,6 +25,7 @@ export const SEO_SETTINGS = {
   // URL publique canonique, indépendante des URLs de développement et d'authentification.
   siteUrl: 'https://delice-et-tradition-du-roussillon.fr',
   siteName,
+  siteAlternateNames: ['7.59', '759', 'Le 759'],
   language: 'fr',
   locale: 'fr_FR',
   titleTemplate: `%s | ${siteName}`,
@@ -55,14 +56,7 @@ export const SEO_SETTINGS = {
   verification: {} satisfies NonNullable<Metadata['verification']>,
   robots: {
     userAgents: ['*'],
-    disallow: [
-      '/staff',
-      '/dashboard',
-      '/notifications',
-      '/auth',
-      '/api/',
-      '/calendrier',
-    ],
+    disallow: ['/staff', '/dashboard', '/notifications', '/api/'],
     googleBot: {
       'max-image-preview': 'large' as const,
       'max-snippet': -1,
@@ -72,27 +66,44 @@ export const SEO_SETTINGS = {
   organization: {
     type: 'Organization',
     name: siteName,
-    alternateName: '7.59',
+    alternateName: ['7.59', '759', 'Le 759'],
     description:
-      'Association patriote française attachée à la transmission, aux traditions et à la convivialité du pays catalan.',
+      'Le 7.59, aussi appelé 759, est une association patriote et identitaire à Canohès, près de Perpignan, dans les Pyrénées-Orientales (66), attachée à l’identité française et catalane.',
     logo: '/favicons/android-chrome-512x512.png',
     // Renseigner uniquement les coordonnées et profils publics réels.
     telephone: undefined as string | undefined,
-    email: undefined as string | undefined,
-    address: undefined as
-      | {
-          streetAddress: string;
-          postalCode: string;
-          addressLocality: string;
-          addressCountry: string;
-        }
-      | undefined,
+    email: 'contact@delice-et-tradition-du-roussillon.fr',
+    address: {
+      streetAddress: '3 rue de la Couloumine',
+      postalCode: '66680',
+      addressLocality: 'Canohès',
+      addressCountry: 'FR',
+    },
     sameAs: [] as string[],
     knowsAbout: [
       'Héritage français et catalan',
       'Traditions du pays catalan',
       'Rencontres associatives',
     ],
+  },
+  identity: {
+    heading: 'Le 7.59 (759), association patriote et identitaire',
+    introduction:
+      'À Canohès, près de Perpignan, dans les Pyrénées-Orientales (66), Le 7.59 — également appelé 759 — rassemble des patriotes attachés à l’identité française et catalane. L’association organise des rencontres, des repas, des conférences et des événements en pays catalan.',
+  },
+  collections: {
+    pageSize: 5,
+    descriptionMaxLength: 160,
+    articleType: 'Article' as const,
+    blog: { priority: 0.7, changeFrequency: 'monthly' as const },
+    events: { priority: 0.7, changeFrequency: 'weekly' as const },
+    labels: {
+      previous: 'Page précédente',
+      next: 'Page suivante',
+      page: 'Page',
+      navigation: 'Pagination',
+      back: 'Retour à la liste',
+    },
   },
   privateMetadata: {
     title: 'Espace privé',
@@ -109,9 +120,10 @@ export const SEO_SETTINGS = {
   pages: {
     home: {
       path: '/',
-      title: 'Le 7.59 — Association patriote en pays catalan',
+      title:
+        'Le 7.59 (759) — Association patriote et identitaire près de Perpignan (66)',
       description:
-        'Découvrez Le 7.59, association patriote française en pays catalan : événements, rencontres, traditions et transmission de notre héritage.',
+        'Le 7.59 (759), association patriote et identitaire à Canohès, près de Perpignan, dans les Pyrénées-Orientales (66). Rencontres et traditions catalanes.',
       index: true,
       sitemap: true,
       priority: 1,
@@ -121,7 +133,7 @@ export const SEO_SETTINGS = {
       path: '/blog',
       title: 'Actualités et articles',
       description:
-        'Suivez les actualités du 7.59, la vie de l’association et ses articles consacrés à l’héritage français et catalan.',
+        'Retrouvez les actualités du 7.59 (759), association patriote et identitaire des Pyrénées-Orientales (66), et la vie de l’association à Canohès, près de Perpignan.',
       feature: 'blog',
       index: true,
       sitemap: true,
@@ -132,7 +144,7 @@ export const SEO_SETTINGS = {
       path: '/evenements',
       title: 'Événements et rencontres',
       description:
-        'Découvrez les événements du 7.59 en pays catalan : rencontres associatives, moments de convivialité et rendez-vous autour de nos traditions.',
+        'Découvrez les événements du 7.59 (759) à Canohès, près de Perpignan, et dans les Pyrénées-Orientales (66) : rencontres, conférences et traditions françaises et catalanes.',
       feature: 'events',
       index: true,
       sitemap: true,

@@ -4,6 +4,11 @@ import {
   type SeoPage,
   type SeoPageKey,
 } from '@/settings/settings.seo';
+import {
+  getCollectionPath,
+  getContentPath,
+  type SeoCollection,
+} from './seo-pagination';
 import { SETTINGS } from '@/settings/settings.current';
 
 export function getMetadataBase(): URL {
@@ -30,8 +35,13 @@ export function isSeoPageEnabled(page: SeoPage): boolean {
   return !page.feature || SETTINGS.features[page.feature];
 }
 
-export function createPublicPageMetadata(key: SeoPageKey): Metadata {
-  const page: SeoPage = SEO_SETTINGS.pages[key];
+export function createPublicPageMetadata(
+  key: SeoPageKey,
+  overrides: Partial<
+    Pick<SeoPage, 'title' | 'description' | 'path' | 'image'>
+  > = {},
+): Metadata {
+  const page: SeoPage = { ...SEO_SETTINGS.pages[key], ...overrides };
   const image = page.image ?? SEO_SETTINGS.image;
   const title =
     key === 'home'
@@ -133,6 +143,7 @@ export function createSiteJsonLd() {
         '@id': websiteId,
         url: base.toString(),
         name: SEO_SETTINGS.siteName,
+        alternateName: SEO_SETTINGS.siteAlternateNames,
         description: SEO_SETTINGS.pages.home.description,
         inLanguage: SEO_SETTINGS.language,
         publisher: { '@id': organizationId },
@@ -141,7 +152,10 @@ export function createSiteJsonLd() {
   };
 }
 
-export function createBreadcrumbJsonLd(key: SeoPageKey) {
+export function createBreadcrumbJsonLd(
+  key: SeoPageKey,
+  detail?: { title: string; path: string },
+) {
   const page = SEO_SETTINGS.pages[key];
   return {
     '@context': 'https://schema.org',
@@ -159,6 +173,115 @@ export function createBreadcrumbJsonLd(key: SeoPageKey) {
         name: page.title,
         item: new URL(page.path, getMetadataBase()).toString(),
       },
+      ...(detail
+        ? [
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: detail.title,
+              item: new URL(detail.path, getMetadataBase()).toString(),
+            },
+          ]
+        : []),
     ],
+  };
+}
+
+export function createCollectionMetadata(
+  collection: SeoCollection,
+  page: number,
+): Metadata {
+  const settings = SEO_SETTINGS.pages[collection];
+  return createPublicPageMetadata(collection, {
+    path: getCollectionPath(collection, page),
+    title:
+      page === 1
+        ? settings.title
+        : `${settings.title} — ${SEO_SETTINGS.collections.labels.page} ${page}`,
+  });
+}
+
+type PublicContent = {
+  id: string;
+  title: string;
+  subTitle: string | null;
+  content: string;
+  imageUrl: string | null;
+  author: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export function getContentDescription(
+  content: Pick<PublicContent, 'subTitle' | 'content'>,
+): string {
+  const text = (content.subTitle || content.content)
+    .replace(/\s+/g, ' ')
+    .trim();
+  const limit = SEO_SETTINGS.collections.descriptionMaxLength;
+  return text.length <= limit ? text : `${text.slice(0, limit - 1).trimEnd()}…`;
+}
+
+export function createContentMetadata(
+  collection: SeoCollection,
+  content: PublicContent,
+): Metadata {
+  const metadata = createPublicPageMetadata(collection, {
+    path: getContentPath(collection, content.id),
+    title: content.title,
+    description: getContentDescription(content),
+  });
+  const images = content.imageUrl
+    ? [{ url: content.imageUrl, alt: content.title }]
+    : [SEO_SETTINGS.image];
+  return {
+    ...metadata,
+    authors: [{ name: content.author || SEO_SETTINGS.organization.name }],
+    openGraph: {
+      ...metadata.openGraph,
+      type: 'article',
+      publishedTime: content.createdAt.toISOString(),
+      modifiedTime: content.updatedAt.toISOString(),
+      authors: [content.author || SEO_SETTINGS.organization.name],
+      images,
+    },
+    twitter: { ...metadata.twitter, images },
+  };
+}
+
+export function createContentJsonLd(
+  collection: SeoCollection,
+  content: PublicContent,
+) {
+  const url = new URL(
+    getContentPath(collection, content.id),
+    getMetadataBase(),
+  ).toString();
+  return {
+    '@context': 'https://schema.org',
+    '@type': SEO_SETTINGS.collections.articleType,
+    '@id': `${url}#article`,
+    headline: content.title,
+    description: getContentDescription(content),
+    articleBody: content.content,
+    url,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    datePublished: content.createdAt.toISOString(),
+    dateModified: content.updatedAt.toISOString(),
+    inLanguage: SEO_SETTINGS.language,
+    image: new URL(
+      content.imageUrl || SEO_SETTINGS.image.url,
+      getMetadataBase(),
+    ).toString(),
+    ...(content.author
+      ? { author: { '@type': 'Person', name: content.author } }
+      : {
+          author: {
+            '@id': new URL('/#organization', getMetadataBase()).toString(),
+          },
+        }),
+    publisher: {
+      '@id': new URL('/#organization', getMetadataBase()).toString(),
+    },
   };
 }

@@ -28,7 +28,7 @@ export async function getMaxFiveEventsToDisplayFromPrismaRepository(): Promise<
         displayStartDate: { lte: now },
         displayEndDate: { gte: now },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: 5,
     });
   } catch (error) {
@@ -42,7 +42,7 @@ export async function getLatestEventFromPrismaRepository(): Promise<Event | null
   requireEventsEnabled();
   try {
     return await prisma.event.findFirst({
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     });
   } catch (error) {
     console.error('Error in getLatestEventFromPrismaRepository:', error);
@@ -61,7 +61,7 @@ export async function getEventsFromPrismaRepository(
 
     const [items, aggregate] = await Promise.all([
       prisma.event.findMany({
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip,
         take,
       }),
