@@ -15,10 +15,10 @@ export function LinkWithIcon({ href, Icon, text }: Props) {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 text-secondary hover:text-primary transition-colors"
+        className="flex items-center gap-2 text-secondary hover:text-accent transition-colors"
       >
         <Icon className="w-5 h-5" />
-        {text && <span className="underline sm:no-underline">{text}</span>}
+        {text && <span>{text}</span>}
       </Link>
     </div>
   );

@@ -6,7 +6,10 @@ const fullName = process.env.SITE_FULL_NAME ?? '';
 export const SETTINGS: TSettings = {
   site: {
     fullName,
-    activities: ['Association patriote française','Événements, bonne chère et traditions du pays catalan.'],
+    activities: [
+      'Association patriote française',
+      'Événements, bonne chère et traditions du pays catalan.',
+    ],
     icon: Handshake,
   },
   features: {

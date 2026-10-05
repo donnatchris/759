@@ -1,9 +1,10 @@
 import type { Event } from '@prisma/client';
 
 export const eventsSeed: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>[] = [
-	{
+  {
     title: 'Conférence: La guerre des religions',
-    subTitle: 'Une conférence sur la guerre des religions, le 17 octobre à 15h00.',
+    subTitle:
+      'Une conférence sur la guerre des religions, le 17 octobre à 15h00.',
     tag: 'Conférence',
     content: `Après la soirée de commémoration du 07 octobre, le 7.59 vous propose de poursuivre la réflexion avec une conférence sur le thème de la guerre des religions, animée par Olivier.
 	  
