@@ -111,10 +111,14 @@ const input = {
 test('creating an event queues an optional complete email atomically', async (t) => {
   t.mock.method(console, 'error', () => {});
   SETTINGS.features.events = true;
-  await createEventService(input);
+  await createEventService({ ...input, sendToMembers: false });
   assert.equal(committed[0].mails.length, 0);
-  await createEventService({ ...input, sendToMembers: true });
+  const beforeCreation = Date.now();
+  await createEventService(input);
+  const afterCreation = Date.now();
   const mail = committed[1].mails[0];
+  assert.ok(mail.scheduledFor.getTime() >= beforeCreation);
+  assert.ok(mail.scheduledFor.getTime() <= afterCreation);
   assert.equal(mail.content, input.content);
   assert.equal(mail.eyebrow, input.tag);
   assert.ok(mail.intro.includes('05 octobre 2099'));
@@ -150,8 +154,8 @@ test('creating an event queues an optional complete email atomically', async (t)
   });
 });
 
-test('dates are validated on creation and editing; marketing opt-in defaults off', () => {
-  assert.equal(createEventSchema.parse(input).sendToMembers, false);
+test('dates are validated on creation and editing; event email defaults on', () => {
+  assert.equal(createEventSchema.parse(input).sendToMembers, true);
   assert.equal(
     createEventSchema.safeParse({ ...input, eventEndDate: '2099-10-04' })
       .success,

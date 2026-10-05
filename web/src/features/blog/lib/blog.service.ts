@@ -1,3 +1,6 @@
+import { prisma } from '@/lib/prisma/prisma';
+import { createMarketingEmailService } from '@/features/mail/lib/marketing-email.service';
+import { getBlogPostMarketingEmailData } from './blog.email';
 import { requireBlogEnabled } from '@/settings/settings.guards';
 import { executeServiceOrThrow } from '@/features/core';
 import {
@@ -41,7 +44,17 @@ export async function createBlogPostService(data: unknown): Promise<BlogPost> {
   await requireAdminOrThrow();
   return await executeServiceOrThrow({
     serviceName: 'createBlogPostService',
-    repositoryMethod: createBlogPostInPrismaRepository,
+    repositoryMethod: (parsedData) =>
+      prisma.$transaction(async (tx) => {
+        const blogPost = await createBlogPostInPrismaRepository(parsedData, tx);
+        if (parsedData.sendToUsers) {
+          await createMarketingEmailService(
+            getBlogPostMarketingEmailData(blogPost),
+            tx,
+          );
+        }
+        return blogPost;
+      }),
     data,
     zodSchema: createBlogPostSchema,
   });

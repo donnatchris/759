@@ -45,7 +45,7 @@ export function CalendarEventDialog({
         {event?.details ? (
           <EventCard event={event.details} />
         ) : (
-          <p className="whitespace-pre-line break-words leading-7">
+          <p className="whitespace-pre-line break-words text-lg font-medium leading-8 tracking-normal text-foreground md:text-base md:font-normal md:leading-7 md:tracking-[-0.01em]">
             {event?.content}
           </p>
         )}

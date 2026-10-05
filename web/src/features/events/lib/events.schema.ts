@@ -142,7 +142,7 @@ export const eventSchema = z
   });
 
 export const createEventSchema = eventSchema.safeExtend({
-  sendToMembers: z.boolean().default(false),
+  sendToMembers: z.boolean().default(true),
 });
 export type TCreateEventInput = z.input<typeof createEventSchema>;
 export type TCreateEventOutput = z.output<typeof createEventSchema>;

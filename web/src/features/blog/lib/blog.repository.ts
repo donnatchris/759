@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { requireBlogEnabled } from '@/settings/settings.guards';
 import { AppError } from '@/features/core/error/error.AppError';
 import { ERROR_CODES } from '@/features/core/error/error.handling';
@@ -62,6 +63,7 @@ export async function getBlogPostsFromPrismaRepository(
 
 export async function createBlogPostInPrismaRepository(
   data: TCreateBlogPostOutput,
+  transaction: Prisma.TransactionClient = prisma,
 ): Promise<BlogPost> {
   requireBlogEnabled();
   try {
@@ -69,7 +71,7 @@ export async function createBlogPostInPrismaRepository(
       throw new AppError(ERROR_CODES.BAD_REQUEST);
     }
 
-    return await prisma.blogPost.create({
+    return await transaction.blogPost.create({
       data: {
         title: data.title,
         subTitle: data.subTitle ?? null,

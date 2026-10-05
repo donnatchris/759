@@ -45,7 +45,7 @@ export function CreateEventForm({ onSuccess, onClose }: Props) {
   }, []);
 
   const defaultValues = {
-    sendToMembers: false,
+    sendToMembers: true,
     title: '',
     subTitle: '',
     content: '',
@@ -100,6 +100,23 @@ export function CreateEventForm({ onSuccess, onClose }: Props) {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-4 p-4"
       >
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-primary/40 bg-primary/10 p-4 transition-colors hover:bg-primary/15 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
+          <input
+            type="checkbox"
+            {...form.register('sendToMembers')}
+            className="mt-1 h-5 w-5 shrink-0 accent-primary"
+          />
+          <span className="flex flex-col gap-1">
+            <span className="text-base font-bold text-primary">
+              Envoyer aux utilisateurs
+            </span>
+            <span className="text-sm text-muted-foreground">
+              Un email présentant cet événement sera envoyé lors du prochain
+              envoi nocturne aux utilisateurs ayant vérifié leur adresse email
+              et accepté les emails marketing.
+            </span>
+          </span>
+        </label>
         <RHFInput
           name="title"
           label="Titre"
@@ -185,14 +202,6 @@ export function CreateEventForm({ onSuccess, onClose }: Props) {
           popoverContent="Si une date de début d'affichage est définie, vous devez définir une date de fin d'affichage pour indiquer jusqu'à quand l'événement doit apparaître dans le bandeau de la page d'accueil. Passé cette date, l'événement n'apparaîtra plus dans le bandeau mais sera toujours accessible depuis la page dédiée aux événements."
         />
 
-        <label className="flex items-center gap-2">
-          <input type="checkbox" {...form.register('sendToMembers')} />
-          Envoyer par mail aux adhérents
-        </label>
-        <p className="text-xs text-muted-foreground">
-          Le mail sera envoyé lors du prochain envoi nocturne aux adhérents
-          ayant accepté les emails marketing.
-        </p>
         <div className="flex flex-wrap items-center gap-2">
           <Button type="submit" disabled={isSubmitting} className="rounded-xl">
             <Save size={16} className="mr-1 inline-block" />

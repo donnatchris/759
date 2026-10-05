@@ -80,7 +80,9 @@ export const blogPostSchema = z
     }
   });
 
-export const createBlogPostSchema = blogPostSchema;
+export const createBlogPostSchema = blogPostSchema.safeExtend({
+  sendToUsers: z.boolean().default(true),
+});
 export type TCreateBlogPostInput = z.input<typeof createBlogPostSchema>;
 export type TCreateBlogPostOutput = z.output<typeof createBlogPostSchema>;
 

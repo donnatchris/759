@@ -44,6 +44,7 @@ export function CreateBlogPostForm({ onSuccess, onClose }: Props) {
   }, []);
 
   const defaultValues = {
+    sendToUsers: true,
     title: '',
     subTitle: '',
     content: '',
@@ -95,6 +96,23 @@ export function CreateBlogPostForm({ onSuccess, onClose }: Props) {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-4 p-4"
       >
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-primary/40 bg-primary/10 p-4 transition-colors hover:bg-primary/15 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
+          <input
+            type="checkbox"
+            {...form.register('sendToUsers')}
+            className="mt-1 h-5 w-5 shrink-0 accent-primary"
+          />
+          <span className="flex flex-col gap-1">
+            <span className="text-base font-bold text-primary">
+              Envoyer aux utilisateurs
+            </span>
+            <span className="text-sm text-muted-foreground">
+              Un email présentant cet article sera envoyé lors du prochain envoi
+              nocturne aux utilisateurs ayant vérifié leur adresse email et
+              accepté les emails marketing.
+            </span>
+          </span>
+        </label>
         <RHFInput
           name="title"
           label="Titre"

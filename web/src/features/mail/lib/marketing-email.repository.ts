@@ -73,7 +73,7 @@ export async function createMarketingEmailInPrismaRepository(
           note: data.note ?? null,
           imageUrl: data.imageUrl ?? null,
           links: data.links,
-          scheduledFor: getNextNightSendDate(),
+          scheduledFor: new Date(),
           createdByUserId: data.createdByUserId,
           createdByEmail: data.createdByEmail,
           eligibleRecipientCount,
@@ -130,13 +130,6 @@ export async function getMarketingEmailRecipientsFromPrismaRepository(): Promise
     if (error instanceof AppError) throw error;
     throw new AppError(ERROR_CODES.DATABASE_ERROR);
   }
-}
-
-function getNextNightSendDate() {
-  const scheduledFor = new Date();
-  scheduledFor.setDate(scheduledFor.getDate() + 1);
-  scheduledFor.setHours(2, 0, 0, 0);
-  return scheduledFor;
 }
 
 function toMarketingEmailListItem(

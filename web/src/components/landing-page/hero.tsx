@@ -94,11 +94,11 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
             <div className="mt-9 flex flex-wrap gap-x-6 gap-y-4">
               {isBlogEnabled() && (
                 <Link
-                  href="/blog"
+                  href="/#calendrier"
                   className="inline-flex min-h-12 items-center gap-3 rounded-sm border border-heritage-red bg-heritage-red px-6 py-3 text-sm font-semibold text-heritage-paper transition hover:bg-heritage-paper hover:text-heritage-ink focus-visible:outline-2 focus-visible:outline-offset-4"
                 >
                   <CalendarDays className="size-4" />
-                  Notre Blog
+                  Calendrier des événements
                 </Link>
               )}
               {isHorairesEnabled() && (
@@ -106,7 +106,7 @@ export function Hero({ siteSettings, socialMedias, googleRatings }: Props) {
                   href="#horaires"
                   className="inline-flex min-h-12 items-center gap-3 border-b border-heritage-paper/40 py-3 text-sm font-semibold transition hover:text-heritage-gold focus-visible:outline-2 focus-visible:outline-offset-4"
                 >
-                  Nous retrouver
+                  Nos horaires
                   <ArrowDownRight className="size-4" />
                 </a>
               )}

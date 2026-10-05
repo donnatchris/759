@@ -71,7 +71,7 @@ export function BlogPostCard({ blogPost }: Props) {
             {blogPost.subTitle}
           </p>
         )}
-        <p className="mt-7 whitespace-pre-line leading-7 text-foreground/80">
+        <p className="mt-7 whitespace-pre-line break-words text-lg font-medium leading-8 tracking-normal text-foreground md:text-base md:font-normal md:leading-7 md:tracking-[-0.01em] md:text-foreground/80">
           {blogPost.content}
         </p>
         {blogPost.links.length > 0 && (
