@@ -1,10 +1,11 @@
+import { SEO_SETTINGS } from '@/settings/settings.seo';
 import type { Metadata } from 'next';
 
 import { BackLink } from '@/components/custom-ui/back-link';
 import { SiteHomeQrCode } from '@/features/qrcode';
 
 export const metadata: Metadata = {
-  title: 'QR code du site',
+  title: SEO_SETTINGS.privatePageTitles.qrCode,
 };
 
 export default function StaffQrCodePage() {

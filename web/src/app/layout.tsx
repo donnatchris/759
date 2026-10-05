@@ -1,3 +1,4 @@
+import { SeoJsonLd } from '@/features/seo/components/seo-json-ld';
 import './globals.css';
 import type { Metadata } from 'next';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -13,84 +14,15 @@ import { EditModeProvider } from '@/features/core';
 import { getSiteSettingsService } from '@/features/site-settings/lib/site-settings.service';
 import { countUnreadNotificationsForUserService } from '@/features/notifications/lib/notifications.service';
 import {
-  createIconsMetadata,
-  createLocalBusinessJsonLd,
-  DEFAULT_OG_IMAGE,
-  DEFAULT_SEO_DESCRIPTION,
-  DEFAULT_SEO_TITLE,
-  getMetadataBase,
-  getSeoSiteSettings,
+  createRootMetadata,
+  createSiteJsonLd,
 } from '@/features/seo/lib/seo-metadata';
+import { SEO_SETTINGS } from '@/settings/settings.seo';
 import { UmamiAnalytics } from '@/features/analytics/umami-analytics';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const siteSettings = await getSeoSiteSettings();
-  const title = siteSettings.seoTitle || DEFAULT_SEO_TITLE;
-  const description = siteSettings.seoDescription || DEFAULT_SEO_DESCRIPTION;
-  const metadataBase = getMetadataBase();
-  const ogImage = siteSettings.ogImageUrl || DEFAULT_OG_IMAGE;
-  const ogImageAlt = `Logo de ${siteSettings.fullName}`;
-
-  return {
-    ...(metadataBase ? { metadataBase } : {}),
-
-    title: {
-      default: title,
-      template: `%s | ${siteSettings.fullName}`,
-    },
-
-    alternates: {
-      canonical: '/',
-    },
-
-    icons: createIconsMetadata(),
-
-    description,
-    applicationName: siteSettings.fullName,
-    authors: [{ name: siteSettings.fullName }],
-    creator: siteSettings.fullName,
-    publisher: siteSettings.fullName,
-    category: 'services',
-
-    openGraph: {
-      type: 'website',
-      locale: 'fr_FR',
-      siteName: siteSettings.fullName,
-      title,
-      description,
-      url: '/',
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: ogImageAlt,
-        },
-      ],
-    },
-
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [{ url: ogImage, alt: ogImageAlt }],
-    },
-
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-        'max-video-preview': -1,
-      },
-    },
-  };
-}
+export const metadata: Metadata = createRootMetadata();
 
 type Props = {
   children: React.ReactNode;
@@ -120,21 +52,16 @@ export default async function RootLayout({ children }: Props) {
     unreadNotificationsCountPromise,
   ]);
 
-  const localBusinessJsonLd = createLocalBusinessJsonLd(siteSettings);
+  const siteJsonLd = createSiteJsonLd();
 
   return (
-    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html
+      lang={SEO_SETTINGS.language}
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+    >
       <body className="min-h-full">
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(localBusinessJsonLd).replace(
-              /</g,
-              '\\u003c',
-            ),
-          }}
-        />
+        <SeoJsonLd data={siteJsonLd} />
 
         <ThemeProvider
           attribute="class"

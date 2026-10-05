@@ -1,35 +1,20 @@
-import {
-  isBlogEnabled,
-  isEventsEnabled,
-  isMenuEnabled,
-  isPrestationsEnabled,
-} from '@/settings/settings.helpers';
 import type { MetadataRoute } from 'next';
-
-const PUBLIC_ROUTES = [
-  { path: '/evenements', priority: 0.8, enabled: isEventsEnabled },
-  { path: '/', priority: 1, enabled: () => true },
-  { path: '/menu', priority: 0.9, enabled: isMenuEnabled },
-  { path: '/prestations', priority: 0.9, enabled: isPrestationsEnabled },
-  { path: '/blog', priority: 0.8, enabled: isBlogEnabled },
-] as const;
+import { SEO_SETTINGS, type SeoPage } from '@/settings/settings.seo';
+import {
+  getMetadataBase,
+  isSeoIndexingEnabled,
+  isSeoPageEnabled,
+} from '@/features/seo/lib/seo-metadata';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = getSiteUrl();
-  const lastModified = new Date();
+  if (!isSeoIndexingEnabled()) return [];
 
-  return PUBLIC_ROUTES.filter((route) => route.enabled()).map((route) => ({
-    url: new URL(route.path, siteUrl).toString(),
-    lastModified,
-    changeFrequency: 'weekly',
-    priority: route.priority,
-  }));
-}
-
-function getSiteUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.BETTER_AUTH_URL ??
-    'http://localhost:3000'
-  );
+  return (Object.values(SEO_SETTINGS.pages) as SeoPage[])
+    .filter((page) => isSeoPageEnabled(page) && page.index && page.sitemap)
+    .map((page) => ({
+      url: new URL(page.path, getMetadataBase()).toString(),
+      ...(page.lastModified ? { lastModified: page.lastModified } : {}),
+      changeFrequency: page.changeFrequency,
+      priority: page.priority,
+    }));
 }

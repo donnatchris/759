@@ -1,6 +1,9 @@
+import { createPrivateMetadata } from '@/features/seo/lib/seo-metadata';
 import { auth } from '@/features/auth/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+
+export const metadata = createPrivateMetadata();
 
 type Props = {
   children: React.ReactNode;

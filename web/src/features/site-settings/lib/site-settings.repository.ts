@@ -25,7 +25,6 @@ type TSiteSettingsUpdate = {
   address: string | null | undefined;
   tel: string | null | undefined;
   mail: string | null | undefined;
-  seoTitle: string | null | undefined;
   activities: string[];
 };
 
@@ -46,7 +45,6 @@ export function updateSiteSettingsInPrismaRepository(
         address: data.address ?? null,
         tel: data.tel ?? null,
         mail: data.mail ?? null,
-        seoTitle: data.seoTitle ?? null,
         activities: data.activities,
       },
     });

@@ -1,226 +1,164 @@
 import type { Metadata } from 'next';
-import { getCachedSiteSettingsService } from '@/features/site-settings/lib/site-settings.service';
-import type { SiteSettings } from '@/features/site-settings/lib/site-settings.types';
 import {
-  getSiteActivities,
-  getSiteFullName,
-} from '@/settings/settings.helpers';
+  SEO_SETTINGS,
+  type SeoPage,
+  type SeoPageKey,
+} from '@/settings/settings.seo';
+import { SETTINGS } from '@/settings/settings.current';
 
-const BUSINESS_TOPICS = ['Services', 'Réservation en ligne', 'Blog'];
-
-const SAME_AS_URLS: string[] = [];
-
-const DEFAULT_SITE_NAME = process.env.SITE_FULL_NAME || 'Mon site';
-
-export const DEFAULT_SEO_TITLE = `${DEFAULT_SITE_NAME} - Site officiel`;
-
-export const DEFAULT_OG_IMAGE = '/images/logo-social.jpg';
-
-export const DEFAULT_SEO_DESCRIPTION = `Découvrez ${DEFAULT_SITE_NAME}, ses services, son Blog et ses informations pratiques.`;
-
-type PublicPageMetadataOptions = {
-  title: string;
-  description: string;
-  path: `/${string}`;
-  ogImage?: string | null;
-  ogImageAlt?: string;
-};
-
-export async function getSeoSiteSettings(): Promise<SiteSettings> {
-  try {
-    return await getCachedSiteSettingsService();
-  } catch {
-    return {
-      id: 1,
-      fullName: getSiteFullName(),
-      shortName: getSiteFullName(),
-      sloganHead: null,
-      sloganAccent: null,
-      sloganTail: null,
-      address: null,
-      tel: null,
-      mail: null,
-      activities: getSiteActivities(),
-      seoTitle: DEFAULT_SEO_TITLE,
-      seoDescription: DEFAULT_SEO_DESCRIPTION,
-      ogImageUrl: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+export function getMetadataBase(): URL {
+  const url = new URL(SEO_SETTINGS.siteUrl);
+  if (
+    !['http:', 'https:'].includes(url.protocol) ||
+    url.username ||
+    url.password
+  ) {
+    throw new Error('SEO_SETTINGS.siteUrl doit être une URL publique HTTP(S).');
   }
+  return new URL(url.origin);
 }
 
-export function getMetadataBase(): URL | undefined {
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ?? process.env.BETTER_AUTH_URL;
-
-  if (!siteUrl) {
-    return undefined;
-  }
-
-  try {
-    return new URL(siteUrl);
-  } catch {
-    return undefined;
-  }
+export function isSeoIndexingEnabled(): boolean {
+  const { hostname } = getMetadataBase();
+  return (
+    SEO_SETTINGS.indexingEnabled &&
+    !['localhost', '127.0.0.1', '[::1]'].includes(hostname)
+  );
 }
 
-export function createPublicPageMetadata(
-  siteSettings: SiteSettings,
-  options: PublicPageMetadataOptions,
-): Metadata {
-  const metadataBase = getMetadataBase();
-  const ogImage =
-    options.ogImage || siteSettings.ogImageUrl || DEFAULT_OG_IMAGE;
-  const ogImageAlt = options.ogImageAlt || options.title;
+export function isSeoPageEnabled(page: SeoPage): boolean {
+  return !page.feature || SETTINGS.features[page.feature];
+}
+
+export function createPublicPageMetadata(key: SeoPageKey): Metadata {
+  const page: SeoPage = SEO_SETTINGS.pages[key];
+  const image = page.image ?? SEO_SETTINGS.image;
+  const title =
+    key === 'home'
+      ? page.title
+      : SEO_SETTINGS.titleTemplate.replace('%s', page.title);
+  const index = isSeoIndexingEnabled() && isSeoPageEnabled(page) && page.index;
 
   return {
-    ...(metadataBase ? { metadataBase } : {}),
-
-    title: options.title,
-    description: options.description,
-
-    alternates: {
-      canonical: options.path,
-    },
-
-    authors: [{ name: siteSettings.fullName }],
-    creator: siteSettings.fullName,
-    publisher: siteSettings.fullName,
-    category: 'Services',
-
+    metadataBase: getMetadataBase(),
+    title: { absolute: title },
+    description: page.description,
+    applicationName: SEO_SETTINGS.siteName,
+    authors: [{ name: SEO_SETTINGS.organization.name }],
+    creator: SEO_SETTINGS.organization.name,
+    publisher: SEO_SETTINGS.organization.name,
+    category: SEO_SETTINGS.category,
+    alternates: { canonical: page.path },
     openGraph: {
       type: 'website',
-      locale: 'fr_FR',
-      siteName: siteSettings.fullName,
-      title: options.title,
-      description: options.description,
-      url: options.path,
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: ogImageAlt,
-        },
-      ],
+      locale: SEO_SETTINGS.locale,
+      siteName: SEO_SETTINGS.siteName,
+      title,
+      description: page.description,
+      url: page.path,
+      images: [image],
     },
-
     twitter: {
-      card: 'summary_large_image',
-      title: options.title,
-      description: options.description,
-      images: [{ url: ogImage, alt: ogImageAlt }],
+      ...SEO_SETTINGS.twitter,
+      title,
+      description: page.description,
+      images: [{ url: image.url, alt: image.alt }],
     },
-
     robots: {
-      index: true,
+      index,
       follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-        'max-video-preview': -1,
-      },
+      googleBot: { index, follow: true, ...SEO_SETTINGS.robots.googleBot },
     },
   };
 }
 
-export function createIconsMetadata(): Metadata['icons'] {
+export function createRootMetadata(): Metadata {
   return {
-    icon: [
-      {
-        url: '/favicons/favicon-32x32.png',
-        type: 'image/png',
-        sizes: '32x32',
-      },
-      {
-        url: '/favicons/favicon-16x16.png',
-        type: 'image/png',
-        sizes: '16x16',
-      },
-    ],
-    shortcut: '/favicon.ico',
-    apple: [{ url: '/favicons/apple-touch-icon.png', sizes: '180x180' }],
+    ...createPublicPageMetadata('home'),
+    title: {
+      default: SEO_SETTINGS.pages.home.title,
+      template: SEO_SETTINGS.titleTemplate,
+    },
+    icons: SEO_SETTINGS.icons,
+    verification: SEO_SETTINGS.verification,
   };
 }
 
-export function createLocalBusinessJsonLd(siteSettings: SiteSettings) {
-  const metadataBase = getMetadataBase();
-  const siteUrl = metadataBase?.toString();
-  const address = siteSettings.address ?? undefined;
+export function createPrivateMetadata(
+  kind: 'auth' | 'private' = 'private',
+): Metadata {
+  const options =
+    kind === 'auth' ? SEO_SETTINGS.authMetadata : SEO_SETTINGS.privateMetadata;
+  return {
+    ...options,
+    robots: {
+      index: false,
+      follow: false,
+      googleBot: { index: false, follow: false },
+    },
+    // Effacer les données héritées de l'accueil, notamment sa canonique.
+    alternates: { canonical: null },
+    openGraph: null,
+    twitter: null,
+  };
+}
 
-  const [streetAddress, postalCode, addressLocality] = address
-    ? parseAddress(address)
-    : [undefined, undefined, undefined];
-
+export function createSiteJsonLd() {
+  const base = getMetadataBase();
+  const organizationId = new URL('/#organization', base).toString();
+  const websiteId = new URL('/#website', base).toString();
+  const organization = SEO_SETTINGS.organization;
   return {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    ...(siteUrl ? { '@id': `${siteUrl}#business` } : {}),
-    name: siteSettings.fullName,
-    alternateName: siteSettings.shortName,
-    description: siteSettings.seoDescription || DEFAULT_SEO_DESCRIPTION,
-    ...(siteUrl ? { url: siteUrl } : {}),
-    image: getAbsoluteOrRelativeUrl(
-      siteSettings.ogImageUrl || DEFAULT_OG_IMAGE,
-      metadataBase,
-    ),
-    telephone: siteSettings.tel ?? undefined,
-    email: siteSettings.mail ?? undefined,
-    priceRange: '€€',
-    ...(address
-      ? {
-          address: {
-            '@type': 'PostalAddress',
-            streetAddress,
-            postalCode,
-            addressLocality,
-            addressCountry: 'FR',
-          },
-        }
-      : {}),
-    knowsAbout: BUSINESS_TOPICS,
-    makesOffer: [
+    '@graph': [
       {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Services sur rendez-vous',
-        },
+        '@type': organization.type,
+        '@id': organizationId,
+        name: organization.name,
+        alternateName: organization.alternateName,
+        description: organization.description,
+        url: base.toString(),
+        logo: new URL(organization.logo, base).toString(),
+        image: new URL(SEO_SETTINGS.image.url, base).toString(),
+        telephone: organization.telephone,
+        email: organization.email,
+        ...(organization.address
+          ? { address: { '@type': 'PostalAddress', ...organization.address } }
+          : {}),
+        sameAs: organization.sameAs,
+        knowsAbout: organization.knowsAbout,
+      },
+      {
+        '@type': 'WebSite',
+        '@id': websiteId,
+        url: base.toString(),
+        name: SEO_SETTINGS.siteName,
+        description: SEO_SETTINGS.pages.home.description,
+        inLanguage: SEO_SETTINGS.language,
+        publisher: { '@id': organizationId },
       },
     ],
-    sameAs: SAME_AS_URLS,
   };
 }
 
-function getAbsoluteOrRelativeUrl(value: string, base?: URL): string {
-  if (!base) {
-    return value;
-  }
-
-  try {
-    return new URL(value, base).toString();
-  } catch {
-    return value;
-  }
-}
-
-function parseAddress(address: string): [string?, string?, string?] {
-  const parts = address.split(',').map((part) => part.trim());
-  const streetAddress = parts[0];
-  const postalAndCity = parts[1];
-
-  if (!postalAndCity) {
-    return [streetAddress, undefined, undefined];
-  }
-
-  const match = postalAndCity.match(/^(\d{5})\s+(.+)$/);
-
-  if (!match) {
-    return [streetAddress, undefined, postalAndCity];
-  }
-
-  return [streetAddress, match[1], match[2]];
+export function createBreadcrumbJsonLd(key: SeoPageKey) {
+  const page = SEO_SETTINGS.pages[key];
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: SEO_SETTINGS.siteName,
+        item: new URL('/', getMetadataBase()).toString(),
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: page.title,
+        item: new URL(page.path, getMetadataBase()).toString(),
+      },
+    ],
+  };
 }

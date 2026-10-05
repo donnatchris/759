@@ -50,11 +50,6 @@ export const siteSettingsUpdateSchema = z.object({
         error: 'L’adresse e-mail doit comporter au maximum 100 caractères',
       }),
   ),
-  seoTitle: nullableInput(
-    z.string().trim().max(120, {
-      error: 'Le titre SEO doit comporter au maximum 120 caractères',
-    }),
-  ),
   activities: z.array(z.string().trim()).max(20, {
     error: "Le nombre d'activités doit être inférieur ou égal à 20",
   }),

@@ -33,7 +33,6 @@ export function UpdateSiteSettingsForm({ values, onSuccess, onClose }: Props) {
     address: values?.address ?? '',
     tel: values?.tel ?? '',
     mail: values?.mail ?? '',
-    seoTitle: values?.seoTitle ?? '',
     activities: values?.activities ?? [''],
   };
 
@@ -63,7 +62,6 @@ export function UpdateSiteSettingsForm({ values, onSuccess, onClose }: Props) {
       address: '',
       tel: '',
       mail: '',
-      seoTitle: '',
       activities: [''],
     });
     clearServerError();
@@ -140,14 +138,6 @@ export function UpdateSiteSettingsForm({ values, onSuccess, onClose }: Props) {
           name="mail"
           label="E-mail"
           popoverContent="L'adresse e-mail de votre entreprise, qui peut être affichée sur la page d'accueil, dans le pied de page ou sur la page de contact. Laissez vide si vous ne souhaitez pas afficher publiquement."
-        />
-
-        <RHFInput
-          name="seoTitle"
-          label="Titre SEO"
-          type="textarea"
-          required
-          popoverContent="Le titre principal utilisé pour le référencement de la page d'accueil et affiché dans la page d'accueil. Ne pas modifier si vous n'êtes pas sûr de ce que vous faites."
         />
 
         <RHFInput

@@ -1,38 +1,23 @@
+import { SeoJsonLd } from '@/features/seo/components/seo-json-ld';
 import { isEventsEnabled } from '@/settings/settings.helpers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getCachedPageTitleService } from '@/features/pages/lib/page-title.service';
 import {
   createPublicPageMetadata,
-  getSeoSiteSettings,
+  createBreadcrumbJsonLd,
 } from '@/features/seo/lib/seo-metadata';
 
-type Props = {
-  children: React.ReactNode;
-};
-
-const DEFAULT_EVENTS_TITLE = 'Événements';
-const DEFAULT_EVENTS_DESCRIPTION =
-  'Retrouvez nos prochains événements, rencontres et rendez-vous associatifs.';
-
-export async function generateMetadata(): Promise<Metadata> {
+export function generateMetadata(): Metadata {
   if (!isEventsEnabled()) notFound();
-  const [siteSettings, page] = await Promise.all([
-    getSeoSiteSettings(),
-    getCachedPageTitleService({ slug: 'evenements' }).catch(() => null),
-  ]);
-
-  const title = page?.title || DEFAULT_EVENTS_TITLE;
-  const description = page?.subTitle || DEFAULT_EVENTS_DESCRIPTION;
-
-  return createPublicPageMetadata(siteSettings, {
-    title,
-    description,
-    path: '/evenements',
-    ogImageAlt: `${title} - ${siteSettings.fullName}`,
-  });
+  return createPublicPageMetadata('events');
 }
 
-export default function EventsLayout({ children }: Props) {
-  return children;
+export default function Layout({ children }: { children: React.ReactNode }) {
+  if (!isEventsEnabled()) notFound();
+  return (
+    <>
+      <SeoJsonLd data={createBreadcrumbJsonLd('events')} />
+      {children}
+    </>
+  );
 }

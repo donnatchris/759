@@ -1,6 +1,4 @@
 import { SeoJsonLd } from '@/features/seo/components/seo-json-ld';
-import { isMenuEnabled } from '@/settings/settings.helpers';
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import {
   createPublicPageMetadata,
@@ -8,15 +6,13 @@ import {
 } from '@/features/seo/lib/seo-metadata';
 
 export function generateMetadata(): Metadata {
-  if (!isMenuEnabled()) notFound();
-  return createPublicPageMetadata('menu');
+  return createPublicPageMetadata('legal');
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  if (!isMenuEnabled()) notFound();
   return (
     <>
-      <SeoJsonLd data={createBreadcrumbJsonLd('menu')} />
+      <SeoJsonLd data={createBreadcrumbJsonLd('legal')} />
       {children}
     </>
   );

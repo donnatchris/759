@@ -1,50 +1,27 @@
 import type { MetadataRoute } from 'next';
-
-const PRIVATE_ROUTES = [
-  '/staff',
-  '/staff/',
-  '/dashboard',
-  '/dashboard/',
-  '/notifications',
-  '/notifications/',
-  '/auth',
-  '/auth/',
-];
+import { SEO_SETTINGS, type SeoPage } from '@/settings/settings.seo';
+import {
+  getMetadataBase,
+  isSeoIndexingEnabled,
+  isSeoPageEnabled,
+} from '@/features/seo/lib/seo-metadata';
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = getSiteUrl();
+  const index = isSeoIndexingEnabled();
+  const excludedPages = (Object.values(SEO_SETTINGS.pages) as SeoPage[])
+    .filter((page) => !isSeoPageEnabled(page) || !page.index)
+    .map((page) => page.path);
 
   return {
-    rules: [
-      {
-        userAgent: '*',
-        allow: '/',
-        disallow: PRIVATE_ROUTES,
-      },
-      {
-        userAgent: 'OAI-SearchBot',
-        allow: '/',
-        disallow: PRIVATE_ROUTES,
-      },
-      {
-        userAgent: 'ChatGPT-User',
-        allow: '/',
-        disallow: PRIVATE_ROUTES,
-      },
-      {
-        userAgent: 'GPTBot',
-        allow: '/',
-        disallow: PRIVATE_ROUTES,
-      },
-    ],
-    sitemap: new URL('/sitemap.xml', siteUrl).toString(),
+    rules: {
+      userAgent: SEO_SETTINGS.robots.userAgents,
+      ...(index ? { allow: '/' } : {}),
+      disallow: index
+        ? [...SEO_SETTINGS.robots.disallow, ...excludedPages]
+        : ['/'],
+    },
+    ...(index
+      ? { sitemap: new URL('/sitemap.xml', getMetadataBase()).toString() }
+      : {}),
   };
-}
-
-function getSiteUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.BETTER_AUTH_URL ??
-    'http://localhost:3000'
-  );
 }

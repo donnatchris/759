@@ -1,8 +1,9 @@
+import { SEO_SETTINGS } from '@/settings/settings.seo';
 import type { Metadata } from 'next';
 import { EmailVerificationResult } from '@/features/auth/components/email-verification-result';
 
 export const metadata: Metadata = {
-  title: 'Vérification email',
+  title: SEO_SETTINGS.privatePageTitles.emailVerified,
 };
 
 type Props = {

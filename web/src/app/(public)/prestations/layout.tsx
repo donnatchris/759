@@ -1,38 +1,23 @@
+import { SeoJsonLd } from '@/features/seo/components/seo-json-ld';
 import { isPrestationsEnabled } from '@/settings/settings.helpers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getCachedPageTitleService } from '@/features/pages/lib/page-title.service';
 import {
   createPublicPageMetadata,
-  getSeoSiteSettings,
+  createBreadcrumbJsonLd,
 } from '@/features/seo/lib/seo-metadata';
 
-type Props = {
-  children: React.ReactNode;
-};
-
-const DEFAULT_PRESTATIONS_TITLE = 'Nos prestations';
-const DEFAULT_PRESTATIONS_DESCRIPTION =
-  'Découvrez les services proposés et réservez votre créneau en ligne.';
-
-export async function generateMetadata(): Promise<Metadata> {
+export function generateMetadata(): Metadata {
   if (!isPrestationsEnabled()) notFound();
-  const [siteSettings, page] = await Promise.all([
-    getSeoSiteSettings(),
-    getCachedPageTitleService({ slug: 'prestations' }).catch(() => null),
-  ]);
-
-  const title = page?.title || DEFAULT_PRESTATIONS_TITLE;
-  const description = page?.subTitle || DEFAULT_PRESTATIONS_DESCRIPTION;
-
-  return createPublicPageMetadata(siteSettings, {
-    title,
-    description,
-    path: '/prestations',
-    ogImageAlt: `${title} - ${siteSettings.fullName}`,
-  });
+  return createPublicPageMetadata('prestations');
 }
 
-export default function PrestationsLayout({ children }: Props) {
-  return children;
+export default function Layout({ children }: { children: React.ReactNode }) {
+  if (!isPrestationsEnabled()) notFound();
+  return (
+    <>
+      <SeoJsonLd data={createBreadcrumbJsonLd('prestations')} />
+      {children}
+    </>
+  );
 }

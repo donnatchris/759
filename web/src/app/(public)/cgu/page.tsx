@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import {
   EditLegalTermsAdminButton,
   LegalTermsMarkdown,
@@ -6,15 +5,6 @@ import {
 import { getCachedLatestLegalTermsService } from '@/features/legal-terms/lib/legal-terms.service';
 import { PageTitle } from '@/features/pages/components/page-title';
 import { getCachedPageTitleService } from '@/features/pages/lib/page-title.service';
-
-export const metadata: Metadata = {
-  title: "Conditions générales d'utilisation",
-  description:
-    "Conditions générales d'utilisation, informations légales, données personnelles et cookies.",
-  alternates: {
-    canonical: '/cgu',
-  },
-};
 
 export default async function CguPage() {
   const [page, legalTerms] = await Promise.all([
