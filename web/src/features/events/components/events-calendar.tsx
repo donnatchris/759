@@ -8,7 +8,11 @@ import type { EventSourceFunc, EventSourceFuncArg } from '@fullcalendar/core';
 import { getCalendarEventsAction } from '../lib/events.action';
 import { useCalendarEventsRefresh } from '../lib/events-calendar-refresh';
 import { isHorairesEnabled } from '@/settings/settings.helpers';
-import { getPublicOpeningClosureCalendarEventsAction } from '@/features/opening-slots/lib/opening-slots.action';
+import {
+  getAllOpeningSlotsAction,
+  getPublicOpeningClosureCalendarEventsAction,
+} from '@/features/opening-slots/lib/opening-slots.action';
+import { toPublicOpeningSlotCalendarEvents } from '@/features/opening-slots/lib/opening-slots.calendar';
 import {
   toPublicCalendarEvent,
   toPublicClosureCalendarEvent,
@@ -20,35 +24,52 @@ export function EventsCalendar() {
   const calendarRef = useRef<FullCalendar | null>(null);
   useCalendarEventsRefresh(calendarRef);
   const [error, setError] = useState(false);
-  const [selectedIsClosure, setSelectedIsClosure] = useState(false);
+  const [selectedIsEvent, setSelectedIsEvent] = useState(false);
   const [loading, setLoading] = useState(true);
   const [empty, setEmpty] = useState(false);
   const [selected, setSelected] = useState<TPublicCalendarEvent | null>(null);
   const fetchEvents = useCallback<EventSourceFunc>(
     async (info: EventSourceFuncArg) => {
-      const [eventsResult, closuresResult] = await Promise.allSettled([
-        getCalendarEventsAction({
-          start: info.startStr.slice(0, 10),
-          end: info.endStr.slice(0, 10),
-        }),
-        isHorairesEnabled()
-          ? getPublicOpeningClosureCalendarEventsAction({
-              start: info.start.toISOString(),
-              end: info.end.toISOString(),
-            })
-          : Promise.resolve(null),
-      ]);
+      const [eventsResult, closuresResult, slotsResult] =
+        await Promise.allSettled([
+          getCalendarEventsAction({
+            start: info.startStr.slice(0, 10),
+            end: info.endStr.slice(0, 10),
+          }),
+          isHorairesEnabled()
+            ? getPublicOpeningClosureCalendarEventsAction({
+                start: info.start.toISOString(),
+                end: info.end.toISOString(),
+              })
+            : Promise.resolve(null),
+          isHorairesEnabled()
+            ? getAllOpeningSlotsAction()
+            : Promise.resolve(null),
+        ]);
       const events =
         eventsResult.status === 'fulfilled' ? eventsResult.value : null;
       const closures =
         closuresResult.status === 'fulfilled' ? closuresResult.value : null;
+      const slots =
+        slotsResult.status === 'fulfilled' ? slotsResult.value : null;
       const items = [
         ...(events?.success ? events.data.map(toPublicCalendarEvent) : []),
         ...(closures?.success
           ? closures.data.map(toPublicClosureCalendarEvent)
           : []),
+        ...(slots?.success && closures?.success
+          ? toPublicOpeningSlotCalendarEvents(
+              slots.data,
+              info.startStr.slice(0, 10),
+              info.endStr.slice(0, 10),
+              closures.data,
+            )
+          : []),
       ];
-      setError(!events?.success || (isHorairesEnabled() && !closures?.success));
+      setError(
+        !events?.success ||
+          (isHorairesEnabled() && (!closures?.success || !slots?.success)),
+      );
       setEmpty(items.length === 0);
       return items;
     },
@@ -62,8 +83,8 @@ export function EventsCalendar() {
           : error
             ? 'Certaines informations du calendrier n’ont pas pu être chargées. Réessayez en changeant de mois.'
             : empty
-              ? 'Aucun événement ni fermeture sur cette période.'
-              : 'Sélectionnez un événement pour découvrir les détails.'}
+              ? 'Aucun événement, horaire ou fermeture sur cette période.'
+              : 'Sélectionnez une entrée du calendrier pour découvrir les détails.'}
       </div>
       {isHorairesEnabled() && (
         <div
@@ -73,6 +94,10 @@ export function EventsCalendar() {
           <span className="flex items-center gap-2">
             <span className="size-3 bg-heritage-gold" aria-hidden="true" />
             Événements
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="size-3 bg-heritage-opening" aria-hidden="true" />
+            Horaires
           </span>
           <span className="flex items-center gap-2">
             <span className="size-3 bg-heritage-red" aria-hidden="true" />
@@ -94,15 +119,15 @@ export function EventsCalendar() {
         dayMaxEvents={3}
         eventDisplay="block"
         eventClick={(info) => {
-          setSelectedIsClosure(
-            info.event.extendedProps.eventKind === 'publicClosure',
+          setSelectedIsEvent(
+            info.event.extendedProps.eventKind === 'publicEvent',
           );
           setSelected(info.event.extendedProps.publicEvent);
         }}
       />
       <CalendarEventDialog
         event={selected}
-        showEventsLink={!selectedIsClosure}
+        showEventsLink={selectedIsEvent}
         onClose={() => setSelected(null)}
       />
     </div>

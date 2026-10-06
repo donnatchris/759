@@ -13,6 +13,7 @@
   --color-heritage-gold: var(--heritage-gold);
   --color-heritage-paper: var(--heritage-paper);
   --color-heritage-red: var(--heritage-red);
+  --color-heritage-opening: var(--heritage-opening);
   --color-foreground: var(--foreground);
   --font-sans: 'Avenir Next', Avenir, 'Segoe UI', sans-serif;
   --font-brand: 'Baskerville', 'Palatino Linotype', Georgia, serif;
@@ -61,6 +62,7 @@
   --heritage-gold: #dfb74e;
   --heritage-paper: #faf8f2;
   --heritage-red: #ad343b;
+  --heritage-opening: #75c5b0;
   --background: #f3f2ed;
   --foreground: #1b2c43;
   --card: #faf8f2;
@@ -288,6 +290,7 @@
 }
 .public-events-calendar .fc-event-title {
   white-space: normal;
+  overflow-wrap: anywhere;
 }
 .public-events-calendar .fc-toolbar-title {
   font-family: var(--font-heading);

@@ -19,6 +19,7 @@ import {
   type OpeningSlot,
 } from '../lib/opening-slots.types';
 import { updateAllOpeningSlotsAction } from '../lib/opening-slots.action';
+import { notifyCalendarEventsChanged } from '@/features/events/lib/events-calendar-refresh';
 
 type Props = {
   values?: OpeningSlot[];
@@ -69,6 +70,7 @@ export function UpdateOpeningSlotsForm({ values, onSuccess, onClose }: Props) {
       const response = await updateAllOpeningSlotsAction(data);
 
       if (response.success) {
+        notifyCalendarEventsChanged();
         reset(defaultValues);
         onClose?.();
         onSuccess?.();
