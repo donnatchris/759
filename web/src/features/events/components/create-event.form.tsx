@@ -164,20 +164,20 @@ export function CreateEventForm({ onSuccess, onClose }: Props) {
         </h3>
         <p className="text-xs text-muted-foreground">
           {
-            'La date de début place l’événement dans le calendrier public. La date de fin est facultative : sans elle, l’événement apparaît sur une seule journée.'
+            'La date et l’heure de début placent l’événement dans le calendrier public, uniquement au jour de son début. La date et l’heure de fin sont facultatives. Les horaires sont ceux de Paris.'
           }
         </p>
         <RHFInput
           name="eventStartDate"
-          label="Date de début de l'événement"
-          type="date"
+          label="Date et heure de début de l'événement"
+          type="datetime-local"
           required
-          popoverContent="Date de début obligatoire. L’événement sera visible dans les calendriers et sur la page d’accueil."
+          popoverContent="Date et heure de début obligatoires (heure de Paris). L’événement sera visible dans les calendriers et sur la page d’accueil."
         />
         <RHFInput
           name="eventEndDate"
-          label="Date de fin de l'événement"
-          type="date"
+          label="Date et heure de fin de l'événement"
+          type="datetime-local"
           popoverContent="Date et heure de fin de l'événement (optionnel)."
         />
         <h3 className="text-lg font-bold text-primary border-t mt-2">

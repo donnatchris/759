@@ -4,6 +4,7 @@ export type { OpeningSlot };
 
 export type TOpeningSlotFormSlot = {
   isOpen: boolean;
+  label: string;
   opensAt: string;
   closesAt: string;
 };
@@ -75,6 +76,16 @@ export function formatOpeningSlotTime(minutes: number): string {
   return `${hours}h${mins}`;
 }
 
+export function formatOpeningSlot(
+  slot: Pick<OpeningSlot, 'label' | 'opensAtMinute' | 'closesAtMinute'>,
+): string {
+  const hours =
+    slot.opensAtMinute != null && slot.closesAtMinute != null
+      ? `${formatOpeningSlotTime(slot.opensAtMinute)} - ${formatOpeningSlotTime(slot.closesAtMinute)}`
+      : '';
+  return [slot.label?.trim(), hours].filter(Boolean).join(' - ');
+}
+
 export function getOpeningSlotFormRows(
   openingSlots: OpeningSlot[],
 ): TOpeningSlotFormDay[] {
@@ -90,8 +101,15 @@ export function getOpeningSlotFormRows(
 
         return {
           isOpen: Boolean(slot),
-          opensAt: slot ? minutesToTime(slot.opensAtMinute) : '10:00',
-          closesAt: slot ? minutesToTime(slot.closesAtMinute) : '19:30',
+          label: slot?.label ?? '',
+          opensAt:
+            slot?.opensAtMinute != null
+              ? minutesToTime(slot.opensAtMinute)
+              : '',
+          closesAt:
+            slot?.closesAtMinute != null
+              ? minutesToTime(slot.closesAtMinute)
+              : '',
         };
       }) as [TOpeningSlotFormSlot, TOpeningSlotFormSlot],
     };

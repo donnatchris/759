@@ -13,11 +13,29 @@ const timeSchema = z.iso.time({
 const openingSlotRowSchema = z
   .object({
     isOpen: z.boolean(),
-    opensAt: timeSchema,
-    closesAt: timeSchema,
+    label: z
+      .string()
+      .trim()
+      .max(30, {
+        error: 'Le libellé doit comporter au maximum 30 caractères',
+      })
+      .default(''),
+    opensAt: timeSchema.or(z.literal('')).default(''),
+    closesAt: timeSchema.or(z.literal('24:00')).or(z.literal('')).default(''),
   })
   .superRefine((data, ctx) => {
     if (!data.isOpen) return;
+
+    if (Boolean(data.opensAt) !== Boolean(data.closesAt)) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'Renseignez les deux heures ou laissez-les toutes les deux vides',
+        path: [data.opensAt ? 'closesAt' : 'opensAt'],
+      });
+      return;
+    }
+    if (!data.opensAt || !data.closesAt) return;
 
     const opensAtMinute = timeToMinutes(data.opensAt);
     const closesAtMinute = timeToMinutes(data.closesAt);
@@ -46,7 +64,7 @@ const openingSlotDaySchema = z
         opensAtMinute: timeToMinutes(slot.opensAt),
         closesAtMinute: timeToMinutes(slot.closesAt),
       }))
-      .filter((slot) => slot.isOpen)
+      .filter((slot) => slot.isOpen && slot.opensAt && slot.closesAt)
       .sort((a, b) => a.opensAtMinute - b.opensAtMinute);
 
     for (let index = 1; index < openSlots.length; index++) {

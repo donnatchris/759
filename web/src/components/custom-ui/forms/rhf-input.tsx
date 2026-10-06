@@ -17,11 +17,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Eye, EyeOff, Trash2 } from 'lucide-react';
+import { formatContentDateTimeInput } from '@/lib/content-datetime';
 
 type Props<TFieldValues extends FieldValues> = {
   name: FieldPath<TFieldValues>;
   label: string;
   placeholder?: string;
+  maxLength?: number;
+  midnightAtEndOfDay?: boolean;
   type?: React.InputHTMLAttributes<HTMLInputElement>['type'];
   selectOptions?: { value: string; label: string }[];
   required?: boolean;
@@ -33,6 +36,8 @@ export function RHFInput<TFieldValues extends FieldValues>({
   name,
   label,
   placeholder = '',
+  maxLength,
+  midnightAtEndOfDay = false,
   type = 'text',
   selectOptions,
   required = false,
@@ -77,6 +82,13 @@ export function RHFInput<TFieldValues extends FieldValues>({
   };
 
   const isPassword = type === 'password';
+  const toDateTimeInputValue = (value: unknown): string => {
+    if (typeof value === 'string') {
+      if (!value || /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return value;
+      return formatContentDateTimeInput(value);
+    }
+    return value instanceof Date ? formatContentDateTimeInput(value) : '';
+  };
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
   const renderDefaultInput = () => (
     <div className="relative">
@@ -85,6 +97,7 @@ export function RHFInput<TFieldValues extends FieldValues>({
         id={name}
         type={inputType}
         placeholder={placeholder}
+        maxLength={maxLength}
         {...reg}
         onChange={(e) => reg.onChange(e)}
         className={`${isPassword ? 'pr-10' : ''} rounded-xl`}
@@ -173,6 +186,64 @@ export function RHFInput<TFieldValues extends FieldValues>({
                 <Button
                   type="button"
                   variant="ghost"
+                  onClick={() => field.onChange('')}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          />
+        );
+      case 'time':
+        return (
+          <Controller
+            control={control}
+            name={name}
+            render={({ field }) => (
+              <Input
+                id={name}
+                type="time"
+                value={
+                  field.value === '24:00' && midnightAtEndOfDay
+                    ? '00:00'
+                    : (field.value ?? '')
+                }
+                onChange={(e) =>
+                  field.onChange(
+                    midnightAtEndOfDay && e.target.value === '00:00'
+                      ? '24:00'
+                      : e.target.value,
+                  )
+                }
+                onBlur={field.onBlur}
+                name={field.name}
+                ref={field.ref}
+                className="rounded-xl"
+              />
+            )}
+          />
+        );
+      case 'datetime-local':
+        return (
+          <Controller
+            control={control}
+            name={name}
+            render={({ field }) => (
+              <div className="flex gap-2">
+                <Input
+                  id={name}
+                  type="datetime-local"
+                  value={toDateTimeInputValue(field.value)}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                  className="min-w-0 rounded-xl"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  aria-label={`Effacer : ${label}`}
                   onClick={() => field.onChange('')}
                 >
                   <Trash2 className="h-4 w-4" />

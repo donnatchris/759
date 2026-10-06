@@ -7,6 +7,7 @@ import { EditEventAdminButton } from './edit-event-admin-button';
 import { DeleteEvent } from './delete-event';
 import { formatEventDate } from '../lib/events.ui';
 import { Badge } from '@/components/ui/badge';
+import { formatContentTime } from '@/lib/content-datetime';
 
 type Props = {
   event: Event;
@@ -95,6 +96,9 @@ export function EventCard({ event, detail = false }: Props) {
                             year: 'numeric',
                             timeZone: 'Europe/Paris',
                           })}
+                        </span>
+                        <span className="mt-2 block text-base font-semibold text-heritage-gold tabular-nums">
+                          {formatContentTime(date)}
                         </span>
                       </time>
                     </dd>

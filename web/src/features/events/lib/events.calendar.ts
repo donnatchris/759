@@ -1,15 +1,16 @@
+import {
+  formatContentDateTimeInput,
+  formatContentTime,
+} from '@/lib/content-datetime';
 import type { EventInput } from '@fullcalendar/core';
 import type { TPublicCalendarEvent } from './events.types';
 
 export function toPublicCalendarEvent(event: TPublicCalendarEvent): EventInput {
-  // FullCalendar uses an exclusive end; the event form uses an inclusive last day.
-  const end = new Date(`${event.end ?? event.start}T00:00:00Z`);
-  end.setUTCDate(end.getUTCDate() + 1);
+  const start = formatContentDateTimeInput(event.start).slice(0, 10);
   return {
     id: `public-event-${event.id}`,
-    title: event.title,
-    start: event.start,
-    end: end.toISOString().slice(0, 10),
+    title: `${formatContentTime(event.start)} - ${event.title}`,
+    start,
     allDay: true,
     backgroundColor: 'var(--heritage-gold)',
     borderColor: 'var(--heritage-gold)',

@@ -1,6 +1,7 @@
 import { CalendarX, Clock } from 'lucide-react';
 import {
   createLocalDate,
+  formatOpeningSlot,
   formatOpeningSlotTime,
   OPENING_SLOT_DAY_LABELS,
   type OpeningSlot,
@@ -30,6 +31,7 @@ export function OpeningSlots({
   const { title, subTitle, content, footer } = presentation;
 
   for (const slot of openingSlots) {
+    if (!formatOpeningSlot(slot)) continue;
     const current = slotsByDay.get(slot.dayOfWeek) ?? [];
     slotsByDay.set(slot.dayOfWeek, [...current, slot]);
   }
@@ -107,31 +109,40 @@ export function OpeningSlots({
                 return (
                   <div
                     key={label}
-                    className="grid min-h-16 grid-cols-[6rem_1fr] items-center gap-4 py-5 sm:grid-cols-[9rem_1fr]"
+                    className="grid min-h-16 grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 py-5 sm:grid-cols-[9rem_minmax(0,1fr)]"
                   >
                     <span className="text-sm font-extrabold uppercase text-heritage-ink">
                       {label}
                     </span>
-                    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-sm text-heritage-ink font-semibold">
-                      {daySlots.length === 0 ? (
-                        <span className="text-heritage-ink/50 font-medium">
-                          Sur événement
+                    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-sm text-heritage-ink">
+                      {daySlots.length === 0 && (
+                        <span className="font-normal text-heritage-ink/50">
+                          Fermé
                         </span>
-                      ) : (
-                        daySlots.map((slot) => (
-                          <span key={slot.id} className="whitespace-nowrap">
-                            {formatOpeningSlotTime(slot.opensAtMinute)}
-                            <span className="mx-2 text-heritage-red">-</span>
-                            {formatOpeningSlotTime(slot.closesAtMinute)}
-                          </span>
-                        ))
                       )}
+                      {daySlots.map((slot) => (
+                        <span
+                          key={slot.id}
+                          className="min-w-0 [overflow-wrap:anywhere]"
+                        >
+                          {slot.label?.trim()}
+                          {slot.opensAtMinute != null &&
+                            slot.closesAtMinute != null && (
+                              <>
+                                {slot.label?.trim() ? ' - ' : null}
+                                <strong className="font-bold">
+                                  {formatOpeningSlotTime(slot.opensAtMinute)} -{' '}
+                                  {formatOpeningSlotTime(slot.closesAtMinute)}
+                                </strong>
+                              </>
+                            )}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 );
               })}
             </div>
-
             {footer && (
               <div className="mt-6 flex items-center justify-center gap-2 text-sm text-heritage-paper/75">
                 <Clock

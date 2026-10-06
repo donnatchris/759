@@ -145,10 +145,16 @@ export async function getOpeningWindowsFromPrismaRepository(
       orderBy: [{ slotIndex: 'asc' }, { opensAtMinute: 'asc' }],
     });
 
-    return slots.map((slot) => ({
-      opensAtMinute: slot.opensAtMinute,
-      closesAtMinute: slot.closesAtMinute,
-    }));
+    return slots.flatMap((slot) =>
+      slot.opensAtMinute != null && slot.closesAtMinute != null
+        ? [
+            {
+              opensAtMinute: slot.opensAtMinute,
+              closesAtMinute: slot.closesAtMinute,
+            },
+          ]
+        : [],
+    );
   } catch (error) {
     console.error('Error in getOpeningWindowsFromPrismaRepository:', error);
     if (error instanceof AppError) throw error;

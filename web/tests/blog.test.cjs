@@ -86,6 +86,7 @@ const {
 } = require('../src/features/blog/lib/blog.service.ts');
 const {
   createBlogPostSchema,
+  updateBlogPostSchema,
 } = require('../src/features/blog/lib/blog.schema.ts');
 const input = {
   title: 'Nouvel article',
@@ -140,4 +141,35 @@ test('blog email defaults on and is queued atomically only when selected', async
   );
   assert.equal(committed.length, 3);
   admin = true;
+});
+
+test('blog schedules preserve hours on creation and editing and validate their order', () => {
+  const schedule = {
+    ...input,
+    eventStartDate: '2099-01-05T18:30',
+    eventEndDate: '2099-01-05T20:00',
+  };
+  const created = createBlogPostSchema.parse(schedule);
+  assert.equal(
+    created.eventStartDate.toISOString(),
+    '2099-01-05T17:30:00.000Z',
+  );
+  assert.equal(created.eventEndDate.toISOString(), '2099-01-05T19:00:00.000Z');
+  const edited = updateBlogPostSchema.parse({ ...created, id: 'post' });
+  assert.equal(edited.eventEndDate.getTime(), created.eventEndDate.getTime());
+  assert.equal(
+    createBlogPostSchema.safeParse({
+      ...schedule,
+      eventEndDate: '2099-01-05T18:00',
+    }).success,
+    false,
+  );
+  assert.equal(
+    createBlogPostSchema.safeParse({
+      ...input,
+      eventStartDate: '',
+      eventEndDate: '',
+    }).success,
+    true,
+  );
 });

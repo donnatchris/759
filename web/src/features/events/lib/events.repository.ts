@@ -1,3 +1,4 @@
+import { parseContentDateTimeInput } from '@/lib/content-datetime';
 import type { Prisma } from '@prisma/client';
 import { requireEventsEnabled } from '@/settings/settings.guards';
 import { AppError } from '@/features/core/error/error.AppError';
@@ -177,15 +178,11 @@ export async function getCalendarEventsFromPrismaRepository(
   data: TGetCalendarEventsOutput,
 ): Promise<TPublicCalendarEvent[]> {
   requireEventsEnabled();
-  const start = new Date(data.start);
-  const end = new Date(data.end);
+  const start = parseContentDateTimeInput(`${data.start}T00:00`);
+  const end = parseContentDateTimeInput(`${data.end}T00:00`);
   const events = await prisma.event.findMany({
     where: {
-      eventStartDate: { not: null, lt: end },
-      OR: [
-        { eventEndDate: { gte: start } },
-        { eventEndDate: null, eventStartDate: { gte: start } },
-      ],
+      eventStartDate: { gte: start, lt: end },
     },
     select: {
       id: true,
@@ -209,8 +206,8 @@ export async function getCalendarEventsFromPrismaRepository(
     id: event.id,
     title: event.title,
     content: event.content,
-    start: event.eventStartDate!.toISOString().slice(0, 10),
-    end: event.eventEndDate?.toISOString().slice(0, 10) ?? null,
+    start: event.eventStartDate!.toISOString(),
+    end: event.eventEndDate?.toISOString() ?? null,
     details: event,
   }));
 }

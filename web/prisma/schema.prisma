@@ -363,8 +363,9 @@ model OpeningSlot {
 
     dayOfWeek      Int
     slotIndex      Int @default(1)
-    opensAtMinute  Int
-    closesAtMinute Int
+    label          String? @db.VarChar(30)
+    opensAtMinute  Int?
+    closesAtMinute Int?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

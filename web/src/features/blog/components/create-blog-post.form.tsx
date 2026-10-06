@@ -160,19 +160,19 @@ export function CreateBlogPostForm({ onSuccess, onClose }: Props) {
         </h3>
         <p className="text-xs text-muted-foreground">
           {
-            "Si votre événement est temporaire, vous pouvez définir les dates de début et de fin de l'événement pour informer les utilisateurs de la période de validité de l'article."
+            "Si votre événement est temporaire, vous pouvez définir les dates de début et de fin de l'événement pour informer les utilisateurs de la période de validité de l'article. Les horaires sont ceux de Paris."
           }
         </p>
         <RHFInput
           name="eventStartDate"
-          label="Date de début de l'événement"
-          type="date"
+          label="Date et heure de début de l'événement"
+          type="datetime-local"
           popoverContent="Date et heure de début de l'événement (optionnel)."
         />
         <RHFInput
           name="eventEndDate"
-          label="Date de fin de l'événement"
-          type="date"
+          label="Date et heure de fin de l'événement"
+          type="datetime-local"
           popoverContent="Date et heure de fin de l'événement (optionnel)."
         />
         <div className="flex flex-wrap items-center gap-2">

@@ -88,9 +88,18 @@ export function UpdateOpeningSlotsForm({ values, onSuccess, onClose }: Props) {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-4 p-4"
       >
+        <p className="text-sm text-muted-foreground">
+          Ajoutez un libellé, une plage horaire ou les deux. Les heures
+          d’ouverture et de fermeture doivent être renseignées ensemble. Un
+          libellé seul ne crée pas de disponibilité pour les réservations.
+        </p>
         {OPENING_SLOT_DAY_LABELS.map((label, index) => {
           const daySlots = watchedSlots?.[index]?.slots ?? [];
-          const isDayClosed = !daySlots.some((slot) => slot?.isOpen);
+          const isDayEmpty = !daySlots.some(
+            (slot) =>
+              slot?.isOpen &&
+              (slot.label?.trim() || (slot.opensAt && slot.closesAt)),
+          );
 
           return (
             <div
@@ -111,7 +120,7 @@ export function UpdateOpeningSlotsForm({ values, onSuccess, onClose }: Props) {
                 return (
                   <div
                     key={slotIndex}
-                    className="grid gap-3 sm:grid-cols-[8rem_1fr_1fr]"
+                    className="grid gap-3 sm:grid-cols-[8rem_minmax(0,1fr)_minmax(0,1fr)]"
                   >
                     <div className="flex items-center gap-3">
                       <input
@@ -127,18 +136,29 @@ export function UpdateOpeningSlotsForm({ values, onSuccess, onClose }: Props) {
                       </Label>
                     </div>
 
-                    <RHFInput
-                      name={`slots.${index}.slots.${slotIndex}.opensAt`}
-                      label="Ouverture"
-                      type="time"
-                    />
+                    <div className="min-w-0 sm:col-span-2">
+                      <RHFInput
+                        name={`slots.${index}.slots.${slotIndex}.label`}
+                        label="Libellé"
+                        maxLength={30}
+                        placeholder="Ex. : Sur réservation"
+                      />
+                    </div>
+                    <div className="grid min-w-0 grid-cols-2 gap-3 sm:col-start-2 sm:col-span-2">
+                      <RHFInput
+                        name={`slots.${index}.slots.${slotIndex}.opensAt`}
+                        label="Ouverture"
+                        type="time"
+                      />
 
-                    <RHFInput
-                      name={`slots.${index}.slots.${slotIndex}.closesAt`}
-                      label="Fermeture"
-                      type="time"
-                    />
-
+                      <RHFInput
+                        name={`slots.${index}.slots.${slotIndex}.closesAt`}
+                        label="Fermeture"
+                        type="time"
+                        midnightAtEndOfDay
+                        popoverContent="00:00 correspond à minuit en fin de journée (24h00)."
+                      />
+                    </div>
                     {!isOpen && (
                       <p className="text-sm text-muted-foreground sm:col-span-3">
                         Créneau désactivé.
@@ -148,8 +168,10 @@ export function UpdateOpeningSlotsForm({ values, onSuccess, onClose }: Props) {
                 );
               })}
 
-              {isDayClosed && (
-                <p className="text-sm text-muted-foreground">Fermé ce jour.</p>
+              {isDayEmpty && (
+                <p className="text-sm text-muted-foreground">
+                  Aucun créneau à afficher ce jour.
+                </p>
               )}
             </div>
           );

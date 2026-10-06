@@ -45,12 +45,16 @@ export async function updateAllOpeningSlotsInPrismaRepository(
           ...slot,
           slotIndex: index + 1,
         }))
-        .filter((slot) => slot.isOpen)
+        .filter(
+          (slot) =>
+            slot.isOpen && (slot.label || (slot.opensAt && slot.closesAt)),
+        )
         .map((slot) => ({
           dayOfWeek: day.dayOfWeek,
           slotIndex: slot.slotIndex,
-          opensAtMinute: timeToMinutes(slot.opensAt),
-          closesAtMinute: timeToMinutes(slot.closesAt),
+          label: slot.label || null,
+          opensAtMinute: slot.opensAt ? timeToMinutes(slot.opensAt) : null,
+          closesAtMinute: slot.closesAt ? timeToMinutes(slot.closesAt) : null,
         })),
     );
 

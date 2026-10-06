@@ -23,8 +23,8 @@ export function CalendarEventDialog({
   const format = (value: string) =>
     new Intl.DateTimeFormat('fr-FR', {
       dateStyle: 'long',
-      timeZone: 'UTC',
-    }).format(new Date(`${value}T00:00:00Z`));
+      timeZone: 'Europe/Paris',
+    }).format(new Date(value));
   return (
     <Dialog
       open={Boolean(event)}

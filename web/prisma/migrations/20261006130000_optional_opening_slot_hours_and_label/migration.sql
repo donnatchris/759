@@ -1,0 +1,4 @@
+ALTER TABLE "opening_slot"
+ADD COLUMN "label" VARCHAR(30),
+ALTER COLUMN "opensAtMinute" DROP NOT NULL,
+ALTER COLUMN "closesAtMinute" DROP NOT NULL;

@@ -208,7 +208,7 @@ test('calendar events require a start date and accept a single-day event', () =>
   );
 });
 
-test('calendar includes the last day and isolates event identifiers from reservations', () => {
+test('calendar shows the Paris start day and time once and isolates event identifiers', () => {
   const {
     toPublicCalendarEvent,
   } = require('../src/features/events/lib/events.calendar.ts');
@@ -216,17 +216,22 @@ test('calendar includes the last day and isolates event identifiers from reserva
     id: 'same-id',
     title: 'Public',
     content: 'Details',
-    start: '2028-02-28',
-    end: '2028-02-29',
+    start: '2028-02-28T17:30:00.000Z',
+    end: '2028-02-29T20:00:00.000Z',
   };
   const mapped = toPublicCalendarEvent(event);
-  assert.equal(mapped.end, '2028-03-01');
+  assert.equal(mapped.end, undefined);
+  assert.equal(mapped.title, '18:30 - Public');
   assert.equal(mapped.start, '2028-02-28');
   assert.equal(mapped.allDay, true);
   assert.equal(mapped.id, 'public-event-same-id');
   assert.equal(mapped.extendedProps.eventKind, 'publicEvent');
   assert.equal(
-    toPublicCalendarEvent({ ...event, start: '2026-12-31', end: null }).end,
+    toPublicCalendarEvent({
+      ...event,
+      start: '2026-12-31T23:30:00Z',
+      end: null,
+    }).start,
     '2027-01-01',
   );
 });
@@ -270,8 +275,8 @@ test('public calendar reads only event fields without staff access and validates
       id: 'public',
       title: 'Public',
       content: 'Details',
-      start: '2099-09-29',
-      end: '2099-10-03',
+      start: '2099-09-29T00:00:00.000Z',
+      end: '2099-10-03T00:00:00.000Z',
       details: publicEvent,
     },
   ]);
@@ -292,11 +297,10 @@ test('public calendar reads only event fields without staff access and validates
     updatedAt: true,
   });
   assert.deepEqual(query.where, {
-    eventStartDate: { not: null, lt: new Date('2099-11-01') },
-    OR: [
-      { eventEndDate: { gte: new Date('2099-10-01') } },
-      { eventEndDate: null, eventStartDate: { gte: new Date('2099-10-01') } },
-    ],
+    eventStartDate: {
+      gte: new Date('2099-09-30T22:00:00.000Z'),
+      lt: new Date('2099-10-31T23:00:00.000Z'),
+    },
   });
   for (const range of [
     { start: 'invalid', end: '2099-11-01' },
@@ -333,4 +337,37 @@ test('public closures preserve exclusive calendar end and inclusive detail dates
   assert.equal(event.extendedProps.publicEvent.content, 'Congés');
   assert.equal(event.extendedProps.eventKind, 'publicClosure');
   assert.equal(event.title, 'Fermeture : Congés');
+});
+
+test('event forms preserve Paris hours through creation and editing and reject reversed hours', () => {
+  const schedule = {
+    ...input,
+    eventStartDate: '2099-10-05T18:30',
+    eventEndDate: '2099-10-05T20:00',
+  };
+  const created = createEventSchema.parse(schedule);
+  assert.equal(
+    created.eventStartDate.toISOString(),
+    '2099-10-05T16:30:00.000Z',
+  );
+  assert.equal(created.eventEndDate.toISOString(), '2099-10-05T18:00:00.000Z');
+  const edited = updateEventSchema.parse({ ...created, id: 'event' });
+  assert.equal(
+    edited.eventStartDate.getTime(),
+    created.eventStartDate.getTime(),
+  );
+  assert.equal(
+    createEventSchema.safeParse({
+      ...schedule,
+      eventEndDate: '2099-10-05T18:00',
+    }).success,
+    false,
+  );
+  assert.equal(
+    createEventSchema.safeParse({
+      ...schedule,
+      eventStartDate: '2099-03-29T02:30',
+    }).success,
+    false,
+  );
 });

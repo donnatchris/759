@@ -1,3 +1,4 @@
+import { formatContentTime } from '@/lib/content-datetime';
 import { getContentPath } from '@/features/seo/lib/seo-pagination';
 import { isBlogEnabled } from '@/settings/settings.helpers';
 import Image from 'next/image';
@@ -5,7 +6,7 @@ import Link from 'next/link';
 import type { BlogPost } from '../lib/blog.types';
 import { EditBlogPostAdminButton } from './edit-blog-post-admin-button';
 import { DeleteBlogPost } from './delete-blog-post';
-import { formatBlogPostDateRange, formatBlogPostDate } from '../lib/blog.ui';
+import { formatBlogPostDate } from '../lib/blog.ui';
 import { Badge } from '@/components/ui/badge';
 
 type Props = {
@@ -23,10 +24,10 @@ export function BlogPostCard({ blogPost, detail = false }: Props) {
   const displayCreatedOrEditedDate = isEdited
     ? `Article mis à jour le ${editedAt}`
     : `Article publié le ${publishedAt}`;
-  const displayEventDateRange = formatBlogPostDateRange(
-    blogPost.eventStartDate,
-    blogPost.eventEndDate,
-  );
+  const dates = [
+    { label: 'Début', value: blogPost.eventStartDate },
+    { label: 'Fin', value: blogPost.eventEndDate },
+  ].filter((date) => date.value);
 
   return (
     <article className="relative grid overflow-hidden rounded-sm border border-border bg-card md:grid-cols-[18rem_1fr]">
@@ -55,10 +56,26 @@ export function BlogPostCard({ blogPost, detail = false }: Props) {
             />
           </div>
         )}
-        {displayEventDateRange && (
-          <p className="mt-6 font-heading text-xl font-medium text-heritage-gold">
-            {displayEventDateRange}
-          </p>
+        {dates.length > 0 && (
+          <dl className="mt-6 grid gap-5 text-heritage-gold">
+            {dates.map(({ label, value }) => (
+              <div key={label}>
+                <dt className="text-xs font-semibold uppercase tracking-widest text-heritage-paper/80">
+                  {label}
+                </dt>
+                <dd className="mt-2">
+                  <time dateTime={new Date(value!).toISOString()}>
+                    <span className="block font-heading text-xl font-medium">
+                      {formatBlogPostDate(value)}
+                    </span>
+                    <span className="mt-2 block text-base font-semibold tabular-nums">
+                      {formatContentTime(value!)}
+                    </span>
+                  </time>
+                </dd>
+              </div>
+            ))}
+          </dl>
         )}
       </aside>
       <div className="relative p-7 sm:p-10">

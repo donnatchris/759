@@ -408,7 +408,9 @@ test('opening-hours section disappears when disabled and renders again when enab
       }),
     );
     assert.ok(html.includes('Nos horaires'));
-    assert.ok(html.includes('Sur événement'));
+    assert.ok(!html.includes('Sur événement'));
+    assert.ok(html.includes('divide-y'));
+    assert.ok(html.includes('Fermé'));
   } finally {
     Module._load = loadWithBoundaries;
     Object.assign(SETTINGS.features, originalFlags);

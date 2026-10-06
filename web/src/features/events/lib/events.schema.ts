@@ -1,3 +1,4 @@
+import { parseContentDateTimeInput } from '@/lib/content-datetime';
 import { nullableInput } from '@/features/core';
 import { z } from 'zod';
 
@@ -48,14 +49,28 @@ export const eventSchema = z
       z.array(z.string().max(1000, { error: 'Un lien est trop long' })).max(20),
     ),
     eventStartDate: nullableInput(
-      z.coerce.date({
-        error: "La date de début de l'événement doit être une date valide",
-      }),
+      z.preprocess(
+        (value) =>
+          typeof value === 'string' &&
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)
+            ? parseContentDateTimeInput(value)
+            : value,
+        z.coerce.date({
+          error: "La date de début de l'événement doit être une date valide",
+        }),
+      ),
     ),
     eventEndDate: nullableInput(
-      z.coerce.date({
-        error: "La date de fin de l'événement doit être une date valide",
-      }),
+      z.preprocess(
+        (value) =>
+          typeof value === 'string' &&
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)
+            ? parseContentDateTimeInput(value)
+            : value,
+        z.coerce.date({
+          error: "La date de fin de l'événement doit être une date valide",
+        }),
+      ),
     ),
     displayStartDate: nullableInput(
       z.coerce.date({
