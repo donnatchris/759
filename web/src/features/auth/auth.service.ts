@@ -235,6 +235,7 @@ export async function deleteCurrentUserAccountService(): Promise<{
 
     const deletedUser = await deleteUserAccountInPrismaRepository({
       userId: session.user.id,
+      allowStaffDeletion: true,
     });
 
     await notifyAdminsAboutDeletedUser({
