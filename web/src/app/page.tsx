@@ -4,6 +4,7 @@ import {
   isHorairesEnabled,
   isMenuEnabled,
   isPrestationsEnabled,
+  isSignUpEnabled,
 } from '@/settings/settings.helpers';
 import { HomeEventsCalendar } from '@/features/events/components/home-events-calendar';
 import { Hero } from '@/components/landing-page/hero';
@@ -33,6 +34,9 @@ import {
 import { OpeningSlots } from '@/features/opening-slots';
 import { DishesSummary } from '@/features/dishes';
 import { MoreInfos } from '@/components/landing-page/more-infos';
+import { SignupInvitation } from '@/components/landing-page/signup-invitation';
+import { auth } from '@/features/auth/auth';
+import { headers } from 'next/headers';
 
 export default async function HomePage() {
   const [
@@ -48,6 +52,7 @@ export default async function HomePage() {
     openingClosures,
     openingSlotsPresentation,
     dishCategories,
+    session,
   ] = await Promise.all([
     getCachedSiteSettingsService(),
     isPrestationsEnabled()
@@ -75,6 +80,13 @@ export default async function HomePage() {
     isMenuEnabled()
       ? getCachedAllDishCategoriesService().catch(() => [])
       : Promise.resolve([]),
+    isSignUpEnabled()
+      ? headers()
+          .then((requestHeaders) =>
+            auth.api.getSession({ headers: requestHeaders }),
+          )
+          .catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   return (
@@ -86,6 +98,7 @@ export default async function HomePage() {
       )}
       <EventsPreview events={featuredEvents} />
       <Hero siteSettings={siteSettings} socialMedias={socialMedias} />
+      <SignupInvitation user={session?.user ?? null} />
       <Carousel images={carouselImages} />
       <Presentation presentation={presentation} />
       <DishesSummary dishCategories={dishCategories} />

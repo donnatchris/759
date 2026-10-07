@@ -8,6 +8,10 @@ export function isLoginEnabled() {
   return SETTINGS.features.login;
 }
 
+export function isGoogleAuthEnabled() {
+  return SETTINGS.features.googleAuth;
+}
+
 export function getSiteFullName() {
   return SETTINGS.site.fullName;
 }

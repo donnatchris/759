@@ -4,6 +4,7 @@ import { GoogleLoginButton } from '@/features/auth/components/google-login-butto
 import { AlreadyAuthenticatedMessage } from '@/features/auth/components/already-authenticated-message';
 import { auth } from '@/features/auth/auth';
 import { headers } from 'next/headers';
+import { isGoogleAuthEnabled } from '@/settings/settings.helpers';
 
 export default async function SignUpPage() {
   const session = await auth.api
@@ -12,7 +13,7 @@ export default async function SignUpPage() {
 
   if (session?.user) {
     return (
-      <main className="max-w-md h-screen flex items-center justify-center flex-col mx-auto p-6">
+      <main className="mx-auto flex min-h-[calc(100svh-5rem)] max-w-md flex-col items-center justify-center px-6 py-12">
         <AlreadyAuthenticatedMessage
           user={session.user}
           actionLabel="créer un nouveau compte"
@@ -22,13 +23,17 @@ export default async function SignUpPage() {
   }
 
   return (
-    <main className="max-w-md h-screen flex items-center justify-center flex-col mx-auto p-6 space-y-4">
+    <main className="mx-auto flex min-h-[calc(100svh-5rem)] max-w-md flex-col items-center justify-center gap-4 px-6 py-12">
       <h1 className="text-2xl font-bold">{'Créer un compte'}</h1>
       <SignUpForm />
-      <p className="text-sm text-muted-foreground">-- ou --</p>
-      <div className="flex items-center justify-center">
-        <GoogleLoginButton />
-      </div>
+      {isGoogleAuthEnabled() && (
+        <>
+          <p className="text-sm text-muted-foreground">-- ou --</p>
+          <div className="flex items-center justify-center">
+            <GoogleLoginButton />
+          </div>
+        </>
+      )}
       <p className="text-sm text-muted-foreground">
         {'Vous avez déjà un compte ?'}{' '}
         <Link href="/auth/sign-in" className="text-primary underline">

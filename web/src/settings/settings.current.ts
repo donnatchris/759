@@ -14,6 +14,7 @@ export const SETTINGS: TSettings = {
   },
   features: {
     signup: true,
+    googleAuth: false,
     login: true,
     umami: false,
     blog: true,

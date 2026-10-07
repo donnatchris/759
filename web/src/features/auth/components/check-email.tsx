@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { SETTINGS } from '@/settings/settings.current';
 
 export function CheckEmail() {
+  const siteName = SETTINGS.site.fullName;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 space-y-4 text-center max-w-2xl mx-auto h-full">
       <h1 className="text-2xl sm:text-3xl font-bold mb-4">
@@ -41,7 +44,7 @@ export function CheckEmail() {
         </ul>
       </div>
       <p className="text-center text-primary mt-4">
-        Merci et bienvenue chez Beauté d&apos;Orient !
+        Merci et bienvenue chez <strong>{siteName}</strong> !
       </p>
       <Button asChild variant="default" className="rounded-xl mt-6">
         <Link href="/auth/sign-in">Aller à la page de connexion</Link>

@@ -5,7 +5,10 @@ import { GoogleLoginButton } from '@/features/auth/components/google-login-butto
 import Link from 'next/link';
 import { useUser } from '@/features/auth/auth.context';
 import { AlreadyAuthenticatedMessage } from '@/features/auth/components/already-authenticated-message';
-import { isSignUpEnabled } from '@/settings/settings.helpers';
+import {
+  isGoogleAuthEnabled,
+  isSignUpEnabled,
+} from '@/settings/settings.helpers';
 
 export default function SignInPage() {
   const { user } = useUser();
@@ -25,14 +28,21 @@ export default function SignInPage() {
     <main className="max-w-md h-screen flex items-center justify-center flex-col mx-auto p-6 space-y-4">
       <h1 className="text-2xl font-bold">{'Connexion'}</h1>
       <SignInForm />
-      <p className="text-sm text-muted-foreground">-- ou --</p>
-      <div className="flex items-center justify-center">
-        <GoogleLoginButton />
-      </div>
+      {isGoogleAuthEnabled() && (
+        <>
+          <p className="text-sm text-muted-foreground">-- ou --</p>
+          <div className="flex items-center justify-center">
+            <GoogleLoginButton />
+          </div>
+        </>
+      )}
       {isSignUpEnabled() ? (
-        <p className="text-muted-foreground">
+        <p className="text-lg font font-semibold">
           {'Pas encore de compte ?'}{' '}
-          <Link href="/auth/sign-up" className="text-primary underline">
+          <Link
+            href="/auth/sign-up"
+            className="text-accent underline font-medium"
+          >
             {"S'inscrire"}
           </Link>
         </p>

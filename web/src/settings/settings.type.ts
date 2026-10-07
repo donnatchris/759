@@ -8,6 +8,7 @@ export type TSite = {
 
 export type TFeatures = {
   signup: boolean;
+  googleAuth: boolean;
   login: boolean;
   umami: boolean;
   blog: boolean;
