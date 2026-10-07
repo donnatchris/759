@@ -2,6 +2,12 @@ import type { TServerResponse } from '../server/server.response';
 import { ERROR_CODES, TErrorCode } from './error.handling';
 
 const ERROR_MESSAGES: Record<TErrorCode, string> = {
+  [ERROR_CODES.INVITATION_INVALID]:
+    'Cette invitation est invalide, expirée ou déjà utilisée. Demandez un nouveau lien.',
+  [ERROR_CODES.INVITATION_SEND_FAILED]:
+    'L’invitation n’a pas pu être envoyée. Veuillez réessayer.',
+  [ERROR_CODES.INVITATION_TOO_RECENT]:
+    'Veuillez patienter une minute avant de renvoyer une invitation à cette adresse.',
   [ERROR_CODES.UNAUTHORIZED]:
     'Vous devez être connecté pour accéder à cette ressource.',
   [ERROR_CODES.FORBIDDEN]:

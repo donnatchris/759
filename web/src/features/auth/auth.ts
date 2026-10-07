@@ -1,3 +1,4 @@
+import { isVerifiedInvitationSignup } from './invitation-signup.context';
 import { APIError, betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '@prisma/client';
@@ -14,6 +15,7 @@ type SendVerificationEmailParams = {
     id: string;
     email: string;
     name?: string | null;
+    emailVerified: boolean;
   };
   url: string;
   token: string;
@@ -73,6 +75,8 @@ export const auth = betterAuth({
       user,
       url,
     }: SendVerificationEmailParams) => {
+      // Invitation signup already proves ownership of this address.
+      if (user.emailVerified) return;
       await sendAuthVerificationEmail({ user, url });
     },
   },
@@ -161,6 +165,11 @@ export const auth = betterAuth({
           return {
             data: {
               ...user,
+              emailVerified:
+                path === '/sign-up/email' &&
+                isVerifiedInvitationSignup(user.email)
+                  ? true
+                  : user.emailVerified,
               legalTermsAccepted: true,
               legalTermsAcceptedAt: new Date(),
               acceptedLegalTermsId: legalTerms.id,

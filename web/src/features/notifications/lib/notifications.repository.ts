@@ -5,6 +5,7 @@ import type {
   TMarkNotificationAsReadOutput,
 } from './notifications.schema';
 import type { TNotificationsPagination } from './notifications.types';
+import { isPrestationsEnabled } from '@/settings/settings.helpers';
 
 type TCreateNewUserNotificationData = {
   userId: string;
@@ -201,14 +202,16 @@ export async function createAdminNewUserNotificationsInPrismaRepository(
 export async function createNewUserWelcomeNotificationInPrismaRepository(
   data: TCreateNewUserNotificationData,
 ): Promise<void> {
+  const content = isPrestationsEnabled()
+    ? 'Votre compte a bien été créé. Vous pouvez désormais gérer vos informations et vos réservations depuis votre compte.'
+    : 'Votre compte a bien été créé. Vous pouvez désormais gérer vos informations depuis votre compte.';
   try {
     await prisma.notification.create({
       data: {
         userId: data.userId,
         type: 'NEW_USER_WELCOME',
         title: 'Bienvenue',
-        content:
-          'Votre compte a bien été créé. Vous pouvez désormais gérer vos informations et vos réservations depuis votre compte.',
+        content: content,
       },
     });
   } catch (error) {

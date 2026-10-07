@@ -1,3 +1,5 @@
+import { InviteUserForm } from '@/features/auth/components/admin-users/invite-user.form';
+import { getCurrentUserPermissionsService } from '@/features/permission/lib/permission.service';
 import { ManageUsers } from '@/features/auth/components/admin-users/manage-users';
 import {
   getAdminBannedEmailsService,
@@ -6,9 +8,10 @@ import {
 import { BackLink } from '@/components/custom-ui/back-link';
 
 export default async function AdminUsersPage() {
-  const [users, bannedEmails] = await Promise.all([
+  const [users, bannedEmails, currentUser] = await Promise.all([
     getAdminUsersService(),
     getAdminBannedEmailsService(),
+    getCurrentUserPermissionsService(),
   ]);
   const userAccounts = users.filter((user) => user.role === 'USER');
   const memberAccounts = users.filter((user) => user.role === 'MEMBER');
@@ -25,6 +28,8 @@ export default async function AdminUsersPage() {
       <h1 className="mb-8 p-4 text-center font-brand text-4xl font-bold tracking-wide text-primary sm:text-6xl">
         Utilisateurs
       </h1>
+      {(currentUser.role === 'ADMIN' ||
+        currentUser.permissions?.canManageUsers) && <InviteUserForm />}
       <ManageUsers
         initialUsers={userAccounts}
         initialStaff={staffAccounts}

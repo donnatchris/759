@@ -595,3 +595,16 @@ model MarketingEmailDispatchClock {
     nextSlotAt DateTime
     @@map("marketing_email_dispatch_clock")
 }
+
+// Application invitations are separate from Better Auth verification tokens.
+model UserInvitation {
+    id String @id @default(uuid())
+    email String @unique
+    tokenHash String @unique
+    expiresAt DateTime
+    usedAt DateTime?
+    invitedByUserId String
+    createdAt DateTime @default(now())
+
+    @@map("user_invitation")
+}
