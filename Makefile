@@ -4,22 +4,9 @@ YELLOW=\033[33m
 BLUE=\033[34m
 RESET=\033[0m
 
-# Initialisation de l'environnement de développement
-
-dev-init:
-	@sh scripts/dev-init.sh
-
-# Tâches de développement avec Docker pour la db en local
-dev-local:
-	@sh scripts/dev-run-local.sh
-
-dev-prod:
-	@printf "\n$(YELLOW)Lancement de l'environnement de production...$(RESET)\n" && \
-	printf "\n$(YELLOW)Installation des dépendances...$(RESET)\n" && \
-	(cd web && npm ci) && \
-	printf "\n$(YELLOW)Démarrage de l'application Next.js...$(RESET)\n" && \
-	set -a; . ./web/.env; set +a; \
-	cd web && DATABASE_URL="$$DATABASE_DISTANT_URL" npm run dev
+###################################################################################################
+# Stop and clean development environment
+###################################################################################################
 
 dev-stop:
 	@printf "\n$(YELLOW)Arrêt de l'environnement de développement...$(RESET)\n"
@@ -34,6 +21,65 @@ dev-stop:
 	fi; \
 	$$DC -f docker-compose.dev.yml down --remove-orphans; \
 	printf "\n$(GREEN)Conteneurs de développement arrêtés, volumes conservés.$(RESET)\n"
+
+git-status:
+	@printf "$(YELLOW)Vérification de l'état du dépôt\n$(RESET)"
+	@git fetch --quiet
+	@GIT_STATUS=$$(git status --porcelain); \
+	if [ -n "$$GIT_STATUS" ]; then \
+		printf "$(RED)ABORTED: Repository is not clean.\n$(RESET)"; \
+		exit 1; \
+	fi
+	@if ! git rev-parse --verify '@{upstream}' >/dev/null 2>&1; then \
+		printf "$(RED)ABORTED: No upstream branch configured.\n$(RESET)"; \
+		exit 1; \
+	fi
+	@if [ "$$(git rev-parse HEAD)" != "$$(git rev-parse '@{upstream}')" ]; then \
+		printf "$(RED)ABORTED: Repository is not synchronized with remote.\n$(RESET)"; \
+		exit 1; \
+	fi
+	@printf "$(GREEN)Repository clean and synchronized.\n$(RESET)"
+
+clean-tracked: git-status
+	@printf "$(YELLOW)Suppression of tracked files\n$(RESET)"
+	@git ls-files -z -- ':!Makefile' | xargs -0 rm -f --
+	@printf "$(GREEN)Tracked files removed.\n$(RESET)"
+
+clean: dev-stop
+	@printf "\n$(YELLOW)Suppression des dépendances et fichiers régénérables...$(RESET)\n"
+	@rm -rf web/node_modules web/.next web/out web/dist web/build web/coverage web/.cache
+	@rm -f web/*.tsbuildinfo web/.eslintcache
+	@printf "\n$(GREEN)Nettoyage terminé. Pour relancer : make dev-local$(RESET)\n"
+
+clean-all: clean clean-tracked
+	@printf "$(GREEN)All tracked files have been removed. Restore with 'git restore .'\n$(RESET)"
+
+git-restore:
+	@printf "$(YELLOW)Restoring tracked files\n$(RESET)"
+	@git restore .
+	@printf "$(GREEN)Tracked files restored.\n$(RESET)"
+
+###################################################################################################
+# Initialisation de l'environnement de développement
+###################################################################################################
+
+dev-init:
+	@sh scripts/dev-init.sh
+
+###################################################################################################
+# Tâches de développement avec Docker pour la db en local
+###################################################################################################
+
+dev-local:
+	@sh scripts/dev-run-local.sh
+
+dev-prod:
+	@printf "\n$(YELLOW)Lancement de l'environnement de production...$(RESET)\n" && \
+	printf "\n$(YELLOW)Installation des dépendances...$(RESET)\n" && \
+	(cd web && npm ci) && \
+	printf "\n$(YELLOW)Démarrage de l'application Next.js...$(RESET)\n" && \
+	set -a; . ./web/.env; set +a; \
+	cd web && DATABASE_URL="$$DATABASE_DISTANT_URL" npm run dev
 
 db-local-studio:
 	@printf "\n$(YELLOW)Lancement de prisma studio sur la base locale...$(RESET)\n"
@@ -103,14 +149,6 @@ convert-images:
 	@printf "\n$(GREEN)Conversion des images terminée avec succès !$(RESET)\n"
 
 # Tâches de développement
-
-# Arrêter le serveur Next.js local (Ctrl+C) avant de lancer cette cible.
-# Conserver les volumes PostgreSQL, les .env, les sources et package-lock.json.
-clean: dev-stop
-	@printf "\n$(YELLOW)Suppression des dépendances et fichiers régénérables...$(RESET)\n"
-	@rm -rf web/node_modules web/.next web/out web/dist web/build web/coverage web/.cache
-	@rm -f web/*.tsbuildinfo web/.eslintcache
-	@printf "\n$(GREEN)Nettoyage terminé. Pour relancer : make dev-local$(RESET)\n"
 
 format:
 	@printf "\n$(YELLOW)Formattage du code avec Prettier...$(RESET)\n"
