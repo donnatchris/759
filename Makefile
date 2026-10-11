@@ -181,4 +181,4 @@ push: check
 
 
 
-.PHONY: format lint typecheck check push dev-init dev-run dev-stop db-studio db-local-migrate db-prod-migrate db-seed-data db-seed-data-local db-seed-user db-local-seed-user generate-favicons convert-images clean dev-run-local
+.PHONY: format lint typecheck check push dev-init dev-run dev-stop db-studio db-local-migrate db-prod-migrate db-seed-data db-seed-data-local db-seed-user db-local-seed-user generate-favicons convert-images clean dev-run-local git-status clean-tracked clean-all git-restore dev-local dev-prod db-local-studio db-prod-studio db-local-migrate db-prod-migrate db-local-seed-data db-prod-seed-data db-local-seed-user db-prod-seed-user mail-local mail-prod
